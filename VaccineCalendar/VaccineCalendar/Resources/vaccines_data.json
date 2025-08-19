@@ -1,0 +1,356 @@
+{
+  "russia": {
+    "mandatory": [
+      {
+        "id": "bcg_birth",
+        "name": "БЦЖ",
+        "disease": "Туберкулез",
+        "ageInMonths": 0,
+        "ageDescription": "Новорожденные (3-7 день)",
+        "isMandatory": true,
+        "description": "Вакцинация против туберкулеза",
+        "notes": "Делается в роддоме на 3-7 день жизни"
+      },
+      {
+        "id": "hepb_birth",
+        "name": "Гепатит B (1-я доза)",
+        "disease": "Гепатит B",
+        "ageInMonths": 0,
+        "ageDescription": "Новорожденные (первые 24 часа)",
+        "isMandatory": true,
+        "description": "Первая вакцинация против вирусного гепатита B",
+        "notes": "В первые 24 часа жизни"
+      },
+      {
+        "id": "hepb_1month",
+        "name": "Гепатит B (2-я доза)",
+        "disease": "Гепатит B",
+        "ageInMonths": 1,
+        "ageDescription": "1 месяц",
+        "isMandatory": true,
+        "description": "Вторая вакцинация против вирусного гепатита B"
+      },
+      {
+        "id": "hepb_2months",
+        "name": "Гепатит B (3-я доза) группы риска",
+        "disease": "Гепатит B",
+        "ageInMonths": 2,
+        "ageDescription": "2 месяца",
+        "isMandatory": false,
+        "description": "Третья вакцинация против вирусного гепатита B (группы риска)"
+      },
+      {
+        "id": "pneumo_2months",
+        "name": "Пневмококковая инфекция (1-я доза)",
+        "disease": "Пневмококковая инфекция",
+        "ageInMonths": 2,
+        "ageDescription": "2 месяца",
+        "isMandatory": true,
+        "description": "Первая вакцинация против пневмококковой инфекции"
+      },
+      {
+        "id": "dtp_3months",
+        "name": "АКДС (1-я доза)",
+        "disease": "Коклюш, дифтерия, столбняк",
+        "ageInMonths": 3,
+        "ageDescription": "3 месяца",
+        "isMandatory": true,
+        "description": "Первая вакцинация против коклюша, дифтерии, столбняка"
+      },
+      {
+        "id": "polio_3months",
+        "name": "Полиомиелит (1-я доза)",
+        "disease": "Полиомиелит",
+        "ageInMonths": 3,
+        "ageDescription": "3 месяца",
+        "isMandatory": true,
+        "description": "Первая вакцинация против полиомиелита"
+      },
+      {
+        "id": "hib_3months",
+        "name": "Гемофильная инфекция (1-я доза)",
+        "disease": "Гемофильная инфекция типа b",
+        "ageInMonths": 3,
+        "ageDescription": "3 месяца",
+        "isMandatory": true,
+        "description": "Первая вакцинация против гемофильной инфекции (группы риска)",
+        "notes": "Для детей из групп риска"
+      },
+      {
+        "id": "dtp_4months",
+        "name": "АКДС (2-я доза)",
+        "disease": "Коклюш, дифтерия, столбняк",
+        "ageInMonths": 4,
+        "ageDescription": "4,5 месяца",
+        "isMandatory": true,
+        "description": "Вторая вакцинация против коклюша, дифтерии, столбняка"
+      },
+      {
+        "id": "polio_4months",
+        "name": "Полиомиелит (2-я доза)",
+        "disease": "Полиомиелит",
+        "ageInMonths": 4,
+        "ageDescription": "4,5 месяца",
+        "isMandatory": true,
+        "description": "Вторая вакцинация против полиомиелита"
+      },
+      {
+        "id": "hib_4months",
+        "name": "Гемофильная инфекция (2-я доза)",
+        "disease": "Гемофильная инфекция типа b",
+        "ageInMonths": 4,
+        "ageDescription": "4,5 месяца",
+        "isMandatory": true,
+        "description": "Вторая вакцинация против гемофильной инфекции (группы риска)"
+      },
+      {
+        "id": "pneumo_4months",
+        "name": "Пневмококковая инфекция (2-я доза)",
+        "disease": "Пневмококковая инфекция",
+        "ageInMonths": 4,
+        "ageDescription": "4,5 месяца",
+        "isMandatory": true,
+        "description": "Вторая вакцинация против пневмококковой инфекции"
+      },
+      {
+        "id": "dtp_6months",
+        "name": "АКДС (3-я доза)",
+        "disease": "Коклюш, дифтерия, столбняк",
+        "ageInMonths": 6,
+        "ageDescription": "6 месяцев",
+        "isMandatory": true,
+        "description": "Третья вакцинация против коклюша, дифтерии, столбняка"
+      },
+      {
+        "id": "polio_6months",
+        "name": "Полиомиелит (3-я доза)",
+        "disease": "Полиомиелит",
+        "ageInMonths": 6,
+        "ageDescription": "6 месяцев",
+        "isMandatory": true,
+        "description": "Третья вакцинация против полиомиелита (живая вакцина)"
+      },
+      {
+        "id": "hepb_6months",
+        "name": "Гепатит B (3-я доза)",
+        "disease": "Гепатит B",
+        "ageInMonths": 6,
+        "ageDescription": "6 месяцев",
+        "isMandatory": true,
+        "description": "Третья вакцинация против вирусного гепатита B"
+      },
+      {
+        "id": "hib_6months",
+        "name": "Гемофильная инфекция (3-я доза)",
+        "disease": "Гемофильная инфекция типа b",
+        "ageInMonths": 6,
+        "ageDescription": "6 месяцев",
+        "isMandatory": true,
+        "description": "Третья вакцинация против гемофильной инфекции (группы риска)"
+      },
+      {
+        "id": "mmr_12months",
+        "name": "КПК",
+        "disease": "Корь, краснуха, паротит",
+        "ageInMonths": 12,
+        "ageDescription": "12 месяцев",
+        "isMandatory": true,
+        "description": "Вакцинация против кори, краснухи, эпидемического паротита"
+      },
+      {
+        "id": "hepb_12months",
+        "name": "Гепатит B (4-я доза) группы риска",
+        "disease": "Гепатит B",
+        "ageInMonths": 12,
+        "ageDescription": "12 месяцев",
+        "isMandatory": false,
+        "description": "Четвертая вакцинация против вирусного гепатита B (группы риска)"
+      },
+      {
+        "id": "pneumo_15months",
+        "name": "Пневмококковая инфекция (ревакцинация)",
+        "disease": "Пневмококковая инфекция",
+        "ageInMonths": 15,
+        "ageDescription": "15 месяцев",
+        "isMandatory": true,
+        "description": "Ревакцинация против пневмококковой инфекции"
+      },
+      {
+        "id": "dtp_18months",
+        "name": "АКДС (ревакцинация 1)",
+        "disease": "Коклюш, дифтерия, столбняк",
+        "ageInMonths": 18,
+        "ageDescription": "18 месяцев",
+        "isMandatory": true,
+        "description": "Первая ревакцинация против коклюша, дифтерии, столбняка"
+      },
+      {
+        "id": "polio_18months",
+        "name": "Полиомиелит (ревакцинация 1)",
+        "disease": "Полиомиелит",
+        "ageInMonths": 18,
+        "ageDescription": "18 месяцев",
+        "isMandatory": true,
+        "description": "Первая ревакцинация против полиомиелита"
+      },
+      {
+        "id": "hib_18months",
+        "name": "Гемофильная инфекция (ревакцинация)",
+        "disease": "Гемофильная инфекция типа b",
+        "ageInMonths": 18,
+        "ageDescription": "18 месяцев",
+        "isMandatory": true,
+        "description": "Ревакцинация против гемофильной инфекции (группы риска)"
+      },
+      {
+        "id": "polio_20months",
+        "name": "Полиомиелит (ревакцинация 2)",
+        "disease": "Полиомиелит",
+        "ageInMonths": 20,
+        "ageDescription": "20 месяцев",
+        "isMandatory": true,
+        "description": "Вторая ревакцинация против полиомиелита"
+      },
+      {
+        "id": "mmr_6years",
+        "name": "КПК (ревакцинация)",
+        "disease": "Корь, краснуха, паротит",
+        "ageInMonths": 72,
+        "ageDescription": "6 лет",
+        "isMandatory": true,
+        "description": "Ревакцинация против кори, краснухи, эпидемического паротита"
+      },
+      {
+        "id": "dt_6years",
+        "name": "АДС-М (ревакцинация 2)",
+        "disease": "Дифтерия, столбняк",
+        "ageInMonths": 84,
+        "ageDescription": "6-7 лет",
+        "isMandatory": true,
+        "description": "Вторая ревакцинация против дифтерии, столбняка"
+      },
+      {
+        "id": "bcg_7years",
+        "name": "БЦЖ (ревакцинация)",
+        "disease": "Туберкулез",
+        "ageInMonths": 84,
+        "ageDescription": "6-7 лет",
+        "isMandatory": true,
+        "description": "Ревакцинация против туберкулеза",
+        "notes": "При отрицательной реакции Манту"
+      },
+      {
+        "id": "dt_14years",
+        "name": "АДС-М (ревакцинация 3)",
+        "disease": "Дифтерия, столбняк",
+        "ageInMonths": 168,
+        "ageDescription": "14 лет",
+        "isMandatory": true,
+        "description": "Третья ревакцинация против дифтерии, столбняка"
+      },
+      {
+        "id": "polio_14years",
+        "name": "Полиомиелит (ревакцинация 3)",
+        "disease": "Полиомиелит",
+        "ageInMonths": 168,
+        "ageDescription": "14 лет",
+        "isMandatory": true,
+        "description": "Третья ревакцинация против полиомиелита"
+      }
+    ],
+    "recommended": [
+      {
+        "id": "rotavirus_2months",
+        "name": "Ротавирусная инфекция (1-я доза)",
+        "disease": "Ротавирусная инфекция",
+        "ageInMonths": 2,
+        "ageDescription": "2 месяца",
+        "isMandatory": false,
+        "description": "Первая вакцинация против ротавирусной инфекции"
+      },
+      {
+        "id": "rotavirus_3months",
+        "name": "Ротавирусная инфекция (2-я доза)",
+        "disease": "Ротавирусная инфекция",
+        "ageInMonths": 3,
+        "ageDescription": "3 месяца",
+        "isMandatory": false,
+        "description": "Вторая вакцинация против ротавирусной инфекции"
+      },
+      {
+        "id": "rotavirus_4months",
+        "name": "Ротавирусная инфекция (3-я доза)",
+        "disease": "Ротавирусная инфекция",
+        "ageInMonths": 4,
+        "ageDescription": "4,5 месяца",
+        "isMandatory": false,
+        "description": "Третья вакцинация против ротавирусной инфекции"
+      },
+      {
+        "id": "varicella_12months",
+        "name": "Ветряная оспа (1-я доза)",
+        "disease": "Ветряная оспа",
+        "ageInMonths": 12,
+        "ageDescription": "12 месяцев",
+        "isMandatory": false,
+        "description": "Вакцинация против ветряной оспы"
+      },
+      {
+        "id": "hepa_12months",
+        "name": "Гепатит А (1-я доза)",
+        "disease": "Гепатит А",
+        "ageInMonths": 12,
+        "ageDescription": "12 месяцев",
+        "isMandatory": false,
+        "description": "Первая вакцинация против гепатита А"
+      },
+      {
+        "id": "hepa_18months",
+        "name": "Гепатит А (2-я доза)",
+        "disease": "Гепатит А",
+        "ageInMonths": 18,
+        "ageDescription": "18 месяцев",
+        "isMandatory": false,
+        "description": "Вторая вакцинация против гепатита А"
+      },
+      {
+        "id": "meningococcal_9months",
+        "name": "Менингококковая инфекция",
+        "disease": "Менингококковая инфекция",
+        "ageInMonths": 9,
+        "ageDescription": "9 месяцев",
+        "isMandatory": false,
+        "description": "Вакцинация против менингококковой инфекции"
+      },
+      {
+        "id": "tick_encephalitis_12months",
+        "name": "Клещевой энцефалит (1-я доза)",
+        "disease": "Клещевой энцефалит",
+        "ageInMonths": 12,
+        "ageDescription": "С 12 месяцев",
+        "isMandatory": false,
+        "description": "Первая вакцинация против клещевого энцефалита",
+        "notes": "Для эндемичных регионов"
+      },
+      {
+        "id": "flu_6months",
+        "name": "Грипп",
+        "disease": "Грипп",
+        "ageInMonths": 6,
+        "ageDescription": "С 6 месяцев ежегодно",
+        "isMandatory": false,
+        "description": "Ежегодная вакцинация против гриппа"
+      },
+      {
+        "id": "hpv_9years",
+        "name": "ВПЧ",
+        "disease": "Вирус папилломы человека",
+        "ageInMonths": 108,
+        "ageDescription": "С 9 лет",
+        "isMandatory": false,
+        "description": "Вакцинация против вируса папилломы человека",
+        "notes": "Рекомендуется девочкам"
+      }
+    ]
+  }
+}
