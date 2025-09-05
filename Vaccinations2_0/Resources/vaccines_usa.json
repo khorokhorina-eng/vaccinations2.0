@@ -1,0 +1,368 @@
+{
+  "usa": {
+    "mandatory": [
+      {
+        "id": "hepb_birth_usa",
+        "name": "Hepatitis B (1st dose)",
+        "disease": "Hepatitis B",
+        "ageInMonths": 0,
+        "ageDescription": "Birth",
+        "isMandatory": true,
+        "description": "First dose of Hepatitis B vaccine",
+        "notes": "Given within 24 hours of birth"
+      },
+      {
+        "id": "hepb_2month_usa",
+        "name": "Hepatitis B (2nd dose)",
+        "disease": "Hepatitis B",
+        "ageInMonths": 2,
+        "ageDescription": "1-2 months",
+        "isMandatory": true,
+        "description": "Second dose of Hepatitis B vaccine",
+        "notes": "Given at 1-2 months of age"
+      },
+      {
+        "id": "rotavirus_2month_usa",
+        "name": "Rotavirus (RV) - 1st dose",
+        "disease": "Rotavirus",
+        "ageInMonths": 2,
+        "ageDescription": "2 months",
+        "isMandatory": true,
+        "description": "First dose of Rotavirus vaccine",
+        "notes": "RV1 (2-dose series); RV5 (3-dose series)"
+      },
+      {
+        "id": "dtap_2month_usa",
+        "name": "DTaP (1st dose)",
+        "disease": "Diphtheria, Tetanus, Pertussis",
+        "ageInMonths": 2,
+        "ageDescription": "2 months",
+        "isMandatory": true,
+        "description": "First dose of DTaP vaccine",
+        "notes": "Protects against diphtheria, tetanus, and pertussis"
+      },
+      {
+        "id": "hib_2month_usa",
+        "name": "Hib (1st dose)",
+        "disease": "Haemophilus influenzae type b",
+        "ageInMonths": 2,
+        "ageDescription": "2 months",
+        "isMandatory": true,
+        "description": "First dose of Hib vaccine",
+        "notes": "Prevents Haemophilus influenzae type b disease"
+      },
+      {
+        "id": "pcv13_2month_usa",
+        "name": "PCV13 (1st dose)",
+        "disease": "Pneumococcal disease",
+        "ageInMonths": 2,
+        "ageDescription": "2 months",
+        "isMandatory": true,
+        "description": "First dose of Pneumococcal conjugate vaccine",
+        "notes": "Protects against 13 types of pneumococcal bacteria"
+      },
+      {
+        "id": "ipv_2month_usa",
+        "name": "IPV (1st dose)",
+        "disease": "Polio",
+        "ageInMonths": 2,
+        "ageDescription": "2 months",
+        "isMandatory": true,
+        "description": "First dose of Inactivated Poliovirus vaccine",
+        "notes": "Protects against polio"
+      },
+      {
+        "id": "rotavirus_4month_usa",
+        "name": "Rotavirus (RV) - 2nd dose",
+        "disease": "Rotavirus",
+        "ageInMonths": 4,
+        "ageDescription": "4 months",
+        "isMandatory": true,
+        "description": "Second dose of Rotavirus vaccine",
+        "notes": "RV1 (2-dose series); RV5 (3-dose series)"
+      },
+      {
+        "id": "dtap_4month_usa",
+        "name": "DTaP (2nd dose)",
+        "disease": "Diphtheria, Tetanus, Pertussis",
+        "ageInMonths": 4,
+        "ageDescription": "4 months",
+        "isMandatory": true,
+        "description": "Second dose of DTaP vaccine",
+        "notes": "Protects against diphtheria, tetanus, and pertussis"
+      },
+      {
+        "id": "hib_4month_usa",
+        "name": "Hib (2nd dose)",
+        "disease": "Haemophilus influenzae type b",
+        "ageInMonths": 4,
+        "ageDescription": "4 months",
+        "isMandatory": true,
+        "description": "Second dose of Hib vaccine",
+        "notes": "Prevents Haemophilus influenzae type b disease"
+      },
+      {
+        "id": "pcv13_4month_usa",
+        "name": "PCV13 (2nd dose)",
+        "disease": "Pneumococcal disease",
+        "ageInMonths": 4,
+        "ageDescription": "4 months",
+        "isMandatory": true,
+        "description": "Second dose of Pneumococcal conjugate vaccine",
+        "notes": "Protects against 13 types of pneumococcal bacteria"
+      },
+      {
+        "id": "ipv_4month_usa",
+        "name": "IPV (2nd dose)",
+        "disease": "Polio",
+        "ageInMonths": 4,
+        "ageDescription": "4 months",
+        "isMandatory": true,
+        "description": "Second dose of Inactivated Poliovirus vaccine",
+        "notes": "Protects against polio"
+      },
+      {
+        "id": "rotavirus_6month_usa",
+        "name": "Rotavirus (RV) - 3rd dose",
+        "disease": "Rotavirus",
+        "ageInMonths": 6,
+        "ageDescription": "6 months",
+        "isMandatory": true,
+        "description": "Third dose of Rotavirus vaccine (if needed)",
+        "notes": "Only for RV5 (3-dose series)"
+      },
+      {
+        "id": "dtap_6month_usa",
+        "name": "DTaP (3rd dose)",
+        "disease": "Diphtheria, Tetanus, Pertussis",
+        "ageInMonths": 6,
+        "ageDescription": "6 months",
+        "isMandatory": true,
+        "description": "Third dose of DTaP vaccine",
+        "notes": "Protects against diphtheria, tetanus, and pertussis"
+      },
+      {
+        "id": "hib_6month_usa",
+        "name": "Hib (3rd dose)",
+        "disease": "Haemophilus influenzae type b",
+        "ageInMonths": 6,
+        "ageDescription": "6 months",
+        "isMandatory": true,
+        "description": "Third dose of Hib vaccine (if needed)",
+        "notes": "Depends on vaccine brand"
+      },
+      {
+        "id": "pcv13_6month_usa",
+        "name": "PCV13 (3rd dose)",
+        "disease": "Pneumococcal disease",
+        "ageInMonths": 6,
+        "ageDescription": "6 months",
+        "isMandatory": true,
+        "description": "Third dose of Pneumococcal conjugate vaccine",
+        "notes": "Protects against 13 types of pneumococcal bacteria"
+      },
+      {
+        "id": "hepb_6month_usa",
+        "name": "Hepatitis B (3rd dose)",
+        "disease": "Hepatitis B",
+        "ageInMonths": 6,
+        "ageDescription": "6-18 months",
+        "isMandatory": true,
+        "description": "Third dose of Hepatitis B vaccine",
+        "notes": "Given between 6-18 months of age"
+      },
+      {
+        "id": "influenza_6month_usa",
+        "name": "Influenza (yearly)",
+        "disease": "Influenza",
+        "ageInMonths": 6,
+        "ageDescription": "6 months and yearly",
+        "isMandatory": true,
+        "description": "Annual flu vaccine",
+        "notes": "Given yearly starting at 6 months"
+      },
+      {
+        "id": "mmr_12month_usa",
+        "name": "MMR (1st dose)",
+        "disease": "Measles, Mumps, Rubella",
+        "ageInMonths": 12,
+        "ageDescription": "12-15 months",
+        "isMandatory": true,
+        "description": "First dose of MMR vaccine",
+        "notes": "Protects against measles, mumps, and rubella"
+      },
+      {
+        "id": "varicella_12month_usa",
+        "name": "Varicella (1st dose)",
+        "disease": "Chickenpox",
+        "ageInMonths": 12,
+        "ageDescription": "12-15 months",
+        "isMandatory": true,
+        "description": "First dose of Varicella vaccine",
+        "notes": "Protects against chickenpox"
+      },
+      {
+        "id": "hib_12month_usa",
+        "name": "Hib (4th dose)",
+        "disease": "Haemophilus influenzae type b",
+        "ageInMonths": 12,
+        "ageDescription": "12-15 months",
+        "isMandatory": true,
+        "description": "Fourth dose of Hib vaccine",
+        "notes": "Final dose in the series"
+      },
+      {
+        "id": "pcv13_12month_usa",
+        "name": "PCV13 (4th dose)",
+        "disease": "Pneumococcal disease",
+        "ageInMonths": 12,
+        "ageDescription": "12-15 months",
+        "isMandatory": true,
+        "description": "Fourth dose of Pneumococcal conjugate vaccine",
+        "notes": "Final dose in the series"
+      },
+      {
+        "id": "hepa_12month_usa",
+        "name": "Hepatitis A (1st dose)",
+        "disease": "Hepatitis A",
+        "ageInMonths": 12,
+        "ageDescription": "12-23 months",
+        "isMandatory": true,
+        "description": "First dose of Hepatitis A vaccine",
+        "notes": "2-dose series"
+      },
+      {
+        "id": "dtap_15month_usa",
+        "name": "DTaP (4th dose)",
+        "disease": "Diphtheria, Tetanus, Pertussis",
+        "ageInMonths": 15,
+        "ageDescription": "15-18 months",
+        "isMandatory": true,
+        "description": "Fourth dose of DTaP vaccine",
+        "notes": "Protects against diphtheria, tetanus, and pertussis"
+      },
+      {
+        "id": "hepa_18month_usa",
+        "name": "Hepatitis A (2nd dose)",
+        "disease": "Hepatitis A",
+        "ageInMonths": 18,
+        "ageDescription": "18 months",
+        "isMandatory": true,
+        "description": "Second dose of Hepatitis A vaccine",
+        "notes": "Given 6 months after first dose"
+      },
+      {
+        "id": "dtap_48month_usa",
+        "name": "DTaP (5th dose)",
+        "disease": "Diphtheria, Tetanus, Pertussis",
+        "ageInMonths": 48,
+        "ageDescription": "4-6 years",
+        "isMandatory": true,
+        "description": "Fifth dose of DTaP vaccine",
+        "notes": "Final dose before adolescence"
+      },
+      {
+        "id": "ipv_48month_usa",
+        "name": "IPV (3rd dose)",
+        "disease": "Polio",
+        "ageInMonths": 48,
+        "ageDescription": "4-6 years",
+        "isMandatory": true,
+        "description": "Third dose of Inactivated Poliovirus vaccine",
+        "notes": "Final dose in the series"
+      },
+      {
+        "id": "mmr_48month_usa",
+        "name": "MMR (2nd dose)",
+        "disease": "Measles, Mumps, Rubella",
+        "ageInMonths": 48,
+        "ageDescription": "4-6 years",
+        "isMandatory": true,
+        "description": "Second dose of MMR vaccine",
+        "notes": "Completes the MMR series"
+      },
+      {
+        "id": "varicella_48month_usa",
+        "name": "Varicella (2nd dose)",
+        "disease": "Chickenpox",
+        "ageInMonths": 48,
+        "ageDescription": "4-6 years",
+        "isMandatory": true,
+        "description": "Second dose of Varicella vaccine",
+        "notes": "Completes the varicella series"
+      },
+      {
+        "id": "tdap_132month_usa",
+        "name": "Tdap",
+        "disease": "Tetanus, Diphtheria, Pertussis",
+        "ageInMonths": 132,
+        "ageDescription": "11-12 years",
+        "isMandatory": true,
+        "description": "Tetanus, diphtheria, and pertussis booster",
+        "notes": "Adolescent booster dose"
+      },
+      {
+        "id": "hpv_132month_usa",
+        "name": "HPV (2-dose series)",
+        "disease": "Human Papillomavirus",
+        "ageInMonths": 132,
+        "ageDescription": "11-12 years",
+        "isMandatory": true,
+        "description": "Human Papillomavirus vaccine",
+        "notes": "2-dose series if started before age 15"
+      },
+      {
+        "id": "menacwy_132month_usa",
+        "name": "MenACWY (1st dose)",
+        "disease": "Meningococcal disease",
+        "ageInMonths": 132,
+        "ageDescription": "11-12 years",
+        "isMandatory": true,
+        "description": "First dose of Meningococcal conjugate vaccine",
+        "notes": "Protects against meningococcal disease"
+      },
+      {
+        "id": "menacwy_192month_usa",
+        "name": "MenACWY (2nd dose)",
+        "disease": "Meningococcal disease",
+        "ageInMonths": 192,
+        "ageDescription": "16 years",
+        "isMandatory": true,
+        "description": "Second dose of Meningococcal conjugate vaccine",
+        "notes": "Booster dose"
+      }
+    ],
+    "recommended": [
+      {
+        "id": "covid19_6month_usa",
+        "name": "COVID-19",
+        "disease": "COVID-19",
+        "ageInMonths": 6,
+        "ageDescription": "6 months and older",
+        "isMandatory": false,
+        "description": "COVID-19 vaccine",
+        "notes": "Recommended for all 6 months and older"
+      },
+      {
+        "id": "menb_192month_usa",
+        "name": "MenB",
+        "disease": "Meningococcal B",
+        "ageInMonths": 192,
+        "ageDescription": "16-18 years",
+        "isMandatory": false,
+        "description": "Meningococcal B vaccine",
+        "notes": "May be given based on clinical decision"
+      },
+      {
+        "id": "rsv_0month_usa",
+        "name": "RSV immunization",
+        "disease": "Respiratory Syncytial Virus",
+        "ageInMonths": 0,
+        "ageDescription": "Birth to 8 months",
+        "isMandatory": false,
+        "description": "RSV preventive antibody",
+        "notes": "For infants during RSV season"
+      }
+    ]
+  }
+}
