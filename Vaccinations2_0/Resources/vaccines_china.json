@@ -1,0 +1,398 @@
+{
+  "china": {
+    "mandatory": [
+      {
+        "id": "hepb_birth_cn",
+        "name": "乙肝疫苗 (Hepatitis B) - 1st dose",
+        "disease": "Hepatitis B",
+        "ageInMonths": 0,
+        "ageDescription": "Birth",
+        "isMandatory": true,
+        "description": "First dose of Hepatitis B vaccine",
+        "notes": "Within 24 hours after birth"
+      },
+      {
+        "id": "bcg_birth_cn",
+        "name": "卡介苗 (BCG)",
+        "disease": "Tuberculosis",
+        "ageInMonths": 0,
+        "ageDescription": "Birth",
+        "isMandatory": true,
+        "description": "BCG vaccine against tuberculosis",
+        "notes": "Given at birth"
+      },
+      {
+        "id": "hepb_1month_cn",
+        "name": "乙肝疫苗 (Hepatitis B) - 2nd dose",
+        "disease": "Hepatitis B",
+        "ageInMonths": 1,
+        "ageDescription": "1 month",
+        "isMandatory": true,
+        "description": "Second dose of Hepatitis B vaccine",
+        "notes": "Given at 1 month of age"
+      },
+      {
+        "id": "ipv_2month_cn",
+        "name": "脊灰疫苗 (IPV) - 1st dose",
+        "disease": "Polio",
+        "ageInMonths": 2,
+        "ageDescription": "2 months",
+        "isMandatory": true,
+        "description": "First dose of Inactivated Poliovirus vaccine",
+        "notes": "IPV at 2 months"
+      },
+      {
+        "id": "dtap_3month_cn",
+        "name": "百白破疫苗 (DTaP) - 1st dose",
+        "disease": "Diphtheria, Tetanus, Pertussis",
+        "ageInMonths": 3,
+        "ageDescription": "3 months",
+        "isMandatory": true,
+        "description": "First dose of DTaP vaccine",
+        "notes": "Protects against diphtheria, tetanus, and pertussis"
+      },
+      {
+        "id": "opv_3month_cn",
+        "name": "脊灰疫苗 (bOPV) - 2nd dose",
+        "disease": "Polio",
+        "ageInMonths": 3,
+        "ageDescription": "3 months",
+        "isMandatory": true,
+        "description": "Second dose of Polio vaccine (bOPV)",
+        "notes": "Bivalent oral poliovirus vaccine"
+      },
+      {
+        "id": "dtap_4month_cn",
+        "name": "百白破疫苗 (DTaP) - 2nd dose",
+        "disease": "Diphtheria, Tetanus, Pertussis",
+        "ageInMonths": 4,
+        "ageDescription": "4 months",
+        "isMandatory": true,
+        "description": "Second dose of DTaP vaccine",
+        "notes": "Protects against diphtheria, tetanus, and pertussis"
+      },
+      {
+        "id": "opv_4month_cn",
+        "name": "脊灰疫苗 (bOPV) - 3rd dose",
+        "disease": "Polio",
+        "ageInMonths": 4,
+        "ageDescription": "4 months",
+        "isMandatory": true,
+        "description": "Third dose of Polio vaccine (bOPV)",
+        "notes": "Bivalent oral poliovirus vaccine"
+      },
+      {
+        "id": "dtap_5month_cn",
+        "name": "百白破疫苗 (DTaP) - 3rd dose",
+        "disease": "Diphtheria, Tetanus, Pertussis",
+        "ageInMonths": 5,
+        "ageDescription": "5 months",
+        "isMandatory": true,
+        "description": "Third dose of DTaP vaccine",
+        "notes": "Protects against diphtheria, tetanus, and pertussis"
+      },
+      {
+        "id": "hepb_6month_cn",
+        "name": "乙肝疫苗 (Hepatitis B) - 3rd dose",
+        "disease": "Hepatitis B",
+        "ageInMonths": 6,
+        "ageDescription": "6 months",
+        "isMandatory": true,
+        "description": "Third dose of Hepatitis B vaccine",
+        "notes": "Completes primary series"
+      },
+      {
+        "id": "meningococcal_6month_cn",
+        "name": "流脑疫苗 (Meningococcal A) - 1st dose",
+        "disease": "Meningococcal disease",
+        "ageInMonths": 6,
+        "ageDescription": "6 months",
+        "isMandatory": true,
+        "description": "First dose of Meningococcal A vaccine",
+        "notes": "Group A meningococcal polysaccharide vaccine"
+      },
+      {
+        "id": "je_8month_cn",
+        "name": "乙脑疫苗 (Japanese Encephalitis) - 1st dose",
+        "disease": "Japanese Encephalitis",
+        "ageInMonths": 8,
+        "ageDescription": "8 months",
+        "isMandatory": true,
+        "description": "First dose of Japanese Encephalitis vaccine",
+        "notes": "Live attenuated vaccine"
+      },
+      {
+        "id": "meningococcal_9month_cn",
+        "name": "流脑疫苗 (Meningococcal A) - 2nd dose",
+        "disease": "Meningococcal disease",
+        "ageInMonths": 9,
+        "ageDescription": "9 months",
+        "isMandatory": true,
+        "description": "Second dose of Meningococcal A vaccine",
+        "notes": "Group A meningococcal polysaccharide vaccine"
+      },
+      {
+        "id": "measles_8month_cn",
+        "name": "麻疹疫苗 (Measles)",
+        "disease": "Measles",
+        "ageInMonths": 8,
+        "ageDescription": "8 months",
+        "isMandatory": true,
+        "description": "Measles vaccine",
+        "notes": "Live attenuated vaccine"
+      },
+      {
+        "id": "mmr_18month_cn",
+        "name": "麻腮风疫苗 (MMR)",
+        "disease": "Measles, Mumps, Rubella",
+        "ageInMonths": 18,
+        "ageDescription": "18 months",
+        "isMandatory": true,
+        "description": "MMR vaccine",
+        "notes": "Combined vaccine for measles, mumps, and rubella"
+      },
+      {
+        "id": "dtap_18month_cn",
+        "name": "百白破疫苗 (DTaP) - 4th dose",
+        "disease": "Diphtheria, Tetanus, Pertussis",
+        "ageInMonths": 18,
+        "ageDescription": "18 months",
+        "isMandatory": true,
+        "description": "Fourth dose of DTaP vaccine",
+        "notes": "Booster dose"
+      },
+      {
+        "id": "hepa_18month_cn",
+        "name": "甲肝疫苗 (Hepatitis A)",
+        "disease": "Hepatitis A",
+        "ageInMonths": 18,
+        "ageDescription": "18 months",
+        "isMandatory": true,
+        "description": "Hepatitis A vaccine",
+        "notes": "Live attenuated vaccine"
+      },
+      {
+        "id": "je_24month_cn",
+        "name": "乙脑疫苗 (Japanese Encephalitis) - 2nd dose",
+        "disease": "Japanese Encephalitis",
+        "ageInMonths": 24,
+        "ageDescription": "2 years",
+        "isMandatory": true,
+        "description": "Second dose of Japanese Encephalitis vaccine",
+        "notes": "Booster dose"
+      },
+      {
+        "id": "meningococcal_36month_cn",
+        "name": "流脑疫苗 (Meningococcal AC) - 1st dose",
+        "disease": "Meningococcal disease",
+        "ageInMonths": 36,
+        "ageDescription": "3 years",
+        "isMandatory": true,
+        "description": "First dose of Meningococcal AC vaccine",
+        "notes": "Groups A and C meningococcal polysaccharide vaccine"
+      },
+      {
+        "id": "opv_48month_cn",
+        "name": "脊灰疫苗 (bOPV) - 4th dose",
+        "disease": "Polio",
+        "ageInMonths": 48,
+        "ageDescription": "4 years",
+        "isMandatory": true,
+        "description": "Fourth dose of Polio vaccine (bOPV)",
+        "notes": "Booster dose"
+      },
+      {
+        "id": "meningococcal_72month_cn",
+        "name": "流脑疫苗 (Meningococcal AC) - 2nd dose",
+        "disease": "Meningococcal disease",
+        "ageInMonths": 72,
+        "ageDescription": "6 years",
+        "isMandatory": true,
+        "description": "Second dose of Meningococcal AC vaccine",
+        "notes": "Groups A and C meningococcal polysaccharide vaccine"
+      },
+      {
+        "id": "dt_72month_cn",
+        "name": "白破疫苗 (DT)",
+        "disease": "Diphtheria, Tetanus",
+        "ageInMonths": 72,
+        "ageDescription": "6 years",
+        "isMandatory": true,
+        "description": "Diphtheria and Tetanus vaccine",
+        "notes": "Booster dose without pertussis component"
+      }
+    ],
+    "recommended": [
+      {
+        "id": "hib_2month_cn",
+        "name": "Hib疫苗 (Hib) - 1st dose",
+        "disease": "Haemophilus influenzae type b",
+        "ageInMonths": 2,
+        "ageDescription": "2 months",
+        "isMandatory": false,
+        "description": "First dose of Hib vaccine",
+        "notes": "Self-paid vaccine"
+      },
+      {
+        "id": "hib_3month_cn",
+        "name": "Hib疫苗 (Hib) - 2nd dose",
+        "disease": "Haemophilus influenzae type b",
+        "ageInMonths": 3,
+        "ageDescription": "3 months",
+        "isMandatory": false,
+        "description": "Second dose of Hib vaccine",
+        "notes": "Self-paid vaccine"
+      },
+      {
+        "id": "hib_4month_cn",
+        "name": "Hib疫苗 (Hib) - 3rd dose",
+        "disease": "Haemophilus influenzae type b",
+        "ageInMonths": 4,
+        "ageDescription": "4 months",
+        "isMandatory": false,
+        "description": "Third dose of Hib vaccine",
+        "notes": "Self-paid vaccine"
+      },
+      {
+        "id": "hib_18month_cn",
+        "name": "Hib疫苗 (Hib) - 4th dose",
+        "disease": "Haemophilus influenzae type b",
+        "ageInMonths": 18,
+        "ageDescription": "18 months",
+        "isMandatory": false,
+        "description": "Fourth dose of Hib vaccine",
+        "notes": "Self-paid vaccine"
+      },
+      {
+        "id": "pcv_2month_cn",
+        "name": "肺炎疫苗 (PCV13) - 1st dose",
+        "disease": "Pneumococcal disease",
+        "ageInMonths": 2,
+        "ageDescription": "2 months",
+        "isMandatory": false,
+        "description": "First dose of Pneumococcal conjugate vaccine",
+        "notes": "Self-paid vaccine"
+      },
+      {
+        "id": "pcv_4month_cn",
+        "name": "肺炎疫苗 (PCV13) - 2nd dose",
+        "disease": "Pneumococcal disease",
+        "ageInMonths": 4,
+        "ageDescription": "4 months",
+        "isMandatory": false,
+        "description": "Second dose of Pneumococcal conjugate vaccine",
+        "notes": "Self-paid vaccine"
+      },
+      {
+        "id": "pcv_6month_cn",
+        "name": "肺炎疫苗 (PCV13) - 3rd dose",
+        "disease": "Pneumococcal disease",
+        "ageInMonths": 6,
+        "ageDescription": "6 months",
+        "isMandatory": false,
+        "description": "Third dose of Pneumococcal conjugate vaccine",
+        "notes": "Self-paid vaccine"
+      },
+      {
+        "id": "pcv_12month_cn",
+        "name": "肺炎疫苗 (PCV13) - 4th dose",
+        "disease": "Pneumococcal disease",
+        "ageInMonths": 12,
+        "ageDescription": "12-15 months",
+        "isMandatory": false,
+        "description": "Fourth dose of Pneumococcal conjugate vaccine",
+        "notes": "Self-paid vaccine"
+      },
+      {
+        "id": "rotavirus_2month_cn",
+        "name": "轮状病毒疫苗 (Rotavirus) - 1st dose",
+        "disease": "Rotavirus",
+        "ageInMonths": 2,
+        "ageDescription": "2 months",
+        "isMandatory": false,
+        "description": "First dose of Rotavirus vaccine",
+        "notes": "Self-paid vaccine"
+      },
+      {
+        "id": "rotavirus_3month_cn",
+        "name": "轮状病毒疫苗 (Rotavirus) - 2nd dose",
+        "disease": "Rotavirus",
+        "ageInMonths": 3,
+        "ageDescription": "3 months",
+        "isMandatory": false,
+        "description": "Second dose of Rotavirus vaccine",
+        "notes": "Self-paid vaccine"
+      },
+      {
+        "id": "rotavirus_4month_cn",
+        "name": "轮状病毒疫苗 (Rotavirus) - 3rd dose",
+        "disease": "Rotavirus",
+        "ageInMonths": 4,
+        "ageDescription": "4 months",
+        "isMandatory": false,
+        "description": "Third dose of Rotavirus vaccine",
+        "notes": "Self-paid vaccine"
+      },
+      {
+        "id": "varicella_12month_cn",
+        "name": "水痘疫苗 (Varicella) - 1st dose",
+        "disease": "Chickenpox",
+        "ageInMonths": 12,
+        "ageDescription": "12 months",
+        "isMandatory": false,
+        "description": "First dose of Varicella vaccine",
+        "notes": "Self-paid vaccine"
+      },
+      {
+        "id": "varicella_48month_cn",
+        "name": "水痘疫苗 (Varicella) - 2nd dose",
+        "disease": "Chickenpox",
+        "ageInMonths": 48,
+        "ageDescription": "4 years",
+        "isMandatory": false,
+        "description": "Second dose of Varicella vaccine",
+        "notes": "Self-paid vaccine"
+      },
+      {
+        "id": "influenza_6month_cn",
+        "name": "流感疫苗 (Influenza)",
+        "disease": "Influenza",
+        "ageInMonths": 6,
+        "ageDescription": "6 months and yearly",
+        "isMandatory": false,
+        "description": "Annual flu vaccine",
+        "notes": "Self-paid vaccine, yearly"
+      },
+      {
+        "id": "ev71_6month_cn",
+        "name": "EV71疫苗 (Hand-foot-mouth disease)",
+        "disease": "Enterovirus 71",
+        "ageInMonths": 6,
+        "ageDescription": "6 months to 5 years",
+        "isMandatory": false,
+        "description": "EV71 vaccine for hand-foot-mouth disease",
+        "notes": "Self-paid vaccine, 2-dose series"
+      },
+      {
+        "id": "hpv_108month_cn",
+        "name": "HPV疫苗 (HPV)",
+        "disease": "Human Papillomavirus",
+        "ageInMonths": 108,
+        "ageDescription": "9 years and older",
+        "isMandatory": false,
+        "description": "Human Papillomavirus vaccine",
+        "notes": "Self-paid vaccine, recommended for girls"
+      },
+      {
+        "id": "covid19_36month_cn",
+        "name": "新冠疫苗 (COVID-19)",
+        "disease": "COVID-19",
+        "ageInMonths": 36,
+        "ageDescription": "3 years and older",
+        "isMandatory": false,
+        "description": "COVID-19 vaccine",
+        "notes": "Based on current recommendations"
+      }
+    ]
+  }
+}

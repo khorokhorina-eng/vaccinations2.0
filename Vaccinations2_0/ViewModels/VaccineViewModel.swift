@@ -5,6 +5,7 @@
 
 import Foundation
 import SwiftUI
+import Combine
 
 // ViewModel для управления данными прививок
 class VaccineViewModel: ObservableObject {
@@ -15,9 +16,14 @@ class VaccineViewModel: ObservableObject {
     @Published var customVaccines: [Vaccine] = []
     @Published var showOnlyMandatory: Bool = false
     @Published var selectedFilter: VaccineFilter = .all
+    @Published var isLoadingVaccines: Bool = false
+    @Published var loadingError: VaccineDataLoaderError?
+    @Published var selectedCountry: Country = .usa
     
-   let dataService = DataService.shared
-    private let vaccineLoader = VaccineDataLoader.shared
+    let dataService = DataService.shared
+    let vaccineLoader = VaccineDataLoader.shared
+    private let cacheService = CacheService.shared
+    private var cancellables = Set<AnyCancellable>()
     
     enum VaccineFilter: String, CaseIterable {
         case all = "Все"
@@ -30,6 +36,7 @@ class VaccineViewModel: ObservableObject {
     
     init() {
         loadData()
+        setupBindings()
     }
     
     // MARK: - Data Loading
@@ -41,14 +48,58 @@ class VaccineViewModel: ObservableObject {
         customVaccines = dataService.loadCustomVaccines()
         
         if let profile = childProfile {
-            loadVaccines(for: profile.country)
+            if let country = Country(rawValue: profile.country) {
+                selectedCountry = country
+                loadVaccines(for: country)
+            } else {
+                // Fallback to USA if country is not recognized
+                selectedCountry = .usa
+                loadVaccines(for: .usa)
+            }
         }
     }
     
-    func loadVaccines(for country: String) {
-        let mandatoryVaccines = vaccineLoader.getMandatoryVaccines(for: country)
-        let recommendedVaccines = vaccineLoader.getRecommendedVaccines(for: country)
-        vaccines = mandatoryVaccines + recommendedVaccines + customVaccines
+    private func setupBindings() {
+        // Подписываемся на изменения в загрузчике
+        vaccineLoader.$isLoading
+            .assign(to: &$isLoadingVaccines)
+        
+        vaccineLoader.$error
+            .assign(to: &$loadingError)
+    }
+    
+    func loadVaccines(for country: Country) {
+        isLoadingVaccines = true
+        loadingError = nil
+        
+        vaccineLoader.loadVaccines(for: country) { [weak self] result in
+            DispatchQueue.main.async {
+                self?.isLoadingVaccines = false
+                
+                switch result {
+                case .success(let data):
+                    self?.vaccines = data.mandatory + data.recommended + (self?.customVaccines ?? [])
+                    // Добавляем страну в список загруженных
+                    if !country.isBuiltIn {
+                        self?.cacheService.addDownloadedCountry(country)
+                    }
+                case .failure(let error):
+                    self?.loadingError = error
+                    // Если не удалось загрузить, пытаемся использовать кеш или пустой список
+                    if let cachedData = self?.cacheService.getCachedVaccineData(for: country) {
+                        self?.vaccines = cachedData.mandatory + cachedData.recommended + (self?.customVaccines ?? [])
+                    } else {
+                        self?.vaccines = self?.customVaccines ?? []
+                    }
+                }
+            }
+        }
+    }
+    
+    func loadVaccines(for countryString: String) {
+        if let country = Country(rawValue: countryString) {
+            loadVaccines(for: country)
+        }
     }
     
     // MARK: - Profile Management
@@ -73,7 +124,10 @@ class VaccineViewModel: ObservableObject {
         }
         if let country = country {
             profile.country = country
-            loadVaccines(for: country)
+            if let countryEnum = Country(rawValue: country) {
+                selectedCountry = countryEnum
+                loadVaccines(for: countryEnum)
+            }
         }
         
         childProfile = profile
@@ -239,6 +293,44 @@ class VaccineViewModel: ObservableObject {
         return .scheduled
     }
     
+    // MARK: - Country Management
+    
+    func changeCountry(_ country: Country) {
+        selectedCountry = country
+        updateChildProfile(country: country.rawValue)
+    }
+    
+    func getAvailableCountries() -> [Country] {
+        return Country.allCases
+    }
+    
+    func getDownloadedCountries() -> [Country] {
+        return cacheService.getDownloadedCountries()
+    }
+    
+    func isCountryAvailable(_ country: Country) -> Bool {
+        return country.isBuiltIn || cacheService.isCached(country: country)
+    }
+    
+    func downloadCountryCalendar(_ country: Country, completion: @escaping (Bool) -> Void) {
+        loadVaccines(for: country)
+        
+        // Подписываемся на завершение загрузки
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            completion(self?.loadingError == nil)
+        }
+    }
+    
+    func clearCountryCache(_ country: Country) {
+        cacheService.clearCache(for: country)
+        cacheService.removeDownloadedCountry(country)
+        
+        // Если это текущая страна, перезагружаем данные
+        if country == selectedCountry {
+            loadVaccines(for: country)
+        }
+    }
+    
     // MARK: - Reset
     
     func resetAllData() {
@@ -248,5 +340,6 @@ class VaccineViewModel: ObservableObject {
         vaccineRecords = []
         customVaccines = []
         dataService.resetAllData()
+        cacheService.clearAllCache()
     }
 }

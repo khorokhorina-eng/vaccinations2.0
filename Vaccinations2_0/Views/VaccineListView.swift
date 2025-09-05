@@ -11,6 +11,7 @@ struct VaccineListView: View {
     @State private var selectedVaccine: Vaccine?
     @State private var searchText = ""
     @State private var showingProfile = false
+    @State private var showingCountrySelection = false
     
     var body: some View {
         NavigationView {
@@ -63,6 +64,32 @@ struct VaccineListView: View {
             .sheet(isPresented: $showingProfile) {
                 profileEditView
             }
+            .sheet(isPresented: $showingCountrySelection) {
+                CountrySelectionView(viewModel: viewModel)
+            }
+            .overlay(
+                Group {
+                    if viewModel.isLoadingVaccines {
+                        Color.black.opacity(0.3)
+                            .ignoresSafeArea()
+                        
+                        LoadingOverlay(
+                            message: "Loading vaccination calendar...",
+                            progress: viewModel.vaccineLoader.loadingProgress > 0 ? viewModel.vaccineLoader.loadingProgress : nil
+                        )
+                    }
+                }
+            )
+            .alert("Error", isPresented: .constant(viewModel.loadingError != nil)) {
+                Button("OK") {
+                    viewModel.loadingError = nil
+                }
+                Button("Retry") {
+                    viewModel.loadVaccines(for: viewModel.selectedCountry)
+                }
+            } message: {
+                Text(viewModel.loadingError?.errorDescription ?? "An error occurred")
+            }
         }
     }
     
@@ -78,7 +105,24 @@ struct VaccineListView: View {
                 HStack(spacing: 8) {
                     Label(profile.ageDescription, systemImage: "birthday.cake")
                     Text("•")
-                    Label(profile.country, systemImage: "globe")
+                    Button(action: {
+                        showingCountrySelection = true
+                    }) {
+                        HStack(spacing: 4) {
+                            if let country = Country(rawValue: profile.country) {
+                                Text(country.flag)
+                                    .font(.caption)
+                                Text(country.localizedName)
+                                    .font(.caption)
+                            } else {
+                                Label(profile.country, systemImage: "globe")
+                                    .font(.caption)
+                            }
+                            Image(systemName: "chevron.down")
+                                .font(.caption2)
+                        }
+                        .foregroundColor(.secondary)
+                    }
                 }
                 .font(.caption)
                 .foregroundColor(.secondary)
