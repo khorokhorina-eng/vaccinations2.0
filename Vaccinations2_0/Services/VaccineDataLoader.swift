@@ -5,15 +5,15 @@
 
 import Foundation
 import Combine
-import SystemConfiguration
+import Network
 
-// Структура для парсинга JSON
+// MARK: - Vaccine Data Models
+
 struct VaccineData: Codable {
     let mandatory: [Vaccine]
     let recommended: [Vaccine]
 }
 
-// Единый формат для всех стран
 struct CountryVaccineData: Codable {
     let usa: VaccineData?
     let china: VaccineData?
@@ -40,7 +40,8 @@ struct CountryVaccineData: Codable {
     }
 }
 
-// Ошибки загрузки
+// MARK: - Errors
+
 enum VaccineDataLoaderError: LocalizedError {
     case networkError
     case parsingError
@@ -50,18 +51,37 @@ enum VaccineDataLoaderError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .networkError:
-            return NSLocalizedString("Failed to load vaccine calendar. Please check your internet connection.", comment: "")
+            return "Failed to load vaccine calendar. Please check your internet connection."
         case .parsingError:
-            return NSLocalizedString("Failed to parse vaccine data.", comment: "")
+            return "Failed to parse vaccine data."
         case .fileNotFound:
-            return NSLocalizedString("Vaccine calendar file not found.", comment: "")
+            return "Vaccine calendar file not found."
         case .noInternetConnection:
-            return NSLocalizedString("No internet connection. Please connect to the internet to download vaccine calendar.", comment: "")
+            return "No internet connection. Please connect to the internet to download vaccine calendar."
         }
     }
 }
 
-// Загрузчик данных о прививках из JSON
+// MARK: - Network Monitor
+
+class NetworkMonitor {
+    static let shared = NetworkMonitor()
+    
+    private let monitor = NWPathMonitor()
+    private let queue = DispatchQueue(label: "NetworkMonitor")
+    
+    private(set) var isConnected: Bool = false
+    
+    private init() {
+        monitor.pathUpdateHandler = { path in
+            self.isConnected = path.status == .satisfied
+        }
+        monitor.start(queue: queue)
+    }
+}
+
+// MARK: - Loader
+
 class VaccineDataLoader: ObservableObject {
     static let shared = VaccineDataLoader()
     
@@ -74,27 +94,23 @@ class VaccineDataLoader: ObservableObject {
     
     private init() {}
     
-    // MARK: - Main Loading Method
+    // MARK: - Main Loader
     
     func loadVaccines(for country: Country, completion: @escaping (Result<(mandatory: [Vaccine], recommended: [Vaccine]), VaccineDataLoaderError>) -> Void) {
-        // Сбрасываем состояние ошибки
         error = nil
         
         if country.isBuiltIn {
-            // Загружаем из bundle
             loadFromBundle(country: country, completion: completion)
         } else {
-            // Сначала проверяем кеш
             if let cachedData = cacheService.getCachedVaccineData(for: country) {
                 completion(.success(cachedData))
             } else {
-                // Загружаем из сети
                 loadFromNetwork(country: country, completion: completion)
             }
         }
     }
     
-    // MARK: - Bundle Loading
+    // MARK: - Bundle
     
     private func loadFromBundle(country: Country, completion: @escaping (Result<(mandatory: [Vaccine], recommended: [Vaccine]), VaccineDataLoaderError>) -> Void) {
         guard let url = Bundle.main.url(forResource: country.localFileName, withExtension: "json") else {
@@ -120,7 +136,7 @@ class VaccineDataLoader: ObservableObject {
         }
     }
     
-    // MARK: - Network Loading
+    // MARK: - Network
     
     private func loadFromNetwork(country: Country, completion: @escaping (Result<(mandatory: [Vaccine], recommended: [Vaccine]), VaccineDataLoaderError>) -> Void) {
         guard let urlString = country.remoteURL,
@@ -133,42 +149,32 @@ class VaccineDataLoader: ObservableObject {
         isLoading = true
         loadingProgress = 0.0
         
-        // Проверяем доступность интернета
-        if !isNetworkAvailable() {
+        if !NetworkMonitor.shared.isConnected {
             isLoading = false
             error = .noInternetConnection
             completion(.failure(.noInternetConnection))
             return
         }
         
-        // Создаем URLSession с конфигурацией
         let configuration = URLSessionConfiguration.default
         configuration.timeoutIntervalForRequest = 30
         configuration.timeoutIntervalForResource = 60
         let session = URLSession(configuration: configuration)
         
-        // Симулируем прогресс загрузки
         Timer.publish(every: 0.1, on: .main, in: .common)
             .autoconnect()
-            .prefix(9) // 0.9 seconds
+            .prefix(9)
             .sink { [weak self] _ in
                 self?.loadingProgress = min(self?.loadingProgress ?? 0 + 0.1, 0.9)
             }
             .store(in: &cancellables)
         
-        session.dataTask(with: url) { [weak self] data, response, error in
+        session.dataTask(with: url) { [weak self] data, _, error in
             DispatchQueue.main.async {
                 self?.isLoading = false
                 self?.loadingProgress = 1.0
                 
-                if let error = error {
-                    print("Network error: \(error)")
-                    self?.error = .networkError
-                    completion(.failure(.networkError))
-                    return
-                }
-                
-                guard let data = data else {
+                if error != nil || data == nil {
                     self?.error = .networkError
                     completion(.failure(.networkError))
                     return
@@ -176,10 +182,9 @@ class VaccineDataLoader: ObservableObject {
                 
                 do {
                     let decoder = JSONDecoder()
-                    let vaccineData = try decoder.decode(CountryVaccineData.self, from: data)
+                    let vaccineData = try decoder.decode(CountryVaccineData.self, from: data!)
                     
                     if let countryData = vaccineData.data(for: country) {
-                        // Сохраняем в кеш
                         self?.cacheService.cacheVaccineData(
                             mandatory: countryData.mandatory,
                             recommended: countryData.recommended,
@@ -191,12 +196,10 @@ class VaccineDataLoader: ObservableObject {
                         completion(.failure(.parsingError))
                     }
                 } catch {
-                    print("Parsing error: \(error)")
                     self?.error = .parsingError
                     completion(.failure(.parsingError))
                 }
                 
-                // Сбрасываем прогресс через секунду
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                     self?.loadingProgress = 0.0
                 }
@@ -204,162 +207,39 @@ class VaccineDataLoader: ObservableObject {
         }.resume()
     }
     
-    // MARK: - Network Availability
+    // MARK: - Sync Methods
     
-    private func isNetworkAvailable() -> Bool {
-        // Простая проверка доступности сети
-        // В реальном приложении лучше использовать Reachability или Network framework
-        var zeroAddress = sockaddr_in()
-        zeroAddress.sin_len = UInt8(MemoryLayout<sockaddr_in>.size)
-        zeroAddress.sin_family = sa_family_t(AF_INET)
-        
-        guard let defaultRouteReachability = withUnsafePointer(to: &zeroAddress, {
-            $0.withMemoryRebound(to: sockaddr.self, capacity: 1) {
-                SCNetworkReachabilityCreateWithAddress(nil, $0)
-            }
-        }) else {
-            return false
-        }
-        
-        var flags: SCNetworkReachabilityFlags = []
-        if !SCNetworkReachabilityGetFlags(defaultRouteReachability, &flags) {
-            return false
-        }
-        
-        let isReachable = flags.contains(.reachable)
-        let needsConnection = flags.contains(.connectionRequired)
-        
-        return (isReachable && !needsConnection)
-    }
-    
-    // MARK: - Helper Methods
-    
-    func getAllVaccines(for country: Country, completion: @escaping ([Vaccine]) -> Void) {
-        loadVaccines(for: country) { result in
-            switch result {
-            case .success(let data):
-                completion(data.mandatory + data.recommended)
-            case .failure:
-                completion([])
-            }
-        }
-    }
-    
-    func getMandatoryVaccines(for country: Country, completion: @escaping ([Vaccine]) -> Void) {
-        loadVaccines(for: country) { result in
-            switch result {
-            case .success(let data):
-                completion(data.mandatory)
-            case .failure:
-                completion([])
-            }
-        }
-    }
-    
-    func getRecommendedVaccines(for country: Country, completion: @escaping ([Vaccine]) -> Void) {
-        loadVaccines(for: country) { result in
-            switch result {
-            case .success(let data):
-                completion(data.recommended)
-            case .failure:
-                completion([])
-            }
-        }
-    }
-    
-    // Синхронные методы для обратной совместимости (используют кеш)
     func getMandatoryVaccines(for country: String) -> [Vaccine] {
         guard let countryEnum = Country(rawValue: country) else { return [] }
-        
         if countryEnum.isBuiltIn {
-            // Для встроенных стран загружаем синхронно из bundle
             if let url = Bundle.main.url(forResource: countryEnum.localFileName, withExtension: "json"),
                let data = try? Data(contentsOf: url),
                let vaccineData = try? JSONDecoder().decode(CountryVaccineData.self, from: data),
                let countryData = vaccineData.data(for: countryEnum) {
                 return countryData.mandatory
             }
-        } else {
-            // Для остальных стран возвращаем из кеша
-            if let cachedData = cacheService.getCachedVaccineData(for: countryEnum) {
-                return cachedData.mandatory
-            }
+        } else if let cachedData = cacheService.getCachedVaccineData(for: countryEnum) {
+            return cachedData.mandatory
         }
-        
         return []
     }
     
     func getRecommendedVaccines(for country: String) -> [Vaccine] {
         guard let countryEnum = Country(rawValue: country) else { return [] }
-        
         if countryEnum.isBuiltIn {
-            // Для встроенных стран загружаем синхронно из bundle
             if let url = Bundle.main.url(forResource: countryEnum.localFileName, withExtension: "json"),
                let data = try? Data(contentsOf: url),
                let vaccineData = try? JSONDecoder().decode(CountryVaccineData.self, from: data),
                let countryData = vaccineData.data(for: countryEnum) {
                 return countryData.recommended
             }
-        } else {
-            // Для остальных стран возвращаем из кеша
-            if let cachedData = cacheService.getCachedVaccineData(for: countryEnum) {
-                return cachedData.recommended
-            }
+        } else if let cachedData = cacheService.getCachedVaccineData(for: countryEnum) {
+            return cachedData.recommended
         }
-        
         return []
     }
     
     func getAllVaccines(for country: String) -> [Vaccine] {
         return getMandatoryVaccines(for: country) + getRecommendedVaccines(for: country)
-    }
-    
-    // Получение прививок для определенного возраста
-    func getVaccinesForAge(months: Int, country: String) -> [Vaccine] {
-        let allVaccines = getAllVaccines(for: country)
-        return allVaccines.filter { $0.ageInMonths == months }
-    }
-    
-    // Получение предстоящих прививок
-    func getUpcomingVaccines(birthDate: Date, country: String, withinMonths: Int = 3) -> [Vaccine] {
-        let allVaccines = getAllVaccines(for: country)
-        let currentDate = Date()
-        let futureDate = Calendar.current.date(byAdding: .month, value: withinMonths, to: currentDate) ?? currentDate
-        
-        return allVaccines.filter { vaccine in
-            let scheduledDate = vaccine.scheduledDate(birthDate: birthDate)
-            return scheduledDate >= currentDate && scheduledDate <= futureDate
-        }
-    }
-    
-    // Получение просроченных прививок
-    func getOverdueVaccines(birthDate: Date, country: String, records: [VaccineRecord]) -> [Vaccine] {
-        let allVaccines = getAllVaccines(for: country)
-        let currentDate = Date()
-        
-        return allVaccines.filter { vaccine in
-            // Проверяем, не сделана ли уже эта прививка
-            let record = records.first(where: { $0.vaccineId == vaccine.id })
-            if record?.isDone == true {
-                return false
-            }
-            
-            // Проверяем, просрочена ли прививка
-            return vaccine.scheduledDate(birthDate: birthDate) < currentDate
-        }
-    }
-    
-    // MARK: - Cache Management
-    
-    func clearCache(for country: Country) {
-        cacheService.clearCache(for: country)
-    }
-    
-    func clearAllCache() {
-        cacheService.clearAllCache()
-    }
-    
-    func isCached(country: Country) -> Bool {
-        return cacheService.isCached(country: country)
     }
 }
