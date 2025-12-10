@@ -15,40 +15,60 @@ struct VaccineListView: View {
     
     var body: some View {
         NavigationView {
-            VStack(spacing: 0) {
-                // Информация о ребёнке
-                if let profile = viewModel.childProfile {
-                    profileHeader(profile)
+            ZStack(alignment: .bottom) {
+                ScrollView {
+                    VStack(spacing: 0) {
+                        // Child profile header
+                        if let profile = viewModel.childProfile {
+                            profileHeader(profile)
+                        }
+                        
+                        // Statistics
+                        statisticsView
+                        
+                        // Filter chips
+                        filterView
+                        
+                        // Vaccine list
+                        if viewModel.filteredVaccines.isEmpty {
+                            emptyStateView
+                        } else {
+                            LazyVStack(spacing: 12) {
+                                ForEach(viewModel.filteredVaccines) { vaccine in
+                                    VaccineRowView(
+                                        vaccine: vaccine,
+                                        status: viewModel.getVaccineStatus(vaccine)
+                                    ) {
+                                        selectedVaccine = vaccine
+                                    }
+                                    .environmentObject(viewModel)
+                                }
+                            }
+                            .padding(.top)
+                            .padding(.horizontal)
+                            .padding(.bottom, 120) // space for disclaimer
+                        }
+                    }
                 }
                 
-                // Статистика
-                statisticsView
-                
-                // Фильтры
-                filterView
-                
-                // Список прививок
-                if viewModel.filteredVaccines.isEmpty {
-                    emptyStateView
-                } else {
-                    vaccinesList
-                }
+                // Fixed disclaimer at the bottom
+                CollapsibleDisclaimerView()
+                    .padding(.horizontal)
+                    .padding(.bottom, 10)
+                    .background(.ultraThinMaterial)
+                    .shadow(radius: 5)
             }
-            .navigationTitle("Календарь прививок")
+            .navigationTitle("Vaccination Calendar")
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {
-                        showingProfile = true
-                    }) {
+                    Button(action: { showingProfile = true }) {
                         Image(systemName: "person.circle")
                     }
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        showingAddVaccine = true
-                    }) {
+                    Button(action: { showingAddVaccine = true }) {
                         Image(systemName: "plus")
                     }
                 }
@@ -68,27 +88,31 @@ struct VaccineListView: View {
                 CountrySelectionView(viewModel: viewModel)
             }
             .overlay(
-                Group {
-                    if viewModel.isLoadingVaccines {
-                        Color.black.opacity(0.3)
-                            .ignoresSafeArea()
-                        
-                        LoadingOverlay(
-                            message: "Loading vaccination calendar...",
-                            progress: viewModel.vaccineLoader.loadingProgress > 0 ? viewModel.vaccineLoader.loadingProgress : nil
-                        )
-                    }
-                }
+                loadingOverlay
             )
             .alert("Error", isPresented: .constant(viewModel.loadingError != nil)) {
-                Button("OK") {
-                    viewModel.loadingError = nil
-                }
-                Button("Retry") {
-                    viewModel.loadVaccines(for: viewModel.selectedCountry)
-                }
+                Button("OK") { viewModel.loadingError = nil }
+                Button("Retry") { viewModel.loadVaccines(for: viewModel.selectedCountry) }
             } message: {
                 Text(viewModel.loadingError?.errorDescription ?? "An error occurred")
+            }
+        }
+    }
+    
+    // MARK: - Loading Overlay
+    
+    private var loadingOverlay: some View {
+        Group {
+            if viewModel.isLoadingVaccines {
+                ZStack {
+                    Color.black.opacity(0.3)
+                        .ignoresSafeArea()
+                    
+                    LoadingOverlay(
+                        message: "Loading vaccination calendar...",
+                        progress: viewModel.vaccineLoader.loadingProgress > 0 ? viewModel.vaccineLoader.loadingProgress : nil
+                    )
+                }
             }
         }
     }
@@ -105,14 +129,12 @@ struct VaccineListView: View {
                 HStack(spacing: 8) {
                     Label(profile.ageDescription, systemImage: "birthday.cake")
                     Text("•")
-                    Button(action: {
-                        showingCountrySelection = true
-                    }) {
+                    Button(action: { showingCountrySelection = true }) {
                         HStack(spacing: 4) {
                             if let country = Country(rawValue: profile.country) {
                                 Text(country.flag)
                                     .font(.caption)
-                                Text(country.localizedName)
+                                Text(country.displayName)
                                     .font(.caption)
                             } else {
                                 Label(profile.country, systemImage: "globe")
@@ -130,7 +152,6 @@ struct VaccineListView: View {
             
             Spacer()
             
-            // Предупреждение о просроченных прививках
             if viewModel.overdueVaccinesCount > 0 {
                 HStack(spacing: 4) {
                     Image(systemName: "exclamationmark.triangle.fill")
@@ -154,28 +175,28 @@ struct VaccineListView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 15) {
                 StatCard(
-                    title: "Всего",
+                    title: "Total",
                     value: "\(viewModel.completedVaccinesCount)/\(viewModel.totalVaccinesCount)",
                     color: .blue,
                     icon: "chart.pie.fill"
                 )
                 
                 StatCard(
-                    title: "Обязательные",
+                    title: "Mandatory",
                     value: "\(viewModel.completedMandatoryCount)/\(viewModel.mandatoryVaccinesCount)",
                     color: .green,
                     icon: "checkmark.shield.fill"
                 )
                 
                 StatCard(
-                    title: "Просрочено",
+                    title: "Overdue",
                     value: "\(viewModel.overdueVaccinesCount)",
                     color: .red,
                     icon: "exclamationmark.triangle.fill"
                 )
                 
                 StatCard(
-                    title: "Предстоящие",
+                    title: "Upcoming",
                     value: "\(viewModel.upcomingVaccinesCount)",
                     color: .orange,
                     icon: "clock.fill"
@@ -196,9 +217,7 @@ struct VaccineListView: View {
                         title: filter.rawValue,
                         isSelected: viewModel.selectedFilter == filter
                     ) {
-                        withAnimation {
-                            viewModel.selectedFilter = filter
-                        }
+                        withAnimation { viewModel.selectedFilter = filter }
                     }
                 }
             }
@@ -206,22 +225,6 @@ struct VaccineListView: View {
         }
         .padding(.vertical, 10)
         .background(Color(.systemGray6))
-    }
-    
-    // MARK: - Vaccines List
-    
-    private var vaccinesList: some View {
-        ScrollView {
-            LazyVStack(spacing: 12) {
-                ForEach(viewModel.filteredVaccines) { vaccine in
-                    VaccineRowView(vaccine: vaccine, status: viewModel.getVaccineStatus(vaccine)) {
-                        selectedVaccine = vaccine
-                    }
-                    .environmentObject(viewModel)
-                }
-            }
-            .padding()
-        }
     }
     
     // MARK: - Empty State
@@ -232,11 +235,11 @@ struct VaccineListView: View {
                 .font(.system(size: 60))
                 .foregroundColor(.gray)
             
-            Text("Нет прививок")
+            Text("No Vaccines")
                 .font(.title2)
                 .fontWeight(.semibold)
             
-            Text("Попробуйте изменить фильтр или добавить новую прививку")
+            Text("Try changing the filter or adding a new vaccine")
                 .font(.body)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
@@ -252,30 +255,30 @@ struct VaccineListView: View {
         NavigationView {
             if let profile = viewModel.childProfile {
                 Form {
-                    Section("Информация о ребёнке") {
+                    Section("Child Information") {
                         HStack {
-                            Text("Имя")
+                            Text("Name")
                             Spacer()
                             Text(profile.name)
                                 .foregroundColor(.secondary)
                         }
                         
                         HStack {
-                            Text("Дата рождения")
+                            Text("Birth Date")
                             Spacer()
                             Text(dateFormatter.string(from: profile.birthDate))
                                 .foregroundColor(.secondary)
                         }
                         
                         HStack {
-                            Text("Возраст")
+                            Text("Age")
                             Spacer()
                             Text(profile.ageDescription)
                                 .foregroundColor(.secondary)
                         }
                         
                         HStack {
-                            Text("Страна")
+                            Text("Country")
                             Spacer()
                             Text(profile.country)
                                 .foregroundColor(.secondary)
@@ -287,18 +290,16 @@ struct VaccineListView: View {
                             viewModel.resetAllData()
                             showingProfile = false
                         }) {
-                            Text("Сбросить все данные")
+                            Text("Reset All Data")
                                 .foregroundColor(.red)
                         }
                     }
                 }
-                .navigationTitle("Профиль")
+                .navigationTitle("Profile")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        Button("Готово") {
-                            showingProfile = false
-                        }
+                        Button("Done") { showingProfile = false }
                     }
                 }
             }
@@ -308,7 +309,7 @@ struct VaccineListView: View {
     private var dateFormatter: DateFormatter {
         let formatter = DateFormatter()
         formatter.dateStyle = .long
-        formatter.locale = Locale(identifier: "ru_RU")
+        formatter.locale = Locale(identifier: "en_US")
         return formatter
     }
 }
@@ -360,6 +361,7 @@ struct FilterChip: View {
         }
     }
 }
+// MARK: - Vaccine Row
 
 struct VaccineRowView: View {
     @EnvironmentObject var viewModel: VaccineViewModel
@@ -370,57 +372,24 @@ struct VaccineRowView: View {
     var body: some View {
         Button(action: onTap) {
             HStack(spacing: 12) {
-                // Иконка статуса
                 Image(systemName: status.icon)
                     .font(.title2)
                     .foregroundColor(statusColor)
                     .frame(width: 40)
                 
-                // Информация о прививке
                 VStack(alignment: .leading, spacing: 4) {
                     Text(vaccine.name)
                         .font(.headline)
                         .foregroundColor(.primary)
-                    
                     Text(vaccine.disease)
                         .font(.caption)
                         .foregroundColor(.secondary)
-                    
-                    HStack {
-                        Label(vaccine.ageDescription, systemImage: "calendar")
-                            .font(.caption2)
-                        
-                        if vaccine.isMandatory {
-                            Text("Обязательная")
-                                .font(.caption2)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(Color.green.opacity(0.2))
-                                .foregroundColor(.green)
-                                .cornerRadius(4)
-                        } else {
-                            Text("Рекомендованная")
-                                .font(.caption2)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(Color.blue.opacity(0.2))
-                                .foregroundColor(.blue)
-                                .cornerRadius(4)
-                        }
-                    }
+                    Text(vaccine.ageDescription)
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
                 }
                 
                 Spacer()
-                
-                // Кнопка быстрой отметки
-                Button(action: {
-                    toggleVaccineStatus()
-                }) {
-                    Image(systemName: isCompleted ? "checkmark.circle.fill" : "circle")
-                        .font(.title2)
-                        .foregroundColor(isCompleted ? .green : .gray)
-                }
-                .buttonStyle(PlainButtonStyle())
             }
             .padding()
             .background(Color(.systemBackground))
@@ -428,10 +397,6 @@ struct VaccineRowView: View {
             .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
         }
         .buttonStyle(PlainButtonStyle())
-    }
-    
-    private var isCompleted: Bool {
-        viewModel.getRecord(for: vaccine)?.isDone ?? false
     }
     
     private var statusColor: Color {
@@ -442,19 +407,74 @@ struct VaccineRowView: View {
         case .scheduled: return .blue
         }
     }
-    
-    private func toggleVaccineStatus() {
-        if isCompleted {
-            viewModel.markVaccineNotDone(vaccine: vaccine)
-        } else {
-            viewModel.markVaccineDone(vaccine: vaccine)
-        }
-    }
 }
 
-struct VaccineListView_Previews: PreviewProvider {
-    static var previews: some View {
-        VaccineListView()
-            .environmentObject(VaccineViewModel())
+// MARK: - Collapsible Disclaimer View
+
+struct CollapsibleDisclaimerView: View {
+    @State private var isExpanded = true
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Disclaimer")
+                    .font(.caption)
+                    .fontWeight(.semibold)
+                Spacer()
+                Button(action: {
+                    withAnimation(.easeInOut) {
+                        isExpanded.toggle()
+                    }
+                }) {
+                    Label(isExpanded ? "Hide" : "More", systemImage: isExpanded ? "chevron.down" : "chevron.up")
+                        .font(.caption2)
+                        .foregroundColor(.blue)
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+
+            if isExpanded {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("CareVax provides publicly available vaccination schedule data for informational purposes only.")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    Text("Sources:")
+                        .font(.caption2)
+                        .fontWeight(.semibold)
+                        .padding(.top, 4)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Link("Centers for Disease Control and Prevention (CDC)", destination: URL(string: "https://www.cdc.gov/vaccines-children/schedules/index.html")!)
+                            .font(.caption2)
+                            .foregroundColor(.blue)
+                            .underline()
+                            .multilineTextAlignment(.leading)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+
+                        Link("World Health Organization (WHO)", destination: URL(string: "https://www.who.int/publications/m/item/table1-summary-of-who-position-papers-recommendations-for-routine-immunization")!)
+                            .font(.caption2)
+                            .foregroundColor(.blue)
+                            .underline()
+                            .multilineTextAlignment(.leading)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+
+                    Text("Always consult your healthcare provider for personalized medical advice.")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                        .padding(.top, 4)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+        }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(.systemGray6))
+        .cornerRadius(12)
     }
 }

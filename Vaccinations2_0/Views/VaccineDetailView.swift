@@ -30,27 +30,27 @@ struct VaccineDetailView: View {
         NavigationView {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    // Информация о прививке
+                    // Vaccine Information
                     vaccineInfoSection
                     
                     Divider()
                     
-                    // Статус прививки
+                    // Status
                     statusSection
                     
-                    // Детали записи
+                    // Record Details
                     if record.isDone {
                         Divider()
                         recordDetailsSection
                     }
                     
-                    // Заметки
+                    // Notes
                     if ((record.notes?.isEmpty) == nil) {
                         Divider()
                         notesSection
                     }
                     
-                    // Побочные эффекты
+                    // Side Effects
                     if ((record.sideEffects?.isEmpty) == nil) {
                         Divider()
                         sideEffectsSection
@@ -62,14 +62,14 @@ struct VaccineDetailView: View {
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Закрыть") {
+                    Button("Close") {
                         presentationMode.wrappedValue.dismiss()
                     }
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     if record.isDone {
-                        Button(isEditing ? "Готово" : "Изменить") {
+                        Button(isEditing ? "Done" : "Edit") {
                             if isEditing {
                                 saveChanges()
                             }
@@ -110,13 +110,13 @@ struct VaccineDetailView: View {
                         .font(.headline)
                 } icon: {
                     Image(systemName: "clock")
-                    .foregroundColor(.purple)
+                        .foregroundColor(.purple)
                 }
             }
             
             HStack {
                 if vaccine.isMandatory {
-                    Label("Обязательная", systemImage: "exclamationmark.circle.fill")
+                    Label("Mandatory", systemImage: "exclamationmark.circle.fill")
                         .font(.caption)
                         .foregroundColor(.white)
                         .padding(.horizontal, 10)
@@ -124,7 +124,7 @@ struct VaccineDetailView: View {
                         .background(Color.green)
                         .cornerRadius(8)
                 } else {
-                    Label("Рекомендованная", systemImage: "info.circle.fill")
+                    Label("Recommended", systemImage: "info.circle.fill")
                         .font(.caption)
                         .foregroundColor(.white)
                         .padding(.horizontal, 10)
@@ -152,7 +152,7 @@ struct VaccineDetailView: View {
     
     private var statusSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Статус")
+            Text("Status")
                 .font(.headline)
             
             HStack {
@@ -166,7 +166,7 @@ struct VaccineDetailView: View {
                     HStack {
                         Image(systemName: record.isDone ? "checkmark.circle.fill" : "circle")
                             .font(.title2)
-                        Text(record.isDone ? "Сделано" : "Не сделано")
+                        Text(record.isDone ? "Completed" : "Not Completed")
                             .font(.body)
                     }
                     .foregroundColor(record.isDone ? .green : .gray)
@@ -180,21 +180,21 @@ struct VaccineDetailView: View {
             
             if showingDatePicker && !record.isDone {
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Дата вакцинации")
+                    Text("Vaccination Date")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                     
                     DatePicker("", selection: $tempDate, in: ...Date(), displayedComponents: .date)
                         .datePickerStyle(GraphicalDatePickerStyle())
                     
-                    TextField("Название вакцины (опционально)", text: $tempVaccineName)
+                    TextField("Vaccine Name (optional)", text: $tempVaccineName)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                     
-                    TextField("Заметки (опционально)", text: $tempNotes)
+                    TextField("Notes (optional)", text: $tempNotes)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                     
                     HStack {
-                        Button("Отмена") {
+                        Button("Cancel") {
                             showingDatePicker = false
                             resetTempValues()
                         }
@@ -202,7 +202,7 @@ struct VaccineDetailView: View {
                         
                         Spacer()
                         
-                        Button("Сохранить") {
+                        Button("Save") {
                             markAsDone()
                         }
                         .foregroundColor(.blue)
@@ -218,7 +218,7 @@ struct VaccineDetailView: View {
     
     private var recordDetailsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Детали вакцинации")
+            Text("Vaccination Details")
                 .font(.headline)
             
             if isEditing {
@@ -231,24 +231,24 @@ struct VaccineDetailView: View {
     
     private var editableDetailsView: some View {
         VStack(spacing: 12) {
-            DatePicker("Дата", selection: $tempDate, in: ...Date(), displayedComponents: .date)
+            DatePicker("Date", selection: $tempDate, in: ...Date(), displayedComponents: .date)
             
-            TextField("Название вакцины", text: $tempVaccineName)
+            TextField("Vaccine Name", text: $tempVaccineName)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
             
-            TextField("Серия вакцины", text: $tempBatchNumber)
+            TextField("Batch Number", text: $tempBatchNumber)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
             
-            TextField("Врач", text: $tempDoctorName)
+            TextField("Doctor", text: $tempDoctorName)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
             
-            TextField("Клиника", text: $tempClinicName)
+            TextField("Clinic", text: $tempClinicName)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
             
-            TextField("Заметки", text: $tempNotes)
+            TextField("Notes", text: $tempNotes)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
             
-            TextField("Побочные эффекты", text: $tempSideEffects)
+            TextField("Side Effects", text: $tempSideEffects)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
         }
     }
@@ -256,30 +256,30 @@ struct VaccineDetailView: View {
     private var readOnlyDetailsView: some View {
         VStack(alignment: .leading, spacing: 10) {
             if let date = record.dateAdministered {
-                DetailRow(label: "Дата", value: dateFormatter.string(from: date))
+                DetailRow(label: "Date", value: dateFormatter.string(from: date))
             }
             
             if let vaccineName = record.vaccineName, !vaccineName.isEmpty {
-                DetailRow(label: "Вакцина", value: vaccineName)
+                DetailRow(label: "Vaccine", value: vaccineName)
             }
             
             if let batchNumber = record.batchNumber, !batchNumber.isEmpty {
-                DetailRow(label: "Серия", value: batchNumber)
+                DetailRow(label: "Batch Number", value: batchNumber)
             }
             
             if let doctorName = record.doctorName, !doctorName.isEmpty {
-                DetailRow(label: "Врач", value: doctorName)
+                DetailRow(label: "Doctor", value: doctorName)
             }
             
             if let clinicName = record.clinicName, !clinicName.isEmpty {
-                DetailRow(label: "Клиника", value: clinicName)
+                DetailRow(label: "Clinic", value: clinicName)
             }
         }
     }
     
     private var notesSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Заметки")
+            Text("Notes")
                 .font(.headline)
             
             Text(record.notes ?? "")
@@ -290,7 +290,7 @@ struct VaccineDetailView: View {
     
     private var sideEffectsSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Побочные эффекты")
+            Text("Side Effects")
                 .font(.headline)
             
             Text(record.sideEffects ?? "")
@@ -361,7 +361,7 @@ struct VaccineDetailView: View {
     private var dateFormatter: DateFormatter {
         let formatter = DateFormatter()
         formatter.dateStyle = .long
-        formatter.locale = Locale(identifier: "ru_RU")
+        formatter.locale = Locale(identifier: "en_US")
         return formatter
     }
 }
@@ -387,12 +387,12 @@ struct VaccineDetailView_Previews: PreviewProvider {
     static var previews: some View {
         let vaccine = Vaccine(
             id: "1",
-            name: "БЦЖ",
-            disease: "Туберкулез",
+            name: "BCG",
+            disease: "Tuberculosis",
             ageInMonths: 0,
-            ageDescription: "Новорожденные",
+            ageDescription: "Newborn",
             isMandatory: true,
-            description: "Вакцинация против туберкулеза",
+            description: "Vaccination against tuberculosis",
             notes: nil
         )
         

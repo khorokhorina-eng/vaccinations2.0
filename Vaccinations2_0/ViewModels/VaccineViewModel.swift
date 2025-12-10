@@ -7,7 +7,7 @@ import Foundation
 import SwiftUI
 import Combine
 
-// ViewModel для управления данными прививок
+// ViewModel for managing vaccine data
 class VaccineViewModel: ObservableObject {
     @Published var isFirstLaunch: Bool = true
     @Published var childProfile: ChildProfile?
@@ -25,13 +25,17 @@ class VaccineViewModel: ObservableObject {
     private let cacheService = CacheService.shared
     private var cancellables = Set<AnyCancellable>()
     
-    enum VaccineFilter: String, CaseIterable {
-        case all = "Все"
-        case upcoming = "Предстоящие"
-        case overdue = "Просроченные"
-        case completed = "Сделанные"
-        case mandatory = "Обязательные"
-        case recommended = "Рекомендованные"
+    // Vaccine filters
+    enum VaccineFilter: String, CaseIterable, Identifiable {
+        case all = "All"
+        case upcoming = "Upcoming"
+        case overdue = "Overdue"
+        case completed = "Completed"
+        case mandatory = "Mandatory"
+        case recommended = "Recommended"
+        
+        var id: String { self.rawValue }
+        var displayName: String { self.rawValue }
     }
     
     init() {
@@ -60,7 +64,7 @@ class VaccineViewModel: ObservableObject {
     }
     
     private func setupBindings() {
-        // Подписываемся на изменения в загрузчике
+        // Subscribe to loader changes
         vaccineLoader.$isLoading
             .assign(to: &$isLoadingVaccines)
         
@@ -79,13 +83,13 @@ class VaccineViewModel: ObservableObject {
                 switch result {
                 case .success(let data):
                     self?.vaccines = data.mandatory + data.recommended + (self?.customVaccines ?? [])
-                    // Добавляем страну в список загруженных
+                    // Add country to downloaded list
                     if !country.isBuiltIn {
                         self?.cacheService.addDownloadedCountry(country)
                     }
                 case .failure(let error):
                     self?.loadingError = error
-                    // Если не удалось загрузить, пытаемся использовать кеш или пустой список
+                    // Use cache if loading fails, or fallback to custom vaccines
                     if let cachedData = self?.cacheService.getCachedVaccineData(for: country) {
                         self?.vaccines = cachedData.mandatory + cachedData.recommended + (self?.customVaccines ?? [])
                     } else {
@@ -176,7 +180,7 @@ class VaccineViewModel: ObservableObject {
             ageDescription: ageDescription,
             isMandatory: false,
             description: description,
-            notes: "Добавлено пользователем"
+            notes: "Added by user"
         )
         
         customVaccines.append(vaccine)
@@ -189,7 +193,7 @@ class VaccineViewModel: ObservableObject {
         vaccines.removeAll(where: { $0.id == vaccine.id })
         dataService.deleteCustomVaccine(withId: vaccine.id)
         
-        // Удаляем также запись о прививке, если она есть
+        // Also remove vaccine record if exists
         if let record = getRecord(for: vaccine) {
             vaccineRecords.removeAll(where: { $0.id == record.id })
             dataService.deleteVaccineRecord(withId: record.id)
@@ -203,12 +207,12 @@ class VaccineViewModel: ObservableObject {
         
         var filtered = vaccines
         
-        // Фильтр по типу (обязательные/рекомендованные)
+        // Filter by type (mandatory/recommended)
         if showOnlyMandatory {
             filtered = filtered.filter { $0.isMandatory }
         }
         
-        // Фильтр по статусу
+        // Filter by status
         switch selectedFilter {
         case .all:
             break
@@ -233,7 +237,7 @@ class VaccineViewModel: ObservableObject {
             filtered = filtered.filter { !$0.isMandatory }
         }
         
-        // Сортировка по возрасту
+        // Sort by age
         return filtered.sorted { $0.ageInMonths < $1.ageInMonths }
     }
     
@@ -315,7 +319,7 @@ class VaccineViewModel: ObservableObject {
     func downloadCountryCalendar(_ country: Country, completion: @escaping (Bool) -> Void) {
         loadVaccines(for: country)
         
-        // Подписываемся на завершение загрузки
+        // Wait for load completion
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
             completion(self?.loadingError == nil)
         }
@@ -325,7 +329,7 @@ class VaccineViewModel: ObservableObject {
         cacheService.clearCache(for: country)
         cacheService.removeDownloadedCountry(country)
         
-        // Если это текущая страна, перезагружаем данные
+        // Reload data if it's the current country
         if country == selectedCountry {
             loadVaccines(for: country)
         }

@@ -24,21 +24,24 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		0219AD8F2E55E8D200526FF6 /* Vaccinations2_0.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Vaccinations2_0.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		0219AD9C2E55E8D400526FF6 /* Vaccinations2_0Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Vaccinations2_0Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		0219ADA62E55E8D400526FF6 /* Vaccinations2_0UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Vaccinations2_0UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		0219AD8F2E55E8D200526FF6 /* CareVax.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CareVax.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0219AD9C2E55E8D400526FF6 /* VaxCareTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VaxCareTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		0219ADA62E55E8D400526FF6 /* VaxCareUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VaxCareUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		0219AE472E69A8F700526FF6 /* Exceptions for "Vaccinations2_0" folder in "Vaccinations2_0" target */ = {
+		0219AE472E69A8F700526FF6 /* Exceptions for "Vaccinations2_0" folder in "VaxCare" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Assets.xcassets,
+				Contents.json,
 				ContentView.swift,
 				Models/ChildProfile.swift,
 				Models/Vaccine.swift,
 				Models/VaccineRecord.swift,
 				Resources/vaccines_china.json,
 				Resources/vaccines_data.json,
+				Resources/vaccines_other.json,
 				Resources/vaccines_usa.json,
 				Services/CacheService.swift,
 				Services/DataService.swift,
@@ -51,11 +54,12 @@
 				Views/VaccineDetailView.swift,
 				Views/VaccineListView.swift,
 			);
-			target = 0219AD8E2E55E8D200526FF6 /* Vaccinations2_0 */;
+			target = 0219AD8E2E55E8D200526FF6 /* VaxCare */;
 		};
-		0219AE482E69A8F700526FF6 /* Exceptions for "Vaccinations2_0" folder in "Vaccinations2_0Tests" target */ = {
+		0219AE482E69A8F700526FF6 /* Exceptions for "Vaccinations2_0" folder in "VaxCareTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Contents.json,
 				ContentView.swift,
 				Info.plist,
 				Models/ChildProfile.swift,
@@ -71,7 +75,17 @@
 				Views/VaccineDetailView.swift,
 				Views/VaccineListView.swift,
 			);
-			target = 0219AD9B2E55E8D400526FF6 /* Vaccinations2_0Tests */;
+			platformFiltersByRelativePath = {
+				Assets.xcassets = (ios, maccatalyst, );
+			};
+			target = 0219AD9B2E55E8D400526FF6 /* VaxCareTests */;
+		};
+		0219AEB52EAA625C00526FF6 /* Exceptions for "Vaccinations2_0" folder in "VaxCareUITests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Assets.xcassets,
+			);
+			target = 0219ADA52E55E8D400526FF6 /* VaxCareUITests */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -79,8 +93,9 @@
 		0219AE372E69A8F600526FF6 /* Vaccinations2_0 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				0219AE472E69A8F700526FF6 /* Exceptions for "Vaccinations2_0" folder in "Vaccinations2_0" target */,
-				0219AE482E69A8F700526FF6 /* Exceptions for "Vaccinations2_0" folder in "Vaccinations2_0Tests" target */,
+				0219AE472E69A8F700526FF6 /* Exceptions for "Vaccinations2_0" folder in "VaxCare" target */,
+				0219AE482E69A8F700526FF6 /* Exceptions for "Vaccinations2_0" folder in "VaxCareTests" target */,
+				0219AEB52EAA625C00526FF6 /* Exceptions for "Vaccinations2_0" folder in "VaxCareUITests" target */,
 			);
 			path = Vaccinations2_0;
 			sourceTree = "<group>";
@@ -123,9 +138,9 @@
 		0219AD902E55E8D200526FF6 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				0219AD8F2E55E8D200526FF6 /* Vaccinations2_0.app */,
-				0219AD9C2E55E8D400526FF6 /* Vaccinations2_0Tests.xctest */,
-				0219ADA62E55E8D400526FF6 /* Vaccinations2_0UITests.xctest */,
+				0219AD8F2E55E8D200526FF6 /* CareVax.app */,
+				0219AD9C2E55E8D400526FF6 /* VaxCareTests.xctest */,
+				0219ADA62E55E8D400526FF6 /* VaxCareUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -133,9 +148,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		0219AD8E2E55E8D200526FF6 /* Vaccinations2_0 */ = {
+		0219AD8E2E55E8D200526FF6 /* VaxCare */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 0219ADB02E55E8D400526FF6 /* Build configuration list for PBXNativeTarget "Vaccinations2_0" */;
+			buildConfigurationList = 0219ADB02E55E8D400526FF6 /* Build configuration list for PBXNativeTarget "VaxCare" */;
 			buildPhases = (
 				0219AD8B2E55E8D200526FF6 /* Sources */,
 				0219AD8C2E55E8D200526FF6 /* Frameworks */,
@@ -145,16 +160,16 @@
 			);
 			dependencies = (
 			);
-			name = Vaccinations2_0;
+			name = VaxCare;
 			packageProductDependencies = (
 			);
 			productName = Vaccinations2_0;
-			productReference = 0219AD8F2E55E8D200526FF6 /* Vaccinations2_0.app */;
+			productReference = 0219AD8F2E55E8D200526FF6 /* CareVax.app */;
 			productType = "com.apple.product-type.application";
 		};
-		0219AD9B2E55E8D400526FF6 /* Vaccinations2_0Tests */ = {
+		0219AD9B2E55E8D400526FF6 /* VaxCareTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 0219ADB32E55E8D400526FF6 /* Build configuration list for PBXNativeTarget "Vaccinations2_0Tests" */;
+			buildConfigurationList = 0219ADB32E55E8D400526FF6 /* Build configuration list for PBXNativeTarget "VaxCareTests" */;
 			buildPhases = (
 				0219AD982E55E8D400526FF6 /* Sources */,
 				0219AD992E55E8D400526FF6 /* Frameworks */,
@@ -168,16 +183,16 @@
 			fileSystemSynchronizedGroups = (
 				0219AE372E69A8F600526FF6 /* Vaccinations2_0 */,
 			);
-			name = Vaccinations2_0Tests;
+			name = VaxCareTests;
 			packageProductDependencies = (
 			);
 			productName = Vaccinations2_0Tests;
-			productReference = 0219AD9C2E55E8D400526FF6 /* Vaccinations2_0Tests.xctest */;
+			productReference = 0219AD9C2E55E8D400526FF6 /* VaxCareTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		0219ADA52E55E8D400526FF6 /* Vaccinations2_0UITests */ = {
+		0219ADA52E55E8D400526FF6 /* VaxCareUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 0219ADB62E55E8D400526FF6 /* Build configuration list for PBXNativeTarget "Vaccinations2_0UITests" */;
+			buildConfigurationList = 0219ADB62E55E8D400526FF6 /* Build configuration list for PBXNativeTarget "VaxCareUITests" */;
 			buildPhases = (
 				0219ADA22E55E8D400526FF6 /* Sources */,
 				0219ADA32E55E8D400526FF6 /* Frameworks */,
@@ -188,11 +203,11 @@
 			dependencies = (
 				0219ADA82E55E8D400526FF6 /* PBXTargetDependency */,
 			);
-			name = Vaccinations2_0UITests;
+			name = VaxCareUITests;
 			packageProductDependencies = (
 			);
 			productName = Vaccinations2_0UITests;
-			productReference = 0219ADA62E55E8D400526FF6 /* Vaccinations2_0UITests.xctest */;
+			productReference = 0219ADA62E55E8D400526FF6 /* VaxCareUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -218,7 +233,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 0219AD8A2E55E8D200526FF6 /* Build configuration list for PBXProject "Vaccinations2_0" */;
+			buildConfigurationList = 0219AD8A2E55E8D200526FF6 /* Build configuration list for PBXProject "VaxCare" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -232,9 +247,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				0219AD8E2E55E8D200526FF6 /* Vaccinations2_0 */,
-				0219AD9B2E55E8D400526FF6 /* Vaccinations2_0Tests */,
-				0219ADA52E55E8D400526FF6 /* Vaccinations2_0UITests */,
+				0219AD8E2E55E8D200526FF6 /* VaxCare */,
+				0219AD9B2E55E8D400526FF6 /* VaxCareTests */,
+				0219ADA52E55E8D400526FF6 /* VaxCareUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -290,12 +305,12 @@
 /* Begin PBXTargetDependency section */
 		0219AD9E2E55E8D400526FF6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 0219AD8E2E55E8D200526FF6 /* Vaccinations2_0 */;
+			target = 0219AD8E2E55E8D200526FF6 /* VaxCare */;
 			targetProxy = 0219AD9D2E55E8D400526FF6 /* PBXContainerItemProxy */;
 		};
 		0219ADA82E55E8D400526FF6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 0219AD8E2E55E8D200526FF6 /* Vaccinations2_0 */;
+			target = 0219AD8E2E55E8D200526FF6 /* VaxCare */;
 			targetProxy = 0219ADA72E55E8D400526FF6 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -427,14 +442,18 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Q77N29WPAR;
+				DEVELOPMENT_TEAM = TNHWFJ88YW;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_FILE = Vaccinations2_0/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CareVax;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIRequiredDeviceCapabilities = armv7;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -442,8 +461,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				NEW_SETTING1 = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.khorokho.Vaccinations2-0";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = CareVax;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -454,15 +474,20 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=*]" = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Q77N29WPAR;
+				DEVELOPMENT_TEAM = TNHWFJ88YW;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_FILE = Vaccinations2_0/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CareVax;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIRequiredDeviceCapabilities = armv7;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -470,8 +495,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				NEW_SETTING1 = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.khorokho.Vaccinations2-0";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = CareVax;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -493,7 +519,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Vaccinations2_0.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Vaccinations2_0";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/VaxCare.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/VaxCare";
 			};
 			name = Debug;
 		};
@@ -512,7 +538,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Vaccinations2_0.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Vaccinations2_0";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/VaxCare.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/VaxCare";
 			};
 			name = Release;
 		};
@@ -553,7 +579,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		0219AD8A2E55E8D200526FF6 /* Build configuration list for PBXProject "Vaccinations2_0" */ = {
+		0219AD8A2E55E8D200526FF6 /* Build configuration list for PBXProject "VaxCare" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				0219ADAE2E55E8D400526FF6 /* Debug */,
@@ -562,7 +588,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		0219ADB02E55E8D400526FF6 /* Build configuration list for PBXNativeTarget "Vaccinations2_0" */ = {
+		0219ADB02E55E8D400526FF6 /* Build configuration list for PBXNativeTarget "VaxCare" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				0219ADB12E55E8D400526FF6 /* Debug */,
@@ -571,7 +597,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		0219ADB32E55E8D400526FF6 /* Build configuration list for PBXNativeTarget "Vaccinations2_0Tests" */ = {
+		0219ADB32E55E8D400526FF6 /* Build configuration list for PBXNativeTarget "VaxCareTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				0219ADB42E55E8D400526FF6 /* Debug */,
@@ -580,7 +606,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		0219ADB62E55E8D400526FF6 /* Build configuration list for PBXNativeTarget "Vaccinations2_0UITests" */ = {
+		0219ADB62E55E8D400526FF6 /* Build configuration list for PBXNativeTarget "VaxCareUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				0219ADB72E55E8D400526FF6 /* Debug */,

@@ -23,8 +23,8 @@ struct AddVaccineView: View {
             VStack {
                 // Tabs
                 Picker("", selection: $selectedTab) {
-                    Text("Рекомендованные").tag(0)
-                    Text("Добавить свою").tag(1)
+                    Text("Recommended").tag(0)
+                    Text("Add Custom").tag(1)
                 }
                 .pickerStyle(SegmentedPickerStyle())
                 .padding()
@@ -35,17 +35,17 @@ struct AddVaccineView: View {
                     customVaccineForm
                 }
             }
-            .navigationTitle("Добавить прививку")
+            .navigationTitle("Add Vaccine")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Отмена") {
+                    Button("Cancel") {
                         presentationMode.wrappedValue.dismiss()
                     }
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Добавить") {
+                    Button("Add") {
                         addVaccines()
                     }
                     .disabled(!canAdd)
@@ -53,7 +53,7 @@ struct AddVaccineView: View {
             }
             .alert(isPresented: $showingAlert) {
                 Alert(
-                    title: Text("Успешно"),
+                    title: Text("Success"),
                     message: Text(alertMessage),
                     dismissButton: .default(Text("OK")) {
                         presentationMode.wrappedValue.dismiss()
@@ -68,7 +68,7 @@ struct AddVaccineView: View {
     private var recommendedVaccinesView: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 15) {
-                Text("Выберите прививки из рекомендованных")
+                Text("Select vaccines from recommended list")
                     .font(.headline)
                     .padding(.horizontal)
                 
@@ -83,7 +83,7 @@ struct AddVaccineView: View {
                 }
                 
                 if availableRecommendedVaccines.isEmpty {
-                    Text("Все рекомендованные прививки уже добавлены")
+                    Text("All recommended vaccines are already added")
                         .font(.body)
                         .foregroundColor(.secondary)
                         .padding()
@@ -98,24 +98,24 @@ struct AddVaccineView: View {
     
     private var customVaccineForm: some View {
         Form {
-            Section(header: Text("Информация о прививке")) {
-                TextField("Название прививки", text: $customVaccineName)
-                TextField("Заболевание", text: $customDisease)
+            Section(header: Text("Vaccine Information")) {
+                TextField("Vaccine Name", text: $customVaccineName)
+                TextField("Disease", text: $customDisease)
                 
                 Stepper(value: $customAgeInMonths, in: 0...1200) {
                     HStack {
-                        Text("Возраст:")
+                        Text("Age:")
                         Spacer()
                         Text(ageDescription)
                             .foregroundColor(.secondary)
                     }
                 }
                 
-                TextField("Описание (опционально)", text: $customDescription)
+                TextField("Description (optional)", text: $customDescription)
             }
             
             Section {
-                Text("Эта прививка будет добавлена как необязательная (рекомендованная)")
+                Text("This vaccine will be added as optional (recommended)")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -128,7 +128,7 @@ struct AddVaccineView: View {
         guard let country = viewModel.childProfile?.country else { return [] }
         let recommendedVaccines = VaccineDataLoader.shared.getRecommendedVaccines(for: country)
         
-        // Фильтруем уже добавленные прививки
+        // Filter out vaccines already added
         let addedVaccineIds = Set(viewModel.vaccines.map { $0.id })
         return recommendedVaccines.filter { !addedVaccineIds.contains($0.id) }
     }
@@ -143,16 +143,16 @@ struct AddVaccineView: View {
     
     private var ageDescription: String {
         if customAgeInMonths == 0 {
-            return "Новорожденный"
+            return "Newborn"
         } else if customAgeInMonths < 12 {
-            return "\(customAgeInMonths) мес."
+            return "\(customAgeInMonths) months"
         } else {
             let years = customAgeInMonths / 12
             let months = customAgeInMonths % 12
             if months == 0 {
-                return "\(years) " + (years == 1 ? "год" : years < 5 ? "года" : "лет")
+                return "\(years) " + (years == 1 ? "year" : years < 5 ? "years" : "years")
             } else {
-                return "\(years) " + (years == 1 ? "год" : years < 5 ? "года" : "лет") + " \(months) мес."
+                return "\(years) " + (years == 1 ? "year" : years < 5 ? "years" : "years") + " \(months) months"
             }
         }
     }
@@ -169,27 +169,27 @@ struct AddVaccineView: View {
     
     private func addVaccines() {
         if selectedTab == 0 {
-            // Добавляем выбранные рекомендованные прививки
+            // Add selected recommended vaccines
             let selectedVaccines = availableRecommendedVaccines.filter {
                 selectedRecommendedVaccines.contains($0.id)
             }
             
             for vaccine in selectedVaccines {
-                // Добавляем прививку в список
+                // Add vaccine to the list
                 viewModel.vaccines.append(vaccine)
                 
-                // Создаем запись для прививки
+                // Create a record for the vaccine
                 let record = VaccineRecord(vaccineId: vaccine.id)
                 viewModel.vaccineRecords.append(record)
             }
             
-            // Сохраняем изменения
+            // Save changes
             viewModel.dataService.saveVaccineRecords(viewModel.vaccineRecords)
             
-            alertMessage = "Добавлено прививок: \(selectedVaccines.count)"
+            alertMessage = "Added vaccines: \(selectedVaccines.count)"
             showingAlert = true
         } else {
-            // Добавляем пользовательскую прививку
+            // Add custom vaccine
             viewModel.addCustomVaccine(
                 name: customVaccineName,
                 disease: customDisease,
@@ -198,7 +198,7 @@ struct AddVaccineView: View {
                 description: customDescription.isEmpty ? nil : customDescription
             )
             
-            alertMessage = "Прививка \"\(customVaccineName)\" добавлена"
+            alertMessage = "Vaccine \"\(customVaccineName)\" added"
             showingAlert = true
         }
     }

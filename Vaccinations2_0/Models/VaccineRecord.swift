@@ -5,18 +5,18 @@
 
 import Foundation
 
-// Модель записи о сделанной прививке
+// Model representing a recorded vaccination
 struct VaccineRecord: Codable, Identifiable {
     let id: String
     let vaccineId: String
     var isDone: Bool
     var dateAdministered: Date?
-    var vaccineName: String? // Конкретное название использованной вакцины
-    var batchNumber: String? // Серия вакцины
-    var notes: String? // Заметки пользователя
-    var sideEffects: String? // Побочные эффекты, если были
-    var doctorName: String? // Имя врача
-    var clinicName: String? // Название клиники
+    var vaccineName: String? // Specific name of the administered vaccine
+    var batchNumber: String? // Vaccine batch number
+    var notes: String? // User notes
+    var sideEffects: String? // Side effects, if any
+    var doctorName: String? // Doctor's name
+    var clinicName: String? // Clinic name
     
     init(vaccineId: String) {
         self.id = UUID().uuidString
@@ -24,7 +24,7 @@ struct VaccineRecord: Codable, Identifiable {
         self.isDone = false
     }
     
-    // Метод для отметки прививки как сделанной
+    // Marks the vaccine as administered
     mutating func markAsDone(date: Date = Date(), vaccineName: String? = nil, notes: String? = nil) {
         self.isDone = true
         self.dateAdministered = date
@@ -32,7 +32,7 @@ struct VaccineRecord: Codable, Identifiable {
         self.notes = notes
     }
     
-    // Метод для отмены отметки
+    // Cancels the "done" status
     mutating func markAsNotDone() {
         self.isDone = false
         self.dateAdministered = nil
@@ -45,7 +45,7 @@ struct VaccineRecord: Codable, Identifiable {
     }
 }
 
-// Статус прививки для отображения
+// Vaccine status for display purposes
 enum VaccineStatus {
     case completed
     case upcoming
@@ -72,10 +72,10 @@ enum VaccineStatus {
     
     var description: String {
         switch self {
-        case .completed: return "Сделано"
-        case .upcoming: return "Скоро"
-        case .overdue: return "Просрочено"
-        case .scheduled: return "Запланировано"
+        case .completed: return "Completed"
+        case .upcoming: return "Upcoming"
+        case .overdue: return "Overdue"
+        case .scheduled: return "Scheduled"
         }
     }
 }

@@ -5,13 +5,13 @@
 
 import Foundation
 
-// Модель профиля ребёнка
+// Model representing a child's profile
 struct ChildProfile: Codable {
     var name: String
     var birthDate: Date
     var country: String
     
-    // Вычисляемые свойства
+    // Computed properties
     var age: Int {
         let calendar = Calendar.current
         let ageComponents = calendar.dateComponents([.year], from: birthDate, to: Date())
@@ -30,43 +30,43 @@ struct ChildProfile: Codable {
         
         if years == 0 {
             if months == 0 {
-                return "Новорожденный"
+                return "Newborn"
             } else if months == 1 {
-                return "1 месяц"
+                return "1 month"
             } else if months < 5 {
-                return "\(months) месяца"
+                return "\(months) months"
             } else {
-                return "\(months) месяцев"
+                return "\(months) months"
             }
         } else if years == 1 {
             if months == 0 {
-                return "1 год"
+                return "1 year"
             } else {
-                return "1 год \(months) мес."
+                return "1 year \(months) months"
             }
         } else if years < 5 {
             if months == 0 {
-                return "\(years) года"
+                return "\(years) years"
             } else {
-                return "\(years) года \(months) мес."
+                return "\(years) years \(months) months"
             }
         } else {
             if months == 0 {
-                return "\(years) лет"
+                return "\(years) years"
             } else {
-                return "\(years) лет \(months) мес."
+                return "\(years) years \(months) months"
             }
         }
     }
 }
 
-// Список поддерживаемых стран
+// List of supported countries
 enum Country: String, CaseIterable {
-    // Встроенные календари (доступны сразу)
+    // Built-in calendars (available immediately)
     case usa = "USA"
     case china = "China"
     
-    // Загружаемые календари
+    // Downloadable calendars
     case russia = "Russia"
     case germany = "Germany"
     case france = "France"
@@ -117,7 +117,7 @@ enum Country: String, CaseIterable {
         }
     }
     
-    // Определяет, встроен ли календарь в приложение
+    // Determines if the calendar is built into the app
     var isBuiltIn: Bool {
         switch self {
         case .usa, .china:
@@ -127,11 +127,11 @@ enum Country: String, CaseIterable {
         }
     }
     
-    // URL для загрузки календаря (для не встроенных стран)
+    // URL for downloading calendar (for non-built-in countries)
     var remoteURL: String? {
         switch self {
         case .usa, .china:
-            return nil // Встроенные календари
+            return nil // Built-in calendars
         case .russia:
             return "https://raw.githubusercontent.com/vaccine-calendars/data/main/russia.json"
         case .germany:
@@ -149,7 +149,7 @@ enum Country: String, CaseIterable {
         }
     }
     
-    // Имя файла для локального календаря
+    // File name for the local calendar
     var localFileName: String {
         switch self {
         case .usa: return "vaccines_usa"
