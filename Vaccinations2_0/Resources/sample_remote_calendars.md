@@ -1,25 +1,28 @@
-# Sample Remote Calendar URLs
+# Offline Vaccine Calendars
 
-В реальном приложении календари прививок для дополнительных стран будут загружаться с удаленного сервера.
+Все календари прививок теперь поставляются вместе с приложением и не требуют загрузки из интернета. Данные находятся в JSON-файлах в каталоге `Resources/` и подгружаются напрямую из бандла, поэтому выбор страны работает полностью офлайн.
 
-## Примеры URL для загрузки:
+## Поддерживаемые страны
 
-### Европа
-- Germany: https://api.vaccine-calendars.org/v1/countries/germany.json
-- France: https://api.vaccine-calendars.org/v1/countries/france.json  
-- Italy: https://api.vaccine-calendars.org/v1/countries/italy.json
-
-### Россия
-- Russia: https://api.vaccine-calendars.org/v1/countries/russia.json
-
-### Латинская Америка
-- Brazil: https://api.vaccine-calendars.org/v1/countries/brazil.json
-- Argentina: https://api.vaccine-calendars.org/v1/countries/argentina.json
-- Mexico: https://api.vaccine-calendars.org/v1/countries/mexico.json
+- USA  
+- China  
+- Russia  
+- Germany  
+- France  
+- Italy  
+- Brazil  
+- Argentina  
+- Mexico  
+- India  
+- Turkey  
+- Japan  
+- Norway  
+- Egypt  
+- Philippines  
 
 ## Формат JSON
 
-Все календари должны следовать единому формату:
+Каждый файл соответствует единому формату:
 
 ```json
 {
@@ -43,14 +46,13 @@
 }
 ```
 
-## Кеширование
+## Хранение данных
 
-- Загруженные календари сохраняются локально на 30 дней
-- При отсутствии интернета используется кешированная версия
-- Пользователь может принудительно обновить календарь
+- Для США и Китая используются файлы `vaccines_usa.json` и `vaccines_china.json`
+- Все остальные страны хранятся в общем файле `vaccines_data.json`
+- Формат позволяет легко добавлять новые страны, достаточно внести запись с соответствующим `country_code`
 
 ## Обработка ошибок
 
-- При отсутствии интернета показывается сообщение об ошибке
-- Если календарь уже был загружен ранее, используется кешированная версия
-- Встроенные календари (США, Китай) всегда доступны офлайн
+- Если файл не найден или JSON поврежден, пользователь увидит понятное сообщение об ошибке
+- При ошибке загрузки показываются только пользовательские прививки, поэтому интерфейс остается рабочим даже при проблемах с данными

@@ -12,8 +12,6 @@ struct OnboardingView: View {
     @State private var selectedCountry: Country = .usa
     @State private var showDatePicker = false
     @State private var showCountrySelection = false
-    @State private var isDownloadingCalendar = false
-    @State private var downloadError: String?
     
     var body: some View {
         NavigationView {
@@ -111,24 +109,17 @@ struct OnboardingView: View {
                     saveProfile()
                 }) {
                     HStack {
-                        if isDownloadingCalendar {
-                            ProgressView()
-                                .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                                .scaleEffect(0.8)
-                            Text("Loading...")
-                        } else {
-                            Text("Start")
-                            Image(systemName: "arrow.right")
-                        }
+                        Text("Start")
+                        Image(systemName: "arrow.right")
                     }
                     .font(.headline)
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(childName.isEmpty || isDownloadingCalendar ? Color.gray : Color.blue)
+                    .background(childName.isEmpty ? Color.gray : Color.blue)
                     .cornerRadius(12)
                 }
-                .disabled(childName.isEmpty || isDownloadingCalendar)
+                .disabled(childName.isEmpty)
                 .padding(.horizontal)
                 .padding(.bottom, 30)
             }
@@ -138,48 +129,9 @@ struct OnboardingView: View {
         .sheet(isPresented: $showCountrySelection) {
             CountrySelectionSheet(selectedCountry: $selectedCountry)
         }
-        .alert("Error", isPresented: .constant(downloadError != nil)) {
-            Button("OK") {
-                downloadError = nil
-            }
-        } message: {
-            Text(downloadError ?? "An error occurred")
-        }
-        .overlay(
-            Group {
-                if isDownloadingCalendar {
-                    Color.black.opacity(0.3)
-                        .ignoresSafeArea()
-                    
-                    LoadingOverlay(
-                        message: "Downloading vaccination calendar...",
-                        progress: viewModel.vaccineLoader.loadingProgress > 0 ? viewModel.vaccineLoader.loadingProgress : nil
-                    )
-                }
-            }
-        )
     }
     
     private func saveProfile() {
-        // Check if we need to download the calendar
-        if !selectedCountry.isBuiltIn && !viewModel.isCountryAvailable(selectedCountry) {
-            isDownloadingCalendar = true
-            
-            viewModel.downloadCountryCalendar(selectedCountry) { success in
-                isDownloadingCalendar = false
-                
-                if success {
-                    completeProfileSave()
-                } else {
-                    downloadError = viewModel.loadingError?.errorDescription ?? "Failed to download vaccination calendar"
-                }
-            }
-        } else {
-            completeProfileSave()
-        }
-    }
-    
-    private func completeProfileSave() {
         viewModel.saveChildProfile(
             name: childName,
             birthDate: birthDate,
@@ -211,32 +163,13 @@ struct CountrySelectionSheet: View {
                 // Countries List
                 ScrollView {
                     VStack(spacing: 12) {
-                        // Built-in countries
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Available Offline")
+                            Text("Available Countries")
                                 .font(.headline)
                                 .foregroundColor(.secondary)
                                 .padding(.horizontal)
                             
-                            ForEach(Country.allCases.filter { $0.isBuiltIn }, id: \.self) { country in
-                                SimpleCountryRow(
-                                    country: country,
-                                    isSelected: tempSelection == country
-                                ) {
-                                    tempSelection = country
-                                }
-                            }
-                        }
-                        
-                        // Downloadable countries
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Requires Download")
-                                .font(.headline)
-                                .foregroundColor(.secondary)
-                                .padding(.horizontal)
-                                .padding(.top)
-                            
-                            ForEach(Country.allCases.filter { !$0.isBuiltIn }, id: \.self) { country in
+                            ForEach(Country.allCases, id: \.self) { country in
                                 SimpleCountryRow(
                                     country: country,
                                     isSelected: tempSelection == country
@@ -293,15 +226,9 @@ struct SimpleCountryRow: View {
                         .fontWeight(isSelected ? .semibold : .regular)
                         .foregroundColor(.primary)
                     
-                    if country.isBuiltIn {
-                        Text("Available offline")
-                            .font(.caption)
-                            .foregroundColor(.green)
-                    } else {
-                        Text("Requires internet connection")
-                            .font(.caption)
-                            .foregroundColor(.orange)
-                    }
+                    Text("Available offline")
+                        .font(.caption)
+                        .foregroundColor(.green)
                 }
                 
                 Spacer()

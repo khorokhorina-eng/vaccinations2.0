@@ -352,5 +352,917 @@
         "notes": "Рекомендуется девочкам"
       }
     ]
+  },
+  "germany": {
+    "mandatory": [
+      {
+        "id": "germany_hepb_birth",
+        "name": "Hepatitis B (birth dose)",
+        "disease": "Hepatitis B",
+        "ageInMonths": 0,
+        "ageDescription": "Birth",
+        "isMandatory": true,
+        "description": "Initial hepatitis B protection for newborns",
+        "notes": "Core schedule for Germany"
+      },
+      {
+        "id": "germany_dtap_2months",
+        "name": "DTaP/IPV/Hib (1st dose)",
+        "disease": "Diphtheria, Tetanus, Pertussis, Polio, Hib",
+        "ageInMonths": 2,
+        "ageDescription": "2 months",
+        "isMandatory": true,
+        "description": "Combination vaccine covering DTaP, polio and Hib",
+        "notes": "Given as hexavalent shot"
+      },
+      {
+        "id": "germany_pcv_4months",
+        "name": "Pneumococcal (PCV13) (2nd dose)",
+        "disease": "Pneumococcal disease",
+        "ageInMonths": 4,
+        "ageDescription": "4 months",
+        "isMandatory": true,
+        "description": "Follow-up pneumococcal dose",
+        "notes": "Protects against invasive pneumococcal disease"
+      },
+      {
+        "id": "germany_mmr_12months",
+        "name": "MMR (1st dose)",
+        "disease": "Measles, Mumps, Rubella",
+        "ageInMonths": 12,
+        "ageDescription": "12 months",
+        "isMandatory": true,
+        "description": "Routine MMR vaccination",
+        "notes": "Required before kindergarten"
+      },
+      {
+        "id": "germany_dtap_60months",
+        "name": "DTaP/IPV Booster",
+        "disease": "Diphtheria, Tetanus, Pertussis, Polio",
+        "ageInMonths": 60,
+        "ageDescription": "5 years",
+        "isMandatory": true,
+        "description": "Booster prior to school entry",
+        "notes": "Ensures sustained protection"
+      }
+    ],
+    "recommended": [
+      {
+        "id": "germany_influenza_6months",
+        "name": "Influenza (annual)",
+        "disease": "Influenza",
+        "ageInMonths": 6,
+        "ageDescription": "6 months and yearly",
+        "isMandatory": false,
+        "description": "Seasonal flu protection",
+        "notes": "Recommended before flu season"
+      },
+      {
+        "id": "germany_hpv_132months",
+        "name": "HPV (2-dose series)",
+        "disease": "Human Papillomavirus",
+        "ageInMonths": 132,
+        "ageDescription": "11-12 years",
+        "isMandatory": false,
+        "description": "HPV protection for adolescents",
+        "notes": "Best before start of sexual activity"
+      }
+    ]
+  },
+  "france": {
+    "mandatory": [
+      {
+        "id": "france_hepb_birth",
+        "name": "Hepatitis B (birth dose)",
+        "disease": "Hepatitis B",
+        "ageInMonths": 0,
+        "ageDescription": "Birth",
+        "isMandatory": true,
+        "description": "Initial hepatitis B protection for newborns",
+        "notes": "Core schedule for France"
+      },
+      {
+        "id": "france_dtap_2months",
+        "name": "DTaP/IPV/Hib (1st dose)",
+        "disease": "Diphtheria, Tetanus, Pertussis, Polio, Hib",
+        "ageInMonths": 2,
+        "ageDescription": "2 months",
+        "isMandatory": true,
+        "description": "Combination vaccine covering DTaP, polio and Hib",
+        "notes": "Administered as hexavalent vaccine"
+      },
+      {
+        "id": "france_pcv_4months",
+        "name": "Pneumococcal (PCV13) (2nd dose)",
+        "disease": "Pneumococcal disease",
+        "ageInMonths": 4,
+        "ageDescription": "4 months",
+        "isMandatory": true,
+        "description": "Follow-up pneumococcal dose",
+        "notes": "Protects against pneumococcal meningitis"
+      },
+      {
+        "id": "france_mmr_12months",
+        "name": "MMR (1st dose)",
+        "disease": "Measles, Mumps, Rubella",
+        "ageInMonths": 12,
+        "ageDescription": "12 months",
+        "isMandatory": true,
+        "description": "Routine MMR vaccination",
+        "notes": "Required before enrollment in crèche"
+      },
+      {
+        "id": "france_dtap_60months",
+        "name": "DTaP/IPV Booster",
+        "disease": "Diphtheria, Tetanus, Pertussis, Polio",
+        "ageInMonths": 60,
+        "ageDescription": "5 years",
+        "isMandatory": true,
+        "description": "Booster prior to school entry",
+        "notes": "Ensures long-term immunity"
+      }
+    ],
+    "recommended": [
+      {
+        "id": "france_influenza_6months",
+        "name": "Influenza (annual)",
+        "disease": "Influenza",
+        "ageInMonths": 6,
+        "ageDescription": "6 months and yearly",
+        "isMandatory": false,
+        "description": "Seasonal flu protection",
+        "notes": "Prioritized for chronic conditions"
+      },
+      {
+        "id": "france_hpv_132months",
+        "name": "HPV (2-dose series)",
+        "disease": "Human Papillomavirus",
+        "ageInMonths": 132,
+        "ageDescription": "11-12 years",
+        "isMandatory": false,
+        "description": "HPV protection for adolescents",
+        "notes": "Recommended for both girls and boys"
+      }
+    ]
+  },
+  "italy": {
+    "mandatory": [
+      {
+        "id": "italy_hepb_birth",
+        "name": "Hepatitis B (birth dose)",
+        "disease": "Hepatitis B",
+        "ageInMonths": 0,
+        "ageDescription": "Birth",
+        "isMandatory": true,
+        "description": "Initial hepatitis B protection for newborns",
+        "notes": "Core schedule for Italy"
+      },
+      {
+        "id": "italy_dtap_2months",
+        "name": "Hexavalent (1st dose)",
+        "disease": "Diphtheria, Tetanus, Pertussis, Polio, Hib, HepB",
+        "ageInMonths": 2,
+        "ageDescription": "2 months",
+        "isMandatory": true,
+        "description": "Comprehensive infant vaccine",
+        "notes": "Offered free via national health service"
+      },
+      {
+        "id": "italy_pcv_4months",
+        "name": "Pneumococcal (PCV13) (2nd dose)",
+        "disease": "Pneumococcal disease",
+        "ageInMonths": 4,
+        "ageDescription": "4 months",
+        "isMandatory": true,
+        "description": "Follow-up pneumococcal dose",
+        "notes": "Prevents invasive pneumococcal infections"
+      },
+      {
+        "id": "italy_mmr_12months",
+        "name": "MMR (1st dose)",
+        "disease": "Measles, Mumps, Rubella",
+        "ageInMonths": 12,
+        "ageDescription": "12 months",
+        "isMandatory": true,
+        "description": "Routine MMR vaccination",
+        "notes": "Part of mandatory schedule since 2017"
+      },
+      {
+        "id": "italy_dtap_60months",
+        "name": "DTaP/IPV Booster",
+        "disease": "Diphtheria, Tetanus, Pertussis, Polio",
+        "ageInMonths": 60,
+        "ageDescription": "5 years",
+        "isMandatory": true,
+        "description": "Booster prior to primary school",
+        "notes": "Required for school attendance"
+      }
+    ],
+    "recommended": [
+      {
+        "id": "italy_influenza_6months",
+        "name": "Influenza (annual)",
+        "disease": "Influenza",
+        "ageInMonths": 6,
+        "ageDescription": "6 months and yearly",
+        "isMandatory": false,
+        "description": "Seasonal flu protection",
+        "notes": "Free for high-risk groups"
+      },
+      {
+        "id": "italy_hpv_132months",
+        "name": "HPV (2-dose series)",
+        "disease": "Human Papillomavirus",
+        "ageInMonths": 132,
+        "ageDescription": "11-12 years",
+        "isMandatory": false,
+        "description": "HPV protection for adolescents",
+        "notes": "Offered to both genders"
+      }
+    ]
+  },
+  "brazil": {
+    "mandatory": [
+      {
+        "id": "brazil_hepb_birth",
+        "name": "Hepatitis B (birth dose)",
+        "disease": "Hepatitis B",
+        "ageInMonths": 0,
+        "ageDescription": "Birth",
+        "isMandatory": true,
+        "description": "Initial hepatitis B protection for newborns",
+        "notes": "Core schedule for Brazil"
+      },
+      {
+        "id": "brazil_dtap_2months",
+        "name": "Pentavalent (1st dose)",
+        "disease": "Diphtheria, Tetanus, Pertussis, Hib, HepB",
+        "ageInMonths": 2,
+        "ageDescription": "2 months",
+        "isMandatory": true,
+        "description": "Combination vaccine used by SUS",
+        "notes": "Protects against five infections"
+      },
+      {
+        "id": "brazil_pcv_4months",
+        "name": "Pneumococcal (PCV10) (2nd dose)",
+        "disease": "Pneumococcal disease",
+        "ageInMonths": 4,
+        "ageDescription": "4 months",
+        "isMandatory": true,
+        "description": "Follow-up pneumococcal dose",
+        "notes": "Part of national immunization program"
+      },
+      {
+        "id": "brazil_mmr_12months",
+        "name": "MMR (1st dose)",
+        "disease": "Measles, Mumps, Rubella",
+        "ageInMonths": 12,
+        "ageDescription": "12 months",
+        "isMandatory": true,
+        "description": "Routine MMR vaccination",
+        "notes": "Administered at basic health units"
+      },
+      {
+        "id": "brazil_yellow_fever_9months",
+        "name": "Yellow Fever (dose única)",
+        "disease": "Yellow Fever",
+        "ageInMonths": 9,
+        "ageDescription": "9 months",
+        "isMandatory": true,
+        "description": "Required in endemic regions",
+        "notes": "Single dose protects for life"
+      }
+    ],
+    "recommended": [
+      {
+        "id": "brazil_influenza_6months",
+        "name": "Influenza (annual)",
+        "disease": "Influenza",
+        "ageInMonths": 6,
+        "ageDescription": "6 months and yearly",
+        "isMandatory": false,
+        "description": "Seasonal flu protection",
+        "notes": "Campaign held before winter"
+      },
+      {
+        "id": "brazil_hpv_132months",
+        "name": "HPV (2-dose series)",
+        "disease": "Human Papillomavirus",
+        "ageInMonths": 132,
+        "ageDescription": "11-12 years",
+        "isMandatory": false,
+        "description": "HPV protection for adolescents",
+        "notes": "Free via public health system"
+      }
+    ]
+  },
+  "argentina": {
+    "mandatory": [
+      {
+        "id": "argentina_hepb_birth",
+        "name": "Hepatitis B (birth dose)",
+        "disease": "Hepatitis B",
+        "ageInMonths": 0,
+        "ageDescription": "Birth",
+        "isMandatory": true,
+        "description": "Initial hepatitis B protection for newborns",
+        "notes": "Core schedule for Argentina"
+      },
+      {
+        "id": "argentina_dtap_2months",
+        "name": "Pentavalent (1st dose)",
+        "disease": "Diphtheria, Tetanus, Pertussis, Hib, HepB",
+        "ageInMonths": 2,
+        "ageDescription": "2 months",
+        "isMandatory": true,
+        "description": "Combination vaccine",
+        "notes": "Part of national program"
+      },
+      {
+        "id": "argentina_pcv_4months",
+        "name": "Pneumococcal (PCV13) (2nd dose)",
+        "disease": "Pneumococcal disease",
+        "ageInMonths": 4,
+        "ageDescription": "4 months",
+        "isMandatory": true,
+        "description": "Follow-up pneumococcal dose",
+        "notes": "Protects against pneumonia and meningitis"
+      },
+      {
+        "id": "argentina_mmr_12months",
+        "name": "MMR (1st dose)",
+        "disease": "Measles, Mumps, Rubella",
+        "ageInMonths": 12,
+        "ageDescription": "12 months",
+        "isMandatory": true,
+        "description": "Routine MMR vaccination",
+        "notes": "Required for childcare enrollment"
+      },
+      {
+        "id": "argentina_dtap_60months",
+        "name": "DTaP/IPV Booster",
+        "disease": "Diphtheria, Tetanus, Pertussis, Polio",
+        "ageInMonths": 60,
+        "ageDescription": "5 years",
+        "isMandatory": true,
+        "description": "Booster before school",
+        "notes": "Ensures sustained protection"
+      }
+    ],
+    "recommended": [
+      {
+        "id": "argentina_influenza_6months",
+        "name": "Influenza (annual)",
+        "disease": "Influenza",
+        "ageInMonths": 6,
+        "ageDescription": "6 months and yearly",
+        "isMandatory": false,
+        "description": "Seasonal flu protection",
+        "notes": "Free during immunization campaigns"
+      },
+      {
+        "id": "argentina_hpv_132months",
+        "name": "HPV (2-dose series)",
+        "disease": "Human Papillomavirus",
+        "ageInMonths": 132,
+        "ageDescription": "11-12 years",
+        "isMandatory": false,
+        "description": "HPV protection for adolescents",
+        "notes": "Available for girls and boys"
+      }
+    ]
+  },
+  "mexico": {
+    "mandatory": [
+      {
+        "id": "mexico_hepb_birth",
+        "name": "Hepatitis B (birth dose)",
+        "disease": "Hepatitis B",
+        "ageInMonths": 0,
+        "ageDescription": "Birth",
+        "isMandatory": true,
+        "description": "Initial hepatitis B protection for newborns",
+        "notes": "Core schedule for Mexico"
+      },
+      {
+        "id": "mexico_dtap_2months",
+        "name": "Pentavalent (1st dose)",
+        "disease": "Diphtheria, Tetanus, Pertussis, Hib, Polio",
+        "ageInMonths": 2,
+        "ageDescription": "2 months",
+        "isMandatory": true,
+        "description": "Combination vaccine from IMSS",
+        "notes": "Covers five diseases at once"
+      },
+      {
+        "id": "mexico_pcv_4months",
+        "name": "Pneumococcal (PCV13) (2nd dose)",
+        "disease": "Pneumococcal disease",
+        "ageInMonths": 4,
+        "ageDescription": "4 months",
+        "isMandatory": true,
+        "description": "Follow-up pneumococcal dose",
+        "notes": "Recommended by Secretaría de Salud"
+      },
+      {
+        "id": "mexico_rotavirus_6months",
+        "name": "Rotavirus (final dose)",
+        "disease": "Rotavirus",
+        "ageInMonths": 6,
+        "ageDescription": "6 months",
+        "isMandatory": true,
+        "description": "Oral vaccine against severe diarrhea",
+        "notes": "Completes the 3-dose series"
+      },
+      {
+        "id": "mexico_mmr_12months",
+        "name": "MMR (1st dose)",
+        "disease": "Measles, Mumps, Rubella",
+        "ageInMonths": 12,
+        "ageDescription": "12 months",
+        "isMandatory": true,
+        "description": "Routine MMR vaccination",
+        "notes": "Applied at health centers"
+      }
+    ],
+    "recommended": [
+      {
+        "id": "mexico_influenza_6months",
+        "name": "Influenza (annual)",
+        "disease": "Influenza",
+        "ageInMonths": 6,
+        "ageDescription": "6 months and yearly",
+        "isMandatory": false,
+        "description": "Seasonal flu protection",
+        "notes": "Campaign runs every autumn"
+      },
+      {
+        "id": "mexico_hpv_132months",
+        "name": "HPV (2-dose series)",
+        "disease": "Human Papillomavirus",
+        "ageInMonths": 132,
+        "ageDescription": "11-12 years",
+        "isMandatory": false,
+        "description": "HPV protection for adolescents",
+        "notes": "School-based campaigns"
+      }
+    ]
+  },
+  "india": {
+    "mandatory": [
+      {
+        "id": "india_hepb_birth",
+        "name": "Hepatitis B (birth dose)",
+        "disease": "Hepatitis B",
+        "ageInMonths": 0,
+        "ageDescription": "Birth",
+        "isMandatory": true,
+        "description": "Initial hepatitis B protection for newborns",
+        "notes": "Core schedule for India"
+      },
+      {
+        "id": "india_bcg_birth",
+        "name": "BCG",
+        "disease": "Tuberculosis",
+        "ageInMonths": 0,
+        "ageDescription": "Birth",
+        "isMandatory": true,
+        "description": "Protection against severe TB",
+        "notes": "Given at delivery facilities"
+      },
+      {
+        "id": "india_pentavalent_6weeks",
+        "name": "Pentavalent (1st dose)",
+        "disease": "Diphtheria, Pertussis, Tetanus, Hib, HepB",
+        "ageInMonths": 1,
+        "ageDescription": "6 weeks",
+        "isMandatory": true,
+        "description": "UIP schedule first shot",
+        "notes": "Free at government clinics"
+      },
+      {
+        "id": "india_opv_14weeks",
+        "name": "OPV (3rd dose)",
+        "disease": "Polio",
+        "ageInMonths": 3,
+        "ageDescription": "14 weeks",
+        "isMandatory": true,
+        "description": "Critical oral polio protection",
+        "notes": "Part of UIP drops"
+      },
+      {
+        "id": "india_mr_9months",
+        "name": "MR (1st dose)",
+        "disease": "Measles, Rubella",
+        "ageInMonths": 9,
+        "ageDescription": "9 months",
+        "isMandatory": true,
+        "description": "Combined measles-rubella vaccine",
+        "notes": "Replaces monovalent measles"
+      }
+    ],
+    "recommended": [
+      {
+        "id": "india_influenza_6months",
+        "name": "Influenza (annual)",
+        "disease": "Influenza",
+        "ageInMonths": 6,
+        "ageDescription": "6 months and yearly",
+        "isMandatory": false,
+        "description": "Seasonal flu protection",
+        "notes": "Especially for high-risk states"
+      },
+      {
+        "id": "india_typhoid_24months",
+        "name": "Typhoid (TCV)",
+        "disease": "Typhoid Fever",
+        "ageInMonths": 24,
+        "ageDescription": "2 years",
+        "isMandatory": false,
+        "description": "Typhoid conjugate vaccine",
+        "notes": "Recommended in urban areas"
+      }
+    ]
+  },
+  "turkey": {
+    "mandatory": [
+      {
+        "id": "turkey_hepb_birth",
+        "name": "Hepatitis B (birth dose)",
+        "disease": "Hepatitis B",
+        "ageInMonths": 0,
+        "ageDescription": "Birth",
+        "isMandatory": true,
+        "description": "Initial hepatitis B protection for newborns",
+        "notes": "Core schedule for Turkey"
+      },
+      {
+        "id": "turkey_bcgs_birth",
+        "name": "BCG",
+        "disease": "Tuberculosis",
+        "ageInMonths": 0,
+        "ageDescription": "Birth",
+        "isMandatory": true,
+        "description": "Protection against severe TB",
+        "notes": "Given after neonatal check"
+      },
+      {
+        "id": "turkey_dtap_2months",
+        "name": "DaBT-IPV-Hib (1st dose)",
+        "disease": "Diphtheria, Tetanus, Pertussis, Polio, Hib",
+        "ageInMonths": 2,
+        "ageDescription": "2 months",
+        "isMandatory": true,
+        "description": "Combination vaccine used nationwide",
+        "notes": "Part of TURKOVAC schedule"
+      },
+      {
+        "id": "turkey_mmr_12months",
+        "name": "MMR (1st dose)",
+        "disease": "Measles, Mumps, Rubella",
+        "ageInMonths": 12,
+        "ageDescription": "12 months",
+        "isMandatory": true,
+        "description": "Routine MMR vaccination",
+        "notes": "Given at family health centers"
+      },
+      {
+        "id": "turkey_dtap_72months",
+        "name": "Td Booster",
+        "disease": "Tetanus, Diphtheria",
+        "ageInMonths": 72,
+        "ageDescription": "6 years",
+        "isMandatory": true,
+        "description": "Booster before primary school",
+        "notes": "Switches to Td formulation"
+      }
+    ],
+    "recommended": [
+      {
+        "id": "turkey_influenza_6months",
+        "name": "Influenza (annual)",
+        "disease": "Influenza",
+        "ageInMonths": 6,
+        "ageDescription": "6 months and yearly",
+        "isMandatory": false,
+        "description": "Seasonal flu protection",
+        "notes": "Advised each autumn"
+      },
+      {
+        "id": "turkey_meningococcal_9months",
+        "name": "Meningococcal ACWY",
+        "disease": "Meningococcal disease",
+        "ageInMonths": 9,
+        "ageDescription": "9-12 months",
+        "isMandatory": false,
+        "description": "Protection for travel and crowded cities",
+        "notes": "Recommended by pediatric societies"
+      }
+    ]
+  },
+  "japan": {
+    "mandatory": [
+      {
+        "id": "japan_hepb_birth",
+        "name": "Hepatitis B (birth dose)",
+        "disease": "Hepatitis B",
+        "ageInMonths": 0,
+        "ageDescription": "Birth",
+        "isMandatory": true,
+        "description": "Initial hepatitis B protection for newborns",
+        "notes": "Core schedule for Japan"
+      },
+      {
+        "id": "japan_bcgs_birth",
+        "name": "BCG",
+        "disease": "Tuberculosis",
+        "ageInMonths": 0,
+        "ageDescription": "Birth",
+        "isMandatory": true,
+        "description": "Live vaccine preventing severe TB",
+        "notes": "Given before 6 months"
+      },
+      {
+        "id": "japan_dtap_3months",
+        "name": "DPT-IPV (1st dose)",
+        "disease": "Diphtheria, Tetanus, Pertussis, Polio",
+        "ageInMonths": 3,
+        "ageDescription": "3 months",
+        "isMandatory": true,
+        "description": "Part of Routine Schedule A",
+        "notes": "Administered at clinics"
+      },
+      {
+        "id": "japan_pcv_4months",
+        "name": "Pneumococcal (PCV13) (2nd dose)",
+        "disease": "Pneumococcal disease",
+        "ageInMonths": 4,
+        "ageDescription": "4 months",
+        "isMandatory": true,
+        "description": "Follow-up pneumococcal dose",
+        "notes": "Prevents bacterial meningitis"
+      },
+      {
+        "id": "japan_mrv_12months",
+        "name": "MR (1st dose)",
+        "disease": "Measles, Rubella",
+        "ageInMonths": 12,
+        "ageDescription": "12 months",
+        "isMandatory": true,
+        "description": "Required under Immunization Act",
+        "notes": "Second dose at 5-6 years"
+      }
+    ],
+    "recommended": [
+      {
+        "id": "japan_influenza_6months",
+        "name": "Influenza (annual)",
+        "disease": "Influenza",
+        "ageInMonths": 6,
+        "ageDescription": "6 months and yearly",
+        "isMandatory": false,
+        "description": "Seasonal flu protection",
+        "notes": "Two doses for first-time recipients"
+      },
+      {
+        "id": "japan_hpvv_132months",
+        "name": "HPV (2-dose series)",
+        "disease": "Human Papillomavirus",
+        "ageInMonths": 132,
+        "ageDescription": "11-12 years",
+        "isMandatory": false,
+        "description": "Resumed proactive recommendation",
+        "notes": "Offered in junior high school"
+      }
+    ]
+  },
+  "norway": {
+    "mandatory": [
+      {
+        "id": "norway_hepb_birth",
+        "name": "Hepatitis B (birth dose)",
+        "disease": "Hepatitis B",
+        "ageInMonths": 0,
+        "ageDescription": "Birth",
+        "isMandatory": true,
+        "description": "Initial hepatitis B protection for newborns",
+        "notes": "Core schedule for Norway"
+      },
+      {
+        "id": "norway_dtap_2months",
+        "name": "Hexavalent (1st dose)",
+        "disease": "Diphtheria, Tetanus, Pertussis, Polio, Hib, HepB",
+        "ageInMonths": 2,
+        "ageDescription": "2 months",
+        "isMandatory": true,
+        "description": "Combination vaccine offered by FHI",
+        "notes": "Covers six diseases"
+      },
+      {
+        "id": "norway_pcv_3months",
+        "name": "Pneumococcal (PCV13) (1st booster)",
+        "disease": "Pneumococcal disease",
+        "ageInMonths": 3,
+        "ageDescription": "3 months",
+        "isMandatory": true,
+        "description": "Primary PCV booster",
+        "notes": "Part of 2+1 schedule"
+      },
+      {
+        "id": "norway_mmr_15months",
+        "name": "MMR (1st dose)",
+        "disease": "Measles, Mumps, Rubella",
+        "ageInMonths": 15,
+        "ageDescription": "15 months",
+        "isMandatory": true,
+        "description": "Routine MMR vaccination",
+        "notes": "Second dose in grade 6"
+      },
+      {
+        "id": "norway_dtap_96months",
+        "name": "DTaP/IPV Booster",
+        "disease": "Diphtheria, Tetanus, Pertussis, Polio",
+        "ageInMonths": 96,
+        "ageDescription": "8 years",
+        "isMandatory": true,
+        "description": "School-age booster",
+        "notes": "Given in 3rd grade"
+      }
+    ],
+    "recommended": [
+      {
+        "id": "norway_influenza_6months",
+        "name": "Influenza (annual)",
+        "disease": "Influenza",
+        "ageInMonths": 6,
+        "ageDescription": "6 months and yearly",
+        "isMandatory": false,
+        "description": "Seasonal flu protection",
+        "notes": "Prioritized for chronic illnesses"
+      },
+      {
+        "id": "norway_hpv_132months",
+        "name": "HPV (2-dose series)",
+        "disease": "Human Papillomavirus",
+        "ageInMonths": 132,
+        "ageDescription": "7th grade",
+        "isMandatory": false,
+        "description": "School-based HPV program",
+        "notes": "Offered to both genders"
+      }
+    ]
+  },
+  "egypt": {
+    "mandatory": [
+      {
+        "id": "egypt_hepb_birth",
+        "name": "Hepatitis B (birth dose)",
+        "disease": "Hepatitis B",
+        "ageInMonths": 0,
+        "ageDescription": "Birth",
+        "isMandatory": true,
+        "description": "Initial hepatitis B protection for newborns",
+        "notes": "Core schedule for Egypt"
+      },
+      {
+        "id": "egypt_bcgs_birth",
+        "name": "BCG",
+        "disease": "Tuberculosis",
+        "ageInMonths": 0,
+        "ageDescription": "Birth",
+        "isMandatory": true,
+        "description": "Protection against severe TB",
+        "notes": "Given on upper arm"
+      },
+      {
+        "id": "egypt_pentavalent_2months",
+        "name": "Pentavalent (1st dose)",
+        "disease": "Diphtheria, Pertussis, Tetanus, Hib, HepB",
+        "ageInMonths": 2,
+        "ageDescription": "2 months",
+        "isMandatory": true,
+        "description": "Combination vaccine from Ministry of Health",
+        "notes": "Part of expanded program"
+      },
+      {
+        "id": "egypt_polio_4months",
+        "name": "OPV/IPV (2nd dose)",
+        "disease": "Polio",
+        "ageInMonths": 4,
+        "ageDescription": "4 months",
+        "isMandatory": true,
+        "description": "Sequential oral and inactivated doses",
+        "notes": "Ensures robust immunity"
+      },
+      {
+        "id": "egypt_mmr_12months",
+        "name": "MMR (1st dose)",
+        "disease": "Measles, Mumps, Rubella",
+        "ageInMonths": 12,
+        "ageDescription": "12 months",
+        "isMandatory": true,
+        "description": "Routine MMR vaccination",
+        "notes": "Followed by booster at 18 months"
+      }
+    ],
+    "recommended": [
+      {
+        "id": "egypt_influenza_6months",
+        "name": "Influenza (annual)",
+        "disease": "Influenza",
+        "ageInMonths": 6,
+        "ageDescription": "6 months and yearly",
+        "isMandatory": false,
+        "description": "Seasonal flu protection",
+        "notes": "Useful during winter months"
+      },
+      {
+        "id": "egypt_hepa_18months",
+        "name": "Hepatitis A (1st dose)",
+        "disease": "Hepatitis A",
+        "ageInMonths": 18,
+        "ageDescription": "18 months",
+        "isMandatory": false,
+        "description": "Protection for childcare attendance",
+        "notes": "Second dose 6 months later"
+      }
+    ]
+  },
+  "philippines": {
+    "mandatory": [
+      {
+        "id": "philippines_hepb_birth",
+        "name": "Hepatitis B (birth dose)",
+        "disease": "Hepatitis B",
+        "ageInMonths": 0,
+        "ageDescription": "Birth",
+        "isMandatory": true,
+        "description": "Initial hepatitis B protection for newborns",
+        "notes": "Core schedule for the Philippines"
+      },
+      {
+        "id": "philippines_bcgs_birth",
+        "name": "BCG",
+        "disease": "Tuberculosis",
+        "ageInMonths": 0,
+        "ageDescription": "Birth",
+        "isMandatory": true,
+        "description": "Protection against severe TB",
+        "notes": "Part of DOH newborn package"
+      },
+      {
+        "id": "philippines_pentavalent_6weeks",
+        "name": "Pentavalent (1st dose)",
+        "disease": "Diphtheria, Pertussis, Tetanus, Hib, HepB",
+        "ageInMonths": 1,
+        "ageDescription": "6 weeks",
+        "isMandatory": true,
+        "description": "Expanded Program on Immunization",
+        "notes": "Given at barangay health centers"
+      },
+      {
+        "id": "philippines_pcv_10weeks",
+        "name": "Pneumococcal (PCV13) (2nd dose)",
+        "disease": "Pneumococcal disease",
+        "ageInMonths": 2,
+        "ageDescription": "10 weeks",
+        "isMandatory": true,
+        "description": "Prevents pneumonia and meningitis",
+        "notes": "Part of routine infant schedule"
+      },
+      {
+        "id": "philippines_mr_9months",
+        "name": "MR (1st dose)",
+        "disease": "Measles, Rubella",
+        "ageInMonths": 9,
+        "ageDescription": "9 months",
+        "isMandatory": true,
+        "description": "Combined measles-rubella vaccine",
+        "notes": "Followed by MMR at 12 months"
+      }
+    ],
+    "recommended": [
+      {
+        "id": "philippines_influenza_6months",
+        "name": "Influenza (annual)",
+        "disease": "Influenza",
+        "ageInMonths": 6,
+        "ageDescription": "6 months and yearly",
+        "isMandatory": false,
+        "description": "Seasonal flu protection",
+        "notes": "Important for typhoon season"
+      },
+      {
+        "id": "philippines_dengue_108months",
+        "name": "Dengue (CYD-TDV)",
+        "disease": "Dengue Fever",
+        "ageInMonths": 108,
+        "ageDescription": "9 years",
+        "isMandatory": false,
+        "description": "For seropositive children in high-risk areas",
+        "notes": "Administer under medical guidance"
+      }
+    ]
   }
 }

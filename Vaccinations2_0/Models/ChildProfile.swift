@@ -62,90 +62,79 @@ struct ChildProfile: Codable {
 
 // List of supported countries
 enum Country: String, CaseIterable {
-    // Built-in calendars (available immediately)
-    case usa = "USA"
-    case china = "China"
-    
-    // Downloadable calendars
-    case russia = "Russia"
-    case germany = "Germany"
-    case france = "France"
-    case italy = "Italy"
-    case brazil = "Brazil"
     case argentina = "Argentina"
+    case brazil = "Brazil"
+    case china = "China"
+    case egypt = "Egypt"
+    case france = "France"
+    case germany = "Germany"
+    case india = "India"
+    case italy = "Italy"
+    case japan = "Japan"
     case mexico = "Mexico"
+    case norway = "Norway"
+    case philippines = "Philippines"
+    case russia = "Russia"
+    case turkey = "Turkey"
+    case usa = "USA"
     
     var flag: String {
         switch self {
-        case .usa: return "🇺🇸"
-        case .china: return "🇨🇳"
-        case .russia: return "🇷🇺"
-        case .germany: return "🇩🇪"
-        case .france: return "🇫🇷"
-        case .italy: return "🇮🇹"
-        case .brazil: return "🇧🇷"
         case .argentina: return "🇦🇷"
+        case .brazil: return "🇧🇷"
+        case .china: return "🇨🇳"
+        case .egypt: return "🇪🇬"
+        case .france: return "🇫🇷"
+        case .germany: return "🇩🇪"
+        case .india: return "🇮🇳"
+        case .italy: return "🇮🇹"
+        case .japan: return "🇯🇵"
         case .mexico: return "🇲🇽"
+        case .norway: return "🇳🇴"
+        case .philippines: return "🇵🇭"
+        case .russia: return "🇷🇺"
+        case .turkey: return "🇹🇷"
+        case .usa: return "🇺🇸"
         }
     }
     
     var displayName: String {
         switch self {
-        case .usa: return "\(flag) United States"
-        case .china: return "\(flag) China"
-        case .russia: return "\(flag) Russia"
-        case .germany: return "\(flag) Germany"
-        case .france: return "\(flag) France"
-        case .italy: return "\(flag) Italy"
-        case .brazil: return "\(flag) Brazil"
         case .argentina: return "\(flag) Argentina"
+        case .brazil: return "\(flag) Brazil"
+        case .china: return "\(flag) China"
+        case .egypt: return "\(flag) Egypt"
+        case .france: return "\(flag) France"
+        case .germany: return "\(flag) Germany"
+        case .india: return "\(flag) India"
+        case .italy: return "\(flag) Italy"
+        case .japan: return "\(flag) Japan"
         case .mexico: return "\(flag) Mexico"
+        case .norway: return "\(flag) Norway"
+        case .philippines: return "\(flag) Philippines"
+        case .russia: return "\(flag) Russia"
+        case .turkey: return "\(flag) Turkey"
+        case .usa: return "\(flag) United States"
         }
     }
     
     var localizedName: String {
         switch self {
-        case .usa: return NSLocalizedString("United States", comment: "")
-        case .china: return NSLocalizedString("China", comment: "")
-        case .russia: return NSLocalizedString("Russia", comment: "")
-        case .germany: return NSLocalizedString("Germany", comment: "")
-        case .france: return NSLocalizedString("France", comment: "")
-        case .italy: return NSLocalizedString("Italy", comment: "")
-        case .brazil: return NSLocalizedString("Brazil", comment: "")
         case .argentina: return NSLocalizedString("Argentina", comment: "")
+        case .brazil: return NSLocalizedString("Brazil", comment: "")
+        case .china: return NSLocalizedString("China", comment: "")
+        case .egypt: return NSLocalizedString("Egypt", comment: "")
+        case .france: return NSLocalizedString("France", comment: "")
+        case .germany: return NSLocalizedString("Germany", comment: "")
+        case .india: return NSLocalizedString("India", comment: "")
+        case .italy: return NSLocalizedString("Italy", comment: "")
+        case .japan: return NSLocalizedString("Japan", comment: "")
         case .mexico: return NSLocalizedString("Mexico", comment: "")
-        }
-    }
-    
-    // Determines if the calendar is built into the app
-    var isBuiltIn: Bool {
-        switch self {
-        case .usa, .china:
-            return true
-        default:
-            return false
-        }
-    }
-    
-    // URL for downloading calendar (for non-built-in countries)
-    var remoteURL: String? {
-        switch self {
-        case .usa, .china:
-            return nil // Built-in calendars
-        case .russia:
-            return "https://raw.githubusercontent.com/vaccine-calendars/data/main/russia.json"
-        case .germany:
-            return "https://raw.githubusercontent.com/vaccine-calendars/data/main/germany.json"
-        case .france:
-            return "https://raw.githubusercontent.com/vaccine-calendars/data/main/france.json"
-        case .italy:
-            return "https://raw.githubusercontent.com/vaccine-calendars/data/main/italy.json"
-        case .brazil:
-            return "https://raw.githubusercontent.com/vaccine-calendars/data/main/brazil.json"
-        case .argentina:
-            return "https://raw.githubusercontent.com/vaccine-calendars/data/main/argentina.json"
-        case .mexico:
-            return "https://raw.githubusercontent.com/vaccine-calendars/data/main/mexico.json"
+        case .norway: return NSLocalizedString("Norway", comment: "")
+        case .philippines: return NSLocalizedString("Philippines", comment: "")
+        case .russia: return NSLocalizedString("Russia", comment: "")
+        case .turkey: return NSLocalizedString("Turkey", comment: "")
+        case .usa: return NSLocalizedString("United States", comment: "")
         }
     }
     
@@ -154,8 +143,7 @@ enum Country: String, CaseIterable {
         switch self {
         case .usa: return "vaccines_usa"
         case .china: return "vaccines_china"
-        case .russia: return "vaccines_russia"
-        default: return "vaccines_\(rawValue.lowercased())"
+        default: return "vaccines_data"
         }
     }
 }

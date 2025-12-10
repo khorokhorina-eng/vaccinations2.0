@@ -9,9 +9,6 @@ struct CountrySelectionView: View {
     @ObservedObject var viewModel: VaccineViewModel
     @Environment(\.dismiss) var dismiss
     @State private var selectedCountry: Country
-    @State private var showDownloadAlert = false
-    @State private var isDownloading = false
-    @State private var downloadError: String?
     
     init(viewModel: VaccineViewModel) {
         self.viewModel = viewModel
@@ -37,39 +34,16 @@ struct CountrySelectionView: View {
                 // Countries List
                 ScrollView {
                     VStack(spacing: 12) {
-                        // Built-in countries section
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Available Offline")
+                            Text("Available Countries")
                                 .font(.headline)
                                 .foregroundColor(.secondary)
                                 .padding(.horizontal)
                             
-                            ForEach(Country.allCases.filter { $0.isBuiltIn }, id: \.self) { country in
+                            ForEach(Country.allCases, id: \.self) { country in
                                 CountryRow(
                                     country: country,
-                                    isSelected: selectedCountry == country,
-                                    isAvailable: true,
-                                    isBuiltIn: true
-                                ) {
-                                    selectCountry(country)
-                                }
-                            }
-                        }
-                        
-                        // Downloadable countries section
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Download Required")
-                                .font(.headline)
-                                .foregroundColor(.secondary)
-                                .padding(.horizontal)
-                                .padding(.top)
-                            
-                            ForEach(Country.allCases.filter { !$0.isBuiltIn }, id: \.self) { country in
-                                CountryRow(
-                                    country: country,
-                                    isSelected: selectedCountry == country,
-                                    isAvailable: viewModel.isCountryAvailable(country),
-                                    isBuiltIn: false
+                                    isSelected: selectedCountry == country
                                 ) {
                                     selectCountry(country)
                                 }
@@ -83,13 +57,7 @@ struct CountrySelectionView: View {
                 VStack(spacing: 12) {
                     Button(action: confirmSelection) {
                         HStack {
-                            if isDownloading {
-                                ProgressView()
-                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                                    .scaleEffect(0.8)
-                            } else {
-                                Text("Select Country")
-                            }
+                            Text("Select Country")
                         }
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -97,7 +65,7 @@ struct CountrySelectionView: View {
                         .foregroundColor(.white)
                         .cornerRadius(12)
                     }
-                    .disabled(selectedCountry == viewModel.selectedCountry || isDownloading)
+                    .disabled(selectedCountry == viewModel.selectedCountry)
                     
                     Button("Cancel") {
                         dismiss()
@@ -108,21 +76,6 @@ struct CountrySelectionView: View {
             }
             .navigationBarHidden(true)
         }
-        .alert("Download Required", isPresented: $showDownloadAlert) {
-            Button("Download") {
-                downloadCountryData()
-            }
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            Text("This country's vaccination calendar needs to be downloaded. This requires an internet connection.")
-        }
-        .alert("Error", isPresented: .constant(downloadError != nil)) {
-            Button("OK") {
-                downloadError = nil
-            }
-        } message: {
-            Text(downloadError ?? "An error occurred")
-        }
     }
     
     private func selectCountry(_ country: Country) {
@@ -130,35 +83,14 @@ struct CountrySelectionView: View {
     }
     
     private func confirmSelection() {
-        if !selectedCountry.isBuiltIn && !viewModel.isCountryAvailable(selectedCountry) {
-            showDownloadAlert = true
-        } else {
-            viewModel.changeCountry(selectedCountry)
-            dismiss()
-        }
-    }
-    
-    private func downloadCountryData() {
-        isDownloading = true
-        
-        viewModel.downloadCountryCalendar(selectedCountry) { success in
-            isDownloading = false
-            
-            if success {
-                viewModel.changeCountry(selectedCountry)
-                dismiss()
-            } else {
-                downloadError = viewModel.loadingError?.errorDescription ?? "Failed to download vaccination calendar"
-            }
-        }
+        viewModel.changeCountry(selectedCountry)
+        dismiss()
     }
 }
 
 struct CountryRow: View {
     let country: Country
     let isSelected: Bool
-    let isAvailable: Bool
-    let isBuiltIn: Bool
     let action: () -> Void
     
     var body: some View {
@@ -173,27 +105,9 @@ struct CountryRow: View {
                         .fontWeight(isSelected ? .semibold : .regular)
                         .foregroundColor(.primary)
                     
-                    if isBuiltIn {
-                        Text("Available offline")
-                            .font(.caption)
-                            .foregroundColor(.green)
-                    } else if isAvailable {
-                        HStack(spacing: 4) {
-                            Image(systemName: "checkmark.circle.fill")
-                                .font(.caption)
-                            Text("Downloaded")
-                                .font(.caption)
-                        }
-                        .foregroundColor(.blue)
-                    } else {
-                        HStack(spacing: 4) {
-                            Image(systemName: "arrow.down.circle")
-                                .font(.caption)
-                            Text("Tap to download")
-                                .font(.caption)
-                        }
-                        .foregroundColor(.secondary)
-                    }
+                    Text("Available offline")
+                        .font(.caption)
+                        .foregroundColor(.green)
                 }
                 
                 Spacer()
