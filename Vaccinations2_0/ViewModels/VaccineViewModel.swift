@@ -22,7 +22,6 @@ class VaccineViewModel: ObservableObject {
     
     let dataService = DataService.shared
     let vaccineLoader = VaccineDataLoader.shared
-    private let cacheService = CacheService.shared
     private var cancellables = Set<AnyCancellable>()
     
     // Vaccine filters
@@ -83,18 +82,9 @@ class VaccineViewModel: ObservableObject {
                 switch result {
                 case .success(let data):
                     self?.vaccines = data.mandatory + data.recommended + (self?.customVaccines ?? [])
-                    // Add country to downloaded list
-                    if !country.isBuiltIn {
-                        self?.cacheService.addDownloadedCountry(country)
-                    }
                 case .failure(let error):
                     self?.loadingError = error
-                    // Use cache if loading fails, or fallback to custom vaccines
-                    if let cachedData = self?.cacheService.getCachedVaccineData(for: country) {
-                        self?.vaccines = cachedData.mandatory + cachedData.recommended + (self?.customVaccines ?? [])
-                    } else {
-                        self?.vaccines = self?.customVaccines ?? []
-                    }
+                    self?.vaccines = self?.customVaccines ?? []
                 }
             }
         }
@@ -308,33 +298,6 @@ class VaccineViewModel: ObservableObject {
         return Country.allCases
     }
     
-    func getDownloadedCountries() -> [Country] {
-        return cacheService.getDownloadedCountries()
-    }
-    
-    func isCountryAvailable(_ country: Country) -> Bool {
-        return country.isBuiltIn || cacheService.isCached(country: country)
-    }
-    
-    func downloadCountryCalendar(_ country: Country, completion: @escaping (Bool) -> Void) {
-        loadVaccines(for: country)
-        
-        // Wait for load completion
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-            completion(self?.loadingError == nil)
-        }
-    }
-    
-    func clearCountryCache(_ country: Country) {
-        cacheService.clearCache(for: country)
-        cacheService.removeDownloadedCountry(country)
-        
-        // Reload data if it's the current country
-        if country == selectedCountry {
-            loadVaccines(for: country)
-        }
-    }
-    
     // MARK: - Reset
     
     func resetAllData() {
@@ -344,6 +307,5 @@ class VaccineViewModel: ObservableObject {
         vaccineRecords = []
         customVaccines = []
         dataService.resetAllData()
-        cacheService.clearAllCache()
     }
 }

@@ -62,11 +62,8 @@ struct ChildProfile: Codable {
 
 // List of supported countries
 enum Country: String, CaseIterable {
-    // Built-in calendars (available immediately)
     case usa = "USA"
     case china = "China"
-    
-    // Downloadable calendars
     case russia = "Russia"
     case germany = "Germany"
     case france = "France"
@@ -74,6 +71,12 @@ enum Country: String, CaseIterable {
     case brazil = "Brazil"
     case argentina = "Argentina"
     case mexico = "Mexico"
+    case india = "India"
+    case turkey = "Turkey"
+    case japan = "Japan"
+    case norway = "Norway"
+    case egypt = "Egypt"
+    case philippines = "Philippines"
     
     var flag: String {
         switch self {
@@ -86,6 +89,12 @@ enum Country: String, CaseIterable {
         case .brazil: return "🇧🇷"
         case .argentina: return "🇦🇷"
         case .mexico: return "🇲🇽"
+        case .india: return "🇮🇳"
+        case .turkey: return "🇹🇷"
+        case .japan: return "🇯🇵"
+        case .norway: return "🇳🇴"
+        case .egypt: return "🇪🇬"
+        case .philippines: return "🇵🇭"
         }
     }
     
@@ -100,6 +109,12 @@ enum Country: String, CaseIterable {
         case .brazil: return "\(flag) Brazil"
         case .argentina: return "\(flag) Argentina"
         case .mexico: return "\(flag) Mexico"
+        case .india: return "\(flag) India"
+        case .turkey: return "\(flag) Turkey"
+        case .japan: return "\(flag) Japan"
+        case .norway: return "\(flag) Norway"
+        case .egypt: return "\(flag) Egypt"
+        case .philippines: return "\(flag) Philippines"
         }
     }
     
@@ -114,38 +129,12 @@ enum Country: String, CaseIterable {
         case .brazil: return NSLocalizedString("Brazil", comment: "")
         case .argentina: return NSLocalizedString("Argentina", comment: "")
         case .mexico: return NSLocalizedString("Mexico", comment: "")
-        }
-    }
-    
-    // Determines if the calendar is built into the app
-    var isBuiltIn: Bool {
-        switch self {
-        case .usa, .china:
-            return true
-        default:
-            return false
-        }
-    }
-    
-    // URL for downloading calendar (for non-built-in countries)
-    var remoteURL: String? {
-        switch self {
-        case .usa, .china:
-            return nil // Built-in calendars
-        case .russia:
-            return "https://raw.githubusercontent.com/vaccine-calendars/data/main/russia.json"
-        case .germany:
-            return "https://raw.githubusercontent.com/vaccine-calendars/data/main/germany.json"
-        case .france:
-            return "https://raw.githubusercontent.com/vaccine-calendars/data/main/france.json"
-        case .italy:
-            return "https://raw.githubusercontent.com/vaccine-calendars/data/main/italy.json"
-        case .brazil:
-            return "https://raw.githubusercontent.com/vaccine-calendars/data/main/brazil.json"
-        case .argentina:
-            return "https://raw.githubusercontent.com/vaccine-calendars/data/main/argentina.json"
-        case .mexico:
-            return "https://raw.githubusercontent.com/vaccine-calendars/data/main/mexico.json"
+        case .india: return NSLocalizedString("India", comment: "")
+        case .turkey: return NSLocalizedString("Turkey", comment: "")
+        case .japan: return NSLocalizedString("Japan", comment: "")
+        case .norway: return NSLocalizedString("Norway", comment: "")
+        case .egypt: return NSLocalizedString("Egypt", comment: "")
+        case .philippines: return NSLocalizedString("Philippines", comment: "")
         }
     }
     
@@ -154,8 +143,7 @@ enum Country: String, CaseIterable {
         switch self {
         case .usa: return "vaccines_usa"
         case .china: return "vaccines_china"
-        case .russia: return "vaccines_russia"
-        default: return "vaccines_\(rawValue.lowercased())"
+        default: return "vaccines_data"
         }
     }
 }
