@@ -62,6 +62,7 @@ struct ChildProfile: Codable {
 
 // List of supported countries
 enum Country: String, CaseIterable {
+    case usa = "USA"
     case argentina = "Argentina"
     case brazil = "Brazil"
     case china = "China"
@@ -76,10 +77,10 @@ enum Country: String, CaseIterable {
     case philippines = "Philippines"
     case russia = "Russia"
     case turkey = "Turkey"
-    case usa = "USA"
     
     var flag: String {
         switch self {
+        case .usa: return "🇺🇸"
         case .argentina: return "🇦🇷"
         case .brazil: return "🇧🇷"
         case .china: return "🇨🇳"
@@ -94,12 +95,12 @@ enum Country: String, CaseIterable {
         case .philippines: return "🇵🇭"
         case .russia: return "🇷🇺"
         case .turkey: return "🇹🇷"
-        case .usa: return "🇺🇸"
         }
     }
     
     var displayName: String {
         switch self {
+        case .usa: return "\(flag) United States"
         case .argentina: return "\(flag) Argentina"
         case .brazil: return "\(flag) Brazil"
         case .china: return "\(flag) China"
@@ -114,12 +115,12 @@ enum Country: String, CaseIterable {
         case .philippines: return "\(flag) Philippines"
         case .russia: return "\(flag) Russia"
         case .turkey: return "\(flag) Turkey"
-        case .usa: return "\(flag) United States"
         }
     }
     
     var localizedName: String {
         switch self {
+        case .usa: return NSLocalizedString("United States", comment: "")
         case .argentina: return NSLocalizedString("Argentina", comment: "")
         case .brazil: return NSLocalizedString("Brazil", comment: "")
         case .china: return NSLocalizedString("China", comment: "")
@@ -134,7 +135,6 @@ enum Country: String, CaseIterable {
         case .philippines: return NSLocalizedString("Philippines", comment: "")
         case .russia: return NSLocalizedString("Russia", comment: "")
         case .turkey: return NSLocalizedString("Turkey", comment: "")
-        case .usa: return NSLocalizedString("United States", comment: "")
         }
     }
     
