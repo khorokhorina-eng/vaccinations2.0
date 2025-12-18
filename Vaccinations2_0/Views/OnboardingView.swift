@@ -15,7 +15,7 @@ struct OnboardingView: View {
     @State private var optionalVaccinesPreference: OptionalVaccinesPreference? = nil
     @State private var personalizationGoal: PersonalizationGoal? = nil
 
-    @State private var showDatePicker = false
+    @State private var showingBirthDatePickerSheet = false
     @State private var showCountrySelection = false
 
     @FocusState private var isNameFocused: Bool
@@ -39,13 +39,33 @@ struct OnboardingView: View {
                 bottomCTA
             }
             .navigationBarHidden(true)
-            .onChange(of: birthDate) { _ in
-                if showDatePicker {
-                    withAnimation(.easeInOut) {
-                        showDatePicker = false
+        }
+        .sheet(isPresented: $showingBirthDatePickerSheet) {
+            NavigationView {
+                DatePicker(
+                    "",
+                    selection: $birthDate,
+                    in: ...Date(),
+                    displayedComponents: .date
+                )
+                .datePickerStyle(GraphicalDatePickerStyle())
+                .padding()
+                .navigationTitle("Select date")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button("Cancel") {
+                            showingBirthDatePickerSheet = false
+                        }
+                    }
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button("Done") {
+                            showingBirthDatePickerSheet = false
+                        }
                     }
                 }
             }
+            .presentationDetents([.medium, .large])
         }
         .sheet(isPresented: $showCountrySelection) {
             CountrySelectionSheet(selectedCountry: $selectedCountry)
@@ -87,7 +107,7 @@ struct OnboardingView: View {
                 withAnimation(.easeInOut) {
                     step = .phraseBeforeStart
                     isNameFocused = false
-                    showDatePicker = false
+                    showingBirthDatePickerSheet = false
                 }
             }
             .opacity(step.isLast ? 0 : 1)
@@ -122,7 +142,7 @@ struct OnboardingView: View {
             phrasePage(
                 imageSystemName: "sparkles",
                 title: "Nice to meet you!",
-                subtitle: "Next, let’s tailor the schedule to your child’s age."
+                subtitle: "Vaccines work best when given on time—delays can leave children unprotected."
             )
 
         case .birthDate:
@@ -135,15 +155,13 @@ struct OnboardingView: View {
                 VStack(alignment: .leading, spacing: 10) {
                     Button(action: {
                         isNameFocused = false
-                        withAnimation(.easeInOut) {
-                            showDatePicker.toggle()
-                        }
+                        showingBirthDatePickerSheet = true
                     }) {
                         HStack {
                             Text(dateFormatter.string(from: birthDate))
                                 .foregroundColor(.primary)
                             Spacer()
-                            Image(systemName: showDatePicker ? "chevron.up" : "chevron.down")
+                            Image(systemName: "calendar")
                                 .foregroundColor(.secondary)
                                 .font(.caption)
                         }
@@ -152,12 +170,9 @@ struct OnboardingView: View {
                         .cornerRadius(12)
                     }
 
-                    if showDatePicker {
-                        DatePicker("", selection: $birthDate, in: ...Date(), displayedComponents: .date)
-                            .datePickerStyle(GraphicalDatePickerStyle())
-                            .padding(.horizontal, 6)
-                            .transition(.opacity)
-                    }
+                    Text("Tap to choose a date.")
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
                 }
             }
 
@@ -165,7 +180,7 @@ struct OnboardingView: View {
             phrasePage(
                 imageSystemName: "checkmark.seal.fill",
                 title: "Perfect.",
-                subtitle: "We’ll highlight what’s upcoming and what’s overdue."
+                subtitle: "Timely vaccination helps prevent outbreaks and protects those who can’t be vaccinated."
             )
 
         case .country:
@@ -199,7 +214,7 @@ struct OnboardingView: View {
             phrasePage(
                 imageSystemName: "list.bullet.rectangle.portrait",
                 title: "Almost there.",
-                subtitle: "A couple more choices to personalize your experience."
+                subtitle: "Staying on schedule reduces the risk of vaccine-preventable diseases."
             )
 
         case .optionalVaccines:
@@ -240,7 +255,7 @@ struct OnboardingView: View {
             phrasePage(
                 imageSystemName: "wand.and.stars",
                 title: "Got it.",
-                subtitle: "One last question to tailor the experience."
+                subtitle: "Small delays can add up—this app helps you stay on time."
             )
 
         case .personalization:
@@ -281,7 +296,7 @@ struct OnboardingView: View {
             phrasePage(
                 imageSystemName: "heart.text.square.fill",
                 title: "You’re all set!",
-                subtitle: "Create your schedule and keep everything organized in one place."
+                subtitle: "On-time vaccines build strong protection early—let’s set up your schedule."
             )
         }
     }
@@ -464,7 +479,7 @@ struct OnboardingView: View {
 
     private func goNext() {
         isNameFocused = false
-        showDatePicker = false
+        showingBirthDatePickerSheet = false
 
         withAnimation(.easeInOut) {
             switch step {
@@ -496,7 +511,7 @@ struct OnboardingView: View {
         guard canGoBack else { return }
 
         isNameFocused = false
-        showDatePicker = false
+        showingBirthDatePickerSheet = false
 
         withAnimation(.easeInOut) {
             switch step {
