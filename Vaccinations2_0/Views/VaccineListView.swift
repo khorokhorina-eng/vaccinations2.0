@@ -13,6 +13,7 @@ struct VaccineListView: View {
     @State private var searchText = ""
     @State private var showingProfile = false
     @State private var showingCountrySelection = false
+    @State private var showingResetConfirmation = false
     
     var body: some View {
         NavigationView {
@@ -288,9 +289,7 @@ struct VaccineListView: View {
                     
                     Section {
                         Button(action: {
-                            Task { await subscriptionManager.resetPromoUnlockAndRefresh() }
-                            viewModel.resetAllData()
-                            showingProfile = false
+                            showingResetConfirmation = true
                         }) {
                             Text("Reset All Data")
                                 .foregroundColor(.red)
@@ -303,6 +302,16 @@ struct VaccineListView: View {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button("Done") { showingProfile = false }
                     }
+                }
+                .alert("Are you sure?", isPresented: $showingResetConfirmation) {
+                    Button("Cancel", role: .cancel) {}
+                    Button("Reset", role: .destructive) {
+                        Task { await subscriptionManager.resetPromoUnlockAndRefresh() }
+                        viewModel.resetAllData()
+                        showingProfile = false
+                    }
+                } message: {
+                    Text("This will remove your profile and all saved data on this device. Purchases will be restored automatically. Promo code will need to be entered again.")
                 }
             }
         }
