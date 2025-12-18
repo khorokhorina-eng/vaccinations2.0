@@ -7,6 +7,7 @@ import SwiftUI
 
 struct VaccineListView: View {
     @EnvironmentObject var viewModel: VaccineViewModel
+    @EnvironmentObject var subscriptionManager: SubscriptionManager
     @State private var showingAddVaccine = false
     @State private var selectedVaccine: Vaccine?
     @State private var searchText = ""
@@ -287,6 +288,7 @@ struct VaccineListView: View {
                     
                     Section {
                         Button(action: {
+                            Task { await subscriptionManager.resetPromoUnlockAndRefresh() }
                             viewModel.resetAllData()
                             showingProfile = false
                         }) {

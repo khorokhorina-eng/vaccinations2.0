@@ -123,6 +123,19 @@ final class SubscriptionManager: ObservableObject {
             lastErrorMessage = NSLocalizedString("Invalid promo code", comment: "")
         }
     }
+    
+    /// Clears local promo-unlock so promo code must be entered again.
+    /// Paid subscriptions are preserved via StoreKit entitlements and will be restored by `refreshEntitlements()`.
+    func resetPromoUnlockAndRefresh() async {
+        UserDefaults.standard.removeObject(forKey: StorageKeys.promoUnlocked)
+        UserDefaults.standard.removeObject(forKey: StorageKeys.promoCodeUsed)
+        
+        // Clear cached flag; it will be recomputed from StoreKit entitlements.
+        UserDefaults.standard.set(false, forKey: StorageKeys.hasPremiumAccess)
+        hasPremiumAccess = false
+        
+        await refreshEntitlements()
+    }
 
     // MARK: - Internals
 
