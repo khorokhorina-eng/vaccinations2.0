@@ -34,33 +34,8 @@ struct OnboardingView: View {
                         .padding(.horizontal)
                         .padding(.top, 10)
 
-                    TabView(selection: $step) {
-                        introPage(
-                            icon: "calendar.badge.clock",
-                            title: "Stay on track",
-                            subtitle: "A personalized vaccination schedule, built around your child’s age."
-                        )
-                        .tag(OnboardingStep.intro1)
-
-                        introPage(
-                            icon: "bell.badge.fill",
-                            title: "Never miss a shot",
-                            subtitle: "See what’s upcoming and what’s overdue at a glance."
-                        )
-                        .tag(OnboardingStep.intro2)
-
-                        introPage(
-                            icon: "globe.europe.africa.fill",
-                            title: "Country schedules",
-                            subtitle: "Choose your country to view the recommended vaccination calendar."
-                        )
-                        .tag(OnboardingStep.intro3)
-
-                        profileForm
-                            .tag(OnboardingStep.profile)
-                    }
-                    .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-                    .animation(.easeInOut, value: step)
+                    currentStepView
+                        .animation(.easeInOut, value: step)
                 }
             }
             .safeAreaInset(edge: .bottom) {
@@ -112,6 +87,36 @@ private enum OnboardingStep: Int, CaseIterable, Identifiable {
 }
 
 private extension OnboardingView {
+    @ViewBuilder
+    var currentStepView: some View {
+        switch step {
+        case .intro1:
+            introPage(
+                icon: "calendar.badge.clock",
+                title: "Stay on track",
+                subtitle: "A personalized vaccination schedule, built around your child’s age."
+            )
+            .transition(.opacity)
+        case .intro2:
+            introPage(
+                icon: "bell.badge.fill",
+                title: "Never miss a shot",
+                subtitle: "See what’s upcoming and what’s overdue at a glance."
+            )
+            .transition(.opacity)
+        case .intro3:
+            introPage(
+                icon: "globe.europe.africa.fill",
+                title: "Country schedules",
+                subtitle: "Choose your country to view the recommended vaccination calendar."
+            )
+            .transition(.opacity)
+        case .profile:
+            profileForm
+                .transition(.opacity)
+        }
+    }
+
     var topBar: some View {
         HStack(spacing: 12) {
             ProgressView(value: step.progress)
