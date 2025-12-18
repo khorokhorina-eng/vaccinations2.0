@@ -50,6 +50,11 @@ class VaccineViewModel: ObservableObject {
         vaccineRecords = dataService.loadVaccineRecords()
         customVaccines = dataService.loadCustomVaccines()
         
+        // Apply onboarding preferences (if set)
+        if let pref = dataService.optionalVaccinesPreference {
+            showOnlyMandatory = (pref == OptionalVaccinesPreference.mandatoryOnly.rawValue)
+        }
+        
         if let profile = childProfile {
             if let country = Country(rawValue: profile.country) {
                 selectedCountry = country
@@ -308,4 +313,22 @@ class VaccineViewModel: ObservableObject {
         customVaccines = []
         dataService.resetAllData()
     }
+}
+
+// MARK: - Onboarding preference enums (stored in UserDefaults)
+
+enum OptionalVaccinesPreference: String, CaseIterable, Identifiable {
+    case includeRecommended = "includeRecommended"
+    case mandatoryOnly = "mandatoryOnly"
+    case decideLater = "decideLater"
+    
+    var id: String { rawValue }
+}
+
+enum PersonalizationGoal: String, CaseIterable, Identifiable {
+    case reminders = "reminders"
+    case simplicity = "simplicity"
+    case learnMore = "learnMore"
+    
+    var id: String { rawValue }
 }

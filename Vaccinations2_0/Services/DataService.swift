@@ -16,6 +16,8 @@ class DataService {
         static let childProfile = "childProfile"
         static let vaccineRecords = "vaccineRecords"
         static let customVaccines = "customVaccines"
+        static let optionalVaccinesPreference = "optionalVaccinesPreference"
+        static let personalizationGoal = "personalizationGoal"
     }
     
     private init() {}
@@ -126,5 +128,21 @@ class DataService {
         userDefaults.removeObject(forKey: Keys.childProfile)
         userDefaults.removeObject(forKey: Keys.vaccineRecords)
         userDefaults.removeObject(forKey: Keys.customVaccines)
+        userDefaults.removeObject(forKey: Keys.optionalVaccinesPreference)
+        userDefaults.removeObject(forKey: Keys.personalizationGoal)
+    }
+}
+
+// MARK: - Onboarding Preferences
+
+extension DataService {
+    var optionalVaccinesPreference: String? {
+        get { userDefaults.string(forKey: Keys.optionalVaccinesPreference) }
+        set { userDefaults.set(newValue, forKey: Keys.optionalVaccinesPreference) }
+    }
+    
+    var personalizationGoal: String? {
+        get { userDefaults.string(forKey: Keys.personalizationGoal) }
+        set { userDefaults.set(newValue, forKey: Keys.personalizationGoal) }
     }
 }
