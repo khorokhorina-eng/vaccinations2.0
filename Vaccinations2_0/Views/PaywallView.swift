@@ -289,7 +289,7 @@ private struct PaywallPlanCard: View {
                         .fontWeight(.bold)
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
+                        .padding(.vertical, 6)
                         .background(
                             LinearGradient(
                                 colors: [
@@ -305,13 +305,13 @@ private struct PaywallPlanCard: View {
                 HStack(alignment: .center, spacing: 12) {
                     VStack(alignment: .leading, spacing: 6) {
                         Text(title)
-                            .font(.system(size: 30, weight: .bold))
+                            .font(.system(size: 26, weight: .bold))
                             .foregroundColor(.primary)
                             .minimumScaleFactor(0.8)
                             .lineLimit(2)
                         
                         Text(durationAndTotal)
-                            .font(.headline)
+                            .font(.subheadline)
                             .foregroundColor(.primary.opacity(0.85))
                     }
                     
@@ -319,7 +319,7 @@ private struct PaywallPlanCard: View {
                     
                     VStack(alignment: .trailing, spacing: 6) {
                         Text(perMonth)
-                            .font(.system(size: 22, weight: .bold))
+                            .font(.system(size: 18, weight: .bold))
                             .foregroundColor(.primary)
                             .lineLimit(1)
                             .minimumScaleFactor(0.9)
@@ -329,7 +329,7 @@ private struct PaywallPlanCard: View {
                         .font(.title2)
                         .foregroundColor(isSelected ? Color(red: 0.96, green: 0.29, blue: 0.41) : .secondary)
                 }
-                .padding(16)
+                .padding(12)
             }
             .background(
                 RoundedRectangle(cornerRadius: 16)
