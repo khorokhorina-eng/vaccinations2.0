@@ -21,49 +21,53 @@ struct PaywallView: View {
 
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack(spacing: 18) {
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 16) {
                     header
                         .padding(.top, 10)
                         .padding(.horizontal)
                     
-                    VStack(spacing: 14) {
-                        Toggle(isOn: $isFreeTrialEnabled) {
-                            Text("Free trial enabled")
-                                .font(.headline)
-                        }
-                        .padding()
-                        .background(
-                            RoundedRectangle(cornerRadius: 18)
-                                .fill(Color.purple.opacity(0.08))
-                        )
-                        .tint(.purple)
-                        .padding(.horizontal)
-                        
-                        VStack(spacing: 12) {
-                            PaywallPlanCard(
-                                badgeText: planBadgeText(forProductId: SubscriptionManager.ProductID.yearly),
-                                title: "Yearly Plan",
-                                durationAndTotal: durationAndTotal(forProductId: SubscriptionManager.ProductID.yearly),
-                                perMonth: perMonthLabel(forProductId: SubscriptionManager.ProductID.yearly),
-                                isSelected: selectedProductID == SubscriptionManager.ProductID.yearly
-                            ) {
-                                selectedProductID = SubscriptionManager.ProductID.yearly
-                            }
-                            
-                            PaywallPlanCard(
-                                badgeText: planBadgeText(forProductId: SubscriptionManager.ProductID.monthly),
-                                title: "Monthly Plan",
-                                durationAndTotal: durationAndTotal(forProductId: SubscriptionManager.ProductID.monthly),
-                                perMonth: perMonthLabel(forProductId: SubscriptionManager.ProductID.monthly),
-                                isSelected: selectedProductID == SubscriptionManager.ProductID.monthly
-                            ) {
-                                selectedProductID = SubscriptionManager.ProductID.monthly
-                            }
-                        }
-                        .padding(.horizontal)
-                    }
+                    // Reviews carousel (horizontal) — stays above plans like in the reference
+                    reviewsCarousel
+                        .padding(.top, 4)
                     
+                    Toggle(isOn: $isFreeTrialEnabled) {
+                        Text("Free trial enabled")
+                            .font(.headline)
+                    }
+                    .padding()
+                    .background(
+                        RoundedRectangle(cornerRadius: 18)
+                            .fill(Color.purple.opacity(0.08))
+                    )
+                    .tint(.purple)
+                    .padding(.horizontal)
+                    
+                    // Plan tiles — kept high on the screen
+                    VStack(spacing: 12) {
+                        PaywallPlanCard(
+                            badgeText: planBadgeText(forProductId: SubscriptionManager.ProductID.yearly),
+                            title: "Yearly Plan",
+                            durationAndTotal: durationAndTotal(forProductId: SubscriptionManager.ProductID.yearly),
+                            perMonth: perMonthLabel(forProductId: SubscriptionManager.ProductID.yearly),
+                            isSelected: selectedProductID == SubscriptionManager.ProductID.yearly
+                        ) {
+                            selectedProductID = SubscriptionManager.ProductID.yearly
+                        }
+                        
+                        PaywallPlanCard(
+                            badgeText: planBadgeText(forProductId: SubscriptionManager.ProductID.monthly),
+                            title: "Monthly Plan",
+                            durationAndTotal: durationAndTotal(forProductId: SubscriptionManager.ProductID.monthly),
+                            perMonth: perMonthLabel(forProductId: SubscriptionManager.ProductID.monthly),
+                            isSelected: selectedProductID == SubscriptionManager.ProductID.monthly
+                        ) {
+                            selectedProductID = SubscriptionManager.ProductID.monthly
+                        }
+                    }
+                    .padding(.horizontal)
+                    
+                    // Keep promo code available but below the first screen content
                     VStack(alignment: .leading, spacing: 10) {
                         Text("Promo code")
                             .font(.headline)
@@ -87,44 +91,39 @@ struct PaywallView: View {
                         }
                     }
                     .padding(.horizontal)
+                    .padding(.top, 6)
                     
-                    VStack(spacing: 12) {
-                        Button(action: {
-                            didTapPrimary = true
-                            Task { await purchaseSelected() }
-                        }) {
-                            HStack {
-                                Text(primaryButtonTitle)
-                                Spacer()
-                                if subscriptionManager.isLoading {
-                                    ProgressView()
-                                } else {
-                                    Image(systemName: "arrow.right")
-                                }
-                            }
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .padding()
-                            .background(subscriptionManager.isLoading ? Color.gray : Color(red: 0.96, green: 0.29, blue: 0.41))
-                            .cornerRadius(16)
-                        }
-                        .disabled(subscriptionManager.isLoading || selectedProduct == nil)
-                        
-                        Button(action: {
-                            Task { await subscriptionManager.restorePurchases() }
-                        }) {
-                            Text("Restore purchases")
-                                .frame(maxWidth: .infinity)
-                        }
-                        .buttonStyle(.bordered)
-                        .disabled(subscriptionManager.isLoading)
-                    }
-                    .padding(.horizontal)
-                    .padding(.top, 4)
-                    
-                    Spacer(minLength: 12)
+                    Color.clear.frame(height: 110)
                 }
-                .padding(.bottom, 24)
+                .padding(.bottom, 16)
+            }
+            .safeAreaInset(edge: .bottom) {
+                VStack(spacing: 10) {
+                    Button(action: {
+                        didTapPrimary = true
+                        Task { await purchaseSelected() }
+                    }) {
+                        HStack {
+                            Text(primaryButtonTitle)
+                            Spacer()
+                            if subscriptionManager.isLoading {
+                                ProgressView()
+                            } else {
+                                Image(systemName: "arrow.right")
+                            }
+                        }
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .padding()
+                        .background(subscriptionManager.isLoading ? Color.gray : Color(red: 0.96, green: 0.29, blue: 0.41))
+                        .cornerRadius(18)
+                    }
+                    .disabled(subscriptionManager.isLoading || selectedProduct == nil)
+                    .padding(.horizontal)
+                    .padding(.top, 10)
+                    .padding(.bottom, 10)
+                }
+                .background(.ultraThinMaterial)
             }
             .navigationBarHidden(true)
             .onAppear {
@@ -177,6 +176,19 @@ struct PaywallView: View {
         default:
             return nil
         }
+    }
+    
+    private var reviewsCarousel: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 14) {
+                ForEach(PaywallReview.sample, id: \.id) { review in
+                    PaywallReviewCard(review: review)
+                }
+            }
+            .padding(.horizontal, 18)
+        }
+        .frame(height: 132)
+        .accessibilityLabel("User reviews")
     }
     
     private var header: some View {
@@ -330,6 +342,70 @@ private struct PaywallPlanCard: View {
             .clipShape(RoundedRectangle(cornerRadius: 16))
         }
         .buttonStyle(.plain)
+    }
+}
+
+private struct PaywallReview: Identifiable {
+    let id: String
+    let stars: Int
+    let quote: String
+    let author: String
+    
+    static let sample: [PaywallReview] = [
+        PaywallReview(
+            id: "r1",
+            stars: 5,
+            quote: "Finally everything is organized. The reminders keep us on track.",
+            author: "Sofia P."
+        ),
+        PaywallReview(
+            id: "r2",
+            stars: 5,
+            quote: "Super clear schedule and easy to mark vaccines as done.",
+            author: "Megan L."
+        ),
+        PaywallReview(
+            id: "r3",
+            stars: 5,
+            quote: "Love having all records in one place. It’s a lifesaver.",
+            author: "Daniel K."
+        )
+    ]
+}
+
+private struct PaywallReviewCard: View {
+    let review: PaywallReview
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 4) {
+                ForEach(0..<review.stars, id: \.self) { _ in
+                    Image(systemName: "star.fill")
+                        .font(.caption)
+                        .foregroundColor(Color(red: 0.92, green: 0.67, blue: 0.18))
+                }
+            }
+            
+            Text("“\(review.quote)”")
+                .font(.callout)
+                .fontWeight(.semibold)
+                .foregroundColor(.primary)
+                .lineLimit(3)
+            
+            Text(review.author)
+                .font(.footnote)
+                .foregroundColor(.secondary)
+        }
+        .padding(14)
+        .frame(width: 280, height: 120, alignment: .topLeading)
+        .background(
+            RoundedRectangle(cornerRadius: 18)
+                .fill(Color.white.opacity(0.85))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .stroke(Color.black.opacity(0.06), lineWidth: 1)
+        )
     }
 }
 
