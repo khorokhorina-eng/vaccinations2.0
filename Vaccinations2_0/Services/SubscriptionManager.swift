@@ -18,7 +18,7 @@ final class SubscriptionManager: ObservableObject {
     // MARK: - Constants
 
     /// Product IDs must match App Store Connect.
-    /// Configure **1 week free trial** as an introductory offer for the yearly subscription in App Store Connect.
+    /// Configure a **7-day free trial** as an introductory offer for the yearly subscription in App Store Connect.
     enum ProductID {
         static let monthly = "com.vaccinecalendar.subscription.monthly"
         static let yearly = "com.vaccinecalendar.subscription.yearly"
