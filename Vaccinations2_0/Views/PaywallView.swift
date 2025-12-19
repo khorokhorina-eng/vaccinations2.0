@@ -14,6 +14,10 @@ struct PaywallView: View {
     @State private var promoCode: String = ""
     @State private var showErrorAlert: Bool = false
     @State private var didTapPrimary: Bool = false
+    
+    // Display pricing (business model). Purchases still use StoreKit products.
+    private let monthlyPriceUSD: Decimal = 5
+    private let yearlyPriceUSD: Decimal = 20
 
     var body: some View {
         NavigationView {
@@ -180,10 +184,6 @@ struct PaywallView: View {
         return "Continue"
     }
 
-    private func product(for id: String) -> Product? {
-        subscriptionManager.products.first(where: { $0.id == id })
-    }
-    
     private func planBadgeText(forProductId id: String) -> String? {
         switch id {
         case SubscriptionManager.ProductID.yearly:
@@ -229,7 +229,7 @@ struct PaywallView: View {
     
     private func durationAndTotal(forProductId id: String) -> String {
         // Match the reference shape: "12 mo • TRY 439.99"
-        let total = product(for: id)?.displayPrice ?? "—"
+        let total = formattedUSD(totalPriceUSD(forProductId: id))
         if id == SubscriptionManager.ProductID.yearly {
             return "12 mo • \(total)"
         }
@@ -241,25 +241,33 @@ struct PaywallView: View {
     
     private func perMonthLabel(forProductId id: String) -> String {
         // Match the reference shape: "TRY 36.67 / mo"
-        guard let product = product(for: id) else {
-            return "— / mo"
-        }
         if id == SubscriptionManager.ProductID.monthly {
-            return "\(product.displayPrice) / mo"
+            return "\(formattedUSD(monthlyPriceUSD)) / mo"
         }
         if id == SubscriptionManager.ProductID.yearly {
-            if let monthly = perMonthPriceString(forYearlyProduct: product) {
-                return "\(monthly) / mo"
-            }
-            return "\(product.displayPrice) / yr"
+            return "\(formattedUSD(yearlyPriceUSD / Decimal(12))) / mo"
         }
-        return product.displayPrice
+        return "—"
     }
     
-    private func perMonthPriceString(forYearlyProduct product: Product) -> String? {
-        // Best-effort monthly price calculation, formatted with the product's currency style.
-        let monthly = product.price / Decimal(12)
-        return monthly.formatted(product.priceFormatStyle)
+    private func totalPriceUSD(forProductId id: String) -> Decimal {
+        switch id {
+        case SubscriptionManager.ProductID.monthly:
+            return monthlyPriceUSD
+        case SubscriptionManager.ProductID.yearly:
+            return yearlyPriceUSD
+        default:
+            return 0
+        }
+    }
+    
+    private func formattedUSD(_ amount: Decimal) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.currencyCode = "USD"
+        formatter.maximumFractionDigits = 2
+        formatter.minimumFractionDigits = 2
+        return formatter.string(from: NSDecimalNumber(decimal: amount)) ?? "$\(amount)"
     }
 
     private func purchaseSelected() async {
