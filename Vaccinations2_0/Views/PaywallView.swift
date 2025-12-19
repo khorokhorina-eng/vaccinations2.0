@@ -177,8 +177,8 @@ struct PaywallView: View {
     }
 
     private var primaryButtonTitle: String {
-        // Trial applies to the yearly plan (configured in App Store Connect).
-        if selectedProductID == SubscriptionManager.ProductID.yearly && isFreeTrialEnabled {
+        // Trial applies to both plans (configured in App Store Connect).
+        if isFreeTrialEnabled && (selectedProductID == SubscriptionManager.ProductID.yearly || selectedProductID == SubscriptionManager.ProductID.monthly) {
             return "Start 7-Day Free Trial"
         }
         return "Continue"
@@ -189,7 +189,7 @@ struct PaywallView: View {
         case SubscriptionManager.ProductID.yearly:
             return isFreeTrialEnabled ? "7-DAY FREE TRIAL" : "BEST VALUE"
         case SubscriptionManager.ProductID.monthly:
-            return "MONTHLY PLAN"
+            return isFreeTrialEnabled ? "7-DAY FREE TRIAL" : "MONTHLY PLAN"
         default:
             return nil
         }
