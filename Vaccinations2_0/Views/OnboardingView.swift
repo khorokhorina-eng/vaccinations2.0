@@ -78,7 +78,7 @@ struct OnboardingView: View {
     }
     
     private var primaryButtonTitle: String {
-        step == .finalQuestion ? "Начать" : "Далее"
+        step == .finalQuestion ? "Get started" : "Next"
     }
     
     private var primaryButtonEnabled: Bool {
@@ -129,8 +129,8 @@ struct OnboardingView: View {
             switch step {
             case .intro:
                 interstitial(
-                    title: "Привет!",
-                    subtitle: "Давай сделаем персонализированный план вакцинаций для твоего ребенка",
+                    title: "Hi!",
+                    subtitle: "Let’s create a personalized vaccination plan for your child.",
                     symbol: "sparkles",
                     accent: Color(red: 0.96, green: 0.29, blue: 0.41)
                 )
@@ -138,8 +138,8 @@ struct OnboardingView: View {
                 questionName
             case .betweenNameAndBirth:
                 interstitial(
-                    title: "Всё под контролем",
-                    subtitle: "Сроки, отметки и напоминания — в одном месте.",
+                    title: "Everything under control",
+                    subtitle: "Schedules, records, and reminders — in one place.",
                     symbol: "checkmark.seal.fill",
                     accent: Color(red: 0.45, green: 0.32, blue: 0.96)
                 )
@@ -147,8 +147,8 @@ struct OnboardingView: View {
                 questionBirthDate
             case .betweenBirthAndCountry:
                 interstitial(
-                    title: "Готовим план",
-                    subtitle: "Учтём возраст и календарь для выбранной страны.",
+                    title: "Building your plan",
+                    subtitle: "We’ll use your child’s age and your country’s schedule.",
                     symbol: "calendar.badge.clock",
                     accent: Color(red: 0.12, green: 0.55, blue: 0.95)
                 )
@@ -156,8 +156,8 @@ struct OnboardingView: View {
                 questionCountry
             case .betweenCountryAndOptional:
                 interstitial(
-                    title: "Про необязательные вакцины",
-                    subtitle: "Ты сможешь включить или скрыть рекомендованные прививки — как удобнее.",
+                    title: "Optional vaccines",
+                    subtitle: "You can include or hide recommended vaccines — whatever feels right for you.",
                     symbol: "slider.horizontal.3",
                     accent: Color(red: 0.26, green: 0.78, blue: 0.51)
                 )
@@ -165,8 +165,8 @@ struct OnboardingView: View {
                 questionOptionalVaccines
             case .betweenOptionalAndFinal:
                 interstitial(
-                    title: "Сделаем по‑твоему",
-                    subtitle: "Пара деталей — и всё будет максимально персонально.",
+                    title: "Make it yours",
+                    subtitle: "A couple more details and we’ll personalize everything.",
                     symbol: "wand.and.stars",
                     accent: Color(red: 0.96, green: 0.67, blue: 0.18)
                 )
@@ -181,19 +181,19 @@ struct OnboardingView: View {
             OnboardingIllustration(symbol: "person.crop.circle.fill", accent: Color(red: 0.96, green: 0.29, blue: 0.41))
                 .padding(.top, 6)
             
-            Text("Как зовут твоего ребенка?")
+            Text("What’s your child’s name?")
                 .font(.system(size: 34, weight: .bold))
                 .multilineTextAlignment(.center)
             
-            Text("Мы будем обращаться к нему по имени и показывать понятные напоминания.")
+            Text("We’ll use it in reminders and throughout the plan.")
                 .font(.body)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
             
             VStack(alignment: .leading, spacing: 8) {
-                Text("Имя")
+                Text("Name")
                     .font(.headline)
-                TextField("Введите имя", text: $childName)
+                TextField("Enter a name", text: $childName)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .autocapitalization(.words)
                     .focused($isNameFocused)
@@ -207,17 +207,17 @@ struct OnboardingView: View {
             OnboardingIllustration(symbol: "calendar", accent: Color(red: 0.12, green: 0.55, blue: 0.95))
                 .padding(.top, 6)
             
-            Text("Когда он родился?")
+            Text("When was your child born?")
                 .font(.system(size: 34, weight: .bold))
                 .multilineTextAlignment(.center)
             
-            Text("Мы построим календарь вакцинаций по возрасту.")
+            Text("We’ll build the vaccination schedule based on age.")
                 .font(.body)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
             
             VStack(alignment: .leading, spacing: 10) {
-                Text("Дата рождения")
+                Text("Date of birth")
                     .font(.headline)
                 
                 Button(action: {
@@ -243,7 +243,7 @@ struct OnboardingView: View {
                             .datePickerStyle(GraphicalDatePickerStyle())
                             .labelsHidden()
                         
-                        Button("Готово") {
+                        Button("Done") {
                             withAnimation(.easeInOut) { showDatePicker = false }
                         }
                         .buttonStyle(.bordered)
@@ -266,17 +266,17 @@ struct OnboardingView: View {
             OnboardingIllustration(symbol: "globe.europe.africa.fill", accent: Color(red: 0.45, green: 0.32, blue: 0.96))
                 .padding(.top, 6)
             
-            Text("В какой стране вы живёте?")
+            Text("Which country are you in?")
                 .font(.system(size: 34, weight: .bold))
                 .multilineTextAlignment(.center)
             
-            Text("Так мы подберём календарь вакцинаций именно для вашей страны.")
+            Text("We’ll use your country’s recommended vaccination schedule.")
                 .font(.body)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
             
             VStack(alignment: .leading, spacing: 10) {
-                Text("Страна")
+                Text("Country")
                     .font(.headline)
                 
                 Button(action: {
@@ -307,25 +307,25 @@ struct OnboardingView: View {
             OnboardingIllustration(symbol: "shield.lefthalf.filled", accent: Color(red: 0.26, green: 0.78, blue: 0.51))
                 .padding(.top, 6)
             
-            Text("Как вы относитесь к необязательным вакцинам?")
+            Text("How do you feel about optional vaccines?")
                 .font(.system(size: 32, weight: .bold))
                 .multilineTextAlignment(.center)
             
-            Text("Выберите вариант — мы настроим список так, как удобнее именно вам.")
+            Text("Choose an option — we’ll set up your list accordingly.")
                 .font(.body)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
             
             VStack(spacing: 10) {
                 OnboardingChoiceRow(
-                    title: "Показывать обязательные и рекомендованные",
-                    subtitle: "Полная картина вакцинаций",
+                    title: "Show mandatory + recommended",
+                    subtitle: "See the complete schedule",
                     isSelected: optionalPreference == .includeRecommended
                 ) { optionalPreference = .includeRecommended }
                 
                 OnboardingChoiceRow(
-                    title: "Показывать только обязательные",
-                    subtitle: "Сфокусироваться на главном",
+                    title: "Show mandatory only",
+                    subtitle: "Keep things simple",
                     isSelected: optionalPreference == .onlyMandatory
                 ) { optionalPreference = .onlyMandatory }
             }
@@ -338,45 +338,45 @@ struct OnboardingView: View {
             OnboardingIllustration(symbol: "slider.horizontal.2.square", accent: Color(red: 0.96, green: 0.67, blue: 0.18))
                 .padding(.top, 6)
             
-            Text("Что для вас важнее всего?")
+            Text("What matters most to you?")
                 .font(.system(size: 34, weight: .bold))
                 .multilineTextAlignment(.center)
             
-            Text("Это поможет нам чуть точнее настроить подачу и напоминания.")
+            Text("This helps us personalize the experience and reminders.")
                 .font(.body)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
             
             VStack(spacing: 10) {
                 OnboardingChoiceRow(
-                    title: "Не пропускать сроки",
-                    subtitle: "Напоминания и контрольные даты",
+                    title: "Never miss a due date",
+                    subtitle: "Reminders and upcoming vaccines",
                     isSelected: primaryGoal == .stayOnTrack
                 ) { primaryGoal = .stayOnTrack }
                 
                 OnboardingChoiceRow(
-                    title: "Хранить записи о прививках",
-                    subtitle: "История и отметки всегда под рукой",
+                    title: "Keep vaccination records",
+                    subtitle: "History and confirmations in one place",
                     isSelected: primaryGoal == .keepRecords
                 ) { primaryGoal = .keepRecords }
                 
                 OnboardingChoiceRow(
-                    title: "Понимать, что обязательно",
-                    subtitle: "Чёткое разделение обязательных/рекомендованных",
+                    title: "Understand what’s mandatory",
+                    subtitle: "Clear labels and categories",
                     isSelected: primaryGoal == .understandMandatory
                 ) { primaryGoal = .understandMandatory }
             }
             .padding(.top, 6)
             
             VStack(alignment: .leading, spacing: 10) {
-                Text("Когда напоминать?")
+                Text("When should we remind you?")
                     .font(.headline)
                     .padding(.top, 10)
                 
                 HStack(spacing: 10) {
                     ForEach([1, 3, 7], id: \.self) { days in
                         Button(action: { reminderDays = days }) {
-                            Text("\(days) дн.")
+                            Text(days == 1 ? "1 day" : "\(days) days")
                                 .font(.headline)
                                 .foregroundColor(reminderDays == days ? .white : .primary)
                                 .frame(maxWidth: .infinity)
@@ -410,9 +410,9 @@ struct OnboardingView: View {
             // Small feature list on the intro screen only
             if step == .intro {
                 VStack(alignment: .leading, spacing: 10) {
-                    FeatureRow(icon: "calendar.badge.clock", title: "Сроки и напоминания", subtitle: "Ничего не пропустишь")
-                    FeatureRow(icon: "checkmark.seal", title: "Отметки о прививках", subtitle: "История всегда под рукой")
-                    FeatureRow(icon: "tray.full", title: "Всё под контролем", subtitle: "План, записи и статусы в одном месте")
+                    FeatureRow(icon: "calendar.badge.clock", title: "Schedules & reminders", subtitle: "Stay on track effortlessly")
+                    FeatureRow(icon: "checkmark.seal", title: "Vaccination records", subtitle: "Keep everything documented")
+                    FeatureRow(icon: "tray.full", title: "All in one place", subtitle: "Plan, records, and status")
                 }
                 .padding(.top, 8)
             }

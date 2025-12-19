@@ -39,6 +39,7 @@ struct PaywallView: View {
                         VStack(spacing: 12) {
                             ForEach(displayProducts, id: \.id) { product in
                                 PaywallPlanCard(
+                                    badgeText: planBadgeText(for: product),
                                     title: planTitle(for: product),
                                     durationAndTotal: durationAndTotal(for: product),
                                     perMonth: perMonthLabel(for: product),
@@ -173,11 +174,22 @@ struct PaywallView: View {
     private func planTitle(for product: Product) -> String {
         switch product.id {
         case SubscriptionManager.ProductID.monthly:
-            return "Monthly"
+            return "Monthly Plan"
         case SubscriptionManager.ProductID.yearly:
-            return "Yearly"
+            return "Yearly Plan"
         default:
             return product.displayName
+        }
+    }
+    
+    private func planBadgeText(for product: Product) -> String? {
+        switch product.id {
+        case SubscriptionManager.ProductID.yearly:
+            return isFreeTrialEnabled ? "14-DAY FREE TRIAL" : "BEST VALUE"
+        case SubscriptionManager.ProductID.monthly:
+            return "MONTHLY PLAN"
+        default:
+            return nil
         }
     }
     
@@ -252,6 +264,7 @@ struct PaywallView: View {
 }
 
 private struct PaywallPlanCard: View {
+    let badgeText: String?
     let title: String
     let durationAndTotal: String
     let perMonth: String
@@ -260,34 +273,55 @@ private struct PaywallPlanCard: View {
     
     var body: some View {
         Button(action: action) {
-            HStack(alignment: .center, spacing: 12) {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(title)
-                        .font(.system(size: 34, weight: .bold))
-                        .foregroundColor(.primary)
-                        .minimumScaleFactor(0.85)
-                        .lineLimit(1)
+            VStack(spacing: 0) {
+                if let badgeText = badgeText {
+                    Text(badgeText)
+                        .font(.caption)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
+                        .background(
+                            LinearGradient(
+                                colors: [
+                                    Color(red: 0.96, green: 0.29, blue: 0.41),
+                                    Color(red: 0.98, green: 0.42, blue: 0.55)
+                                ],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                }
+                
+                HStack(alignment: .center, spacing: 12) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(title)
+                            .font(.system(size: 34, weight: .bold))
+                            .foregroundColor(.primary)
+                            .minimumScaleFactor(0.85)
+                            .lineLimit(1)
+                        
+                        Text(durationAndTotal)
+                            .font(.headline)
+                            .foregroundColor(.primary.opacity(0.85))
+                    }
                     
-                    Text(durationAndTotal)
-                        .font(.headline)
-                        .foregroundColor(.primary.opacity(0.85))
+                    Spacer()
+                    
+                    VStack(alignment: .trailing, spacing: 6) {
+                        Text(perMonth)
+                            .font(.system(size: 22, weight: .bold))
+                            .foregroundColor(.primary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.9)
+                    }
+                    
+                    Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                        .font(.title2)
+                        .foregroundColor(isSelected ? Color(red: 0.96, green: 0.29, blue: 0.41) : .secondary)
                 }
-                
-                Spacer()
-                
-                VStack(alignment: .trailing, spacing: 6) {
-                    Text(perMonth)
-                        .font(.system(size: 22, weight: .bold))
-                        .foregroundColor(.primary)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.9)
-                }
-                
-                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                    .font(.title2)
-                    .foregroundColor(isSelected ? Color(red: 0.96, green: 0.29, blue: 0.41) : .secondary)
+                .padding(16)
             }
-            .padding(16)
             .background(
                 RoundedRectangle(cornerRadius: 16)
                     .fill(isSelected ? Color(red: 0.96, green: 0.29, blue: 0.41).opacity(0.12) : Color.gray.opacity(0.06))
@@ -296,6 +330,7 @@ private struct PaywallPlanCard: View {
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(isSelected ? Color(red: 0.96, green: 0.29, blue: 0.41) : Color.gray.opacity(0.15), lineWidth: isSelected ? 2 : 1)
             )
+            .clipShape(RoundedRectangle(cornerRadius: 16))
         }
         .buttonStyle(.plain)
     }
