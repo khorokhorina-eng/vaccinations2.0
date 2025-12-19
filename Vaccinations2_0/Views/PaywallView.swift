@@ -24,7 +24,7 @@ struct PaywallView: View {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 16) {
                     header
-                        .padding(.top, 10)
+                        .padding(.top, 6)
                         .padding(.horizontal)
                     
                     // Reviews carousel (horizontal) — stays above plans like in the reference
@@ -35,7 +35,8 @@ struct PaywallView: View {
                         Text("Free trial enabled")
                             .font(.headline)
                     }
-                    .padding()
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
                     .background(
                         RoundedRectangle(cornerRadius: 18)
                             .fill(Color.purple.opacity(0.08))
@@ -70,7 +71,7 @@ struct PaywallView: View {
                     // Keep promo code available but below the first screen content
                     VStack(alignment: .leading, spacing: 10) {
                         Text("Promo code")
-                            .font(.headline)
+                            .font(.subheadline)
                             .foregroundColor(.secondary)
                         
                         HStack(spacing: 10) {
@@ -91,7 +92,7 @@ struct PaywallView: View {
                         }
                     }
                     .padding(.horizontal)
-                    .padding(.top, 6)
+                    .padding(.top, 2)
                     
                     Color.clear.frame(height: 110)
                 }
@@ -187,7 +188,7 @@ struct PaywallView: View {
             }
             .padding(.horizontal, 18)
         }
-        .frame(height: 132)
+        .frame(height: 110)
         .accessibilityLabel("User reviews")
     }
     
@@ -305,13 +306,13 @@ private struct PaywallPlanCard: View {
                 HStack(alignment: .center, spacing: 12) {
                     VStack(alignment: .leading, spacing: 6) {
                         Text(title)
-                            .font(.system(size: 26, weight: .bold))
+                            .font(.system(size: 24, weight: .bold))
                             .foregroundColor(.primary)
-                            .minimumScaleFactor(0.8)
+                            .minimumScaleFactor(0.85)
                             .lineLimit(2)
                         
                         Text(durationAndTotal)
-                            .font(.subheadline)
+                            .font(.caption)
                             .foregroundColor(.primary.opacity(0.85))
                     }
                     
@@ -319,7 +320,7 @@ private struct PaywallPlanCard: View {
                     
                     VStack(alignment: .trailing, spacing: 6) {
                         Text(perMonth)
-                            .font(.system(size: 18, weight: .bold))
+                            .font(.system(size: 17, weight: .bold))
                             .foregroundColor(.primary)
                             .lineLimit(1)
                             .minimumScaleFactor(0.9)
@@ -329,7 +330,7 @@ private struct PaywallPlanCard: View {
                         .font(.title2)
                         .foregroundColor(isSelected ? Color(red: 0.96, green: 0.29, blue: 0.41) : .secondary)
                 }
-                .padding(12)
+                .padding(10)
             }
             .background(
                 RoundedRectangle(cornerRadius: 16)
@@ -390,14 +391,14 @@ private struct PaywallReviewCard: View {
                 .font(.callout)
                 .fontWeight(.semibold)
                 .foregroundColor(.primary)
-                .lineLimit(3)
+                .lineLimit(2)
             
             Text(review.author)
                 .font(.footnote)
                 .foregroundColor(.secondary)
         }
-        .padding(14)
-        .frame(width: 280, height: 120, alignment: .topLeading)
+        .padding(12)
+        .frame(width: 260, height: 98, alignment: .topLeading)
         .background(
             RoundedRectangle(cornerRadius: 18)
                 .fill(Color.white.opacity(0.85))
