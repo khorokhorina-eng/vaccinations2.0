@@ -37,16 +37,24 @@ struct PaywallView: View {
                         .padding(.horizontal)
                         
                         VStack(spacing: 12) {
-                            ForEach(displayProducts, id: \.id) { product in
-                                PaywallPlanCard(
-                                    badgeText: planBadgeText(for: product),
-                                    title: planTitle(for: product),
-                                    durationAndTotal: durationAndTotal(for: product),
-                                    perMonth: perMonthLabel(for: product),
-                                    isSelected: selectedProductID == product.id
-                                ) {
-                                    selectedProductID = product.id
-                                }
+                            PaywallPlanCard(
+                                badgeText: planBadgeText(forProductId: SubscriptionManager.ProductID.yearly),
+                                title: "Yearly Plan",
+                                durationAndTotal: durationAndTotal(forProductId: SubscriptionManager.ProductID.yearly),
+                                perMonth: perMonthLabel(forProductId: SubscriptionManager.ProductID.yearly),
+                                isSelected: selectedProductID == SubscriptionManager.ProductID.yearly
+                            ) {
+                                selectedProductID = SubscriptionManager.ProductID.yearly
+                            }
+                            
+                            PaywallPlanCard(
+                                badgeText: planBadgeText(forProductId: SubscriptionManager.ProductID.monthly),
+                                title: "Monthly Plan",
+                                durationAndTotal: durationAndTotal(forProductId: SubscriptionManager.ProductID.monthly),
+                                perMonth: perMonthLabel(forProductId: SubscriptionManager.ProductID.monthly),
+                                isSelected: selectedProductID == SubscriptionManager.ProductID.monthly
+                            ) {
+                                selectedProductID = SubscriptionManager.ProductID.monthly
                             }
                             
                             if subscriptionManager.products.isEmpty && !subscriptionManager.isLoading {
@@ -171,19 +179,12 @@ struct PaywallView: View {
         return "Continue"
     }
 
-    private func planTitle(for product: Product) -> String {
-        switch product.id {
-        case SubscriptionManager.ProductID.monthly:
-            return "Monthly Plan"
-        case SubscriptionManager.ProductID.yearly:
-            return "Yearly Plan"
-        default:
-            return product.displayName
-        }
+    private func product(for id: String) -> Product? {
+        subscriptionManager.products.first(where: { $0.id == id })
     }
     
-    private func planBadgeText(for product: Product) -> String? {
-        switch product.id {
+    private func planBadgeText(forProductId id: String) -> String? {
+        switch id {
         case SubscriptionManager.ProductID.yearly:
             return isFreeTrialEnabled ? "14-DAY FREE TRIAL" : "BEST VALUE"
         case SubscriptionManager.ProductID.monthly:
@@ -225,24 +226,27 @@ struct PaywallView: View {
         }
     }
     
-    private func durationAndTotal(for product: Product) -> String {
+    private func durationAndTotal(forProductId id: String) -> String {
         // Match the reference shape: "12 mo • TRY 439.99"
-        let total = product.displayPrice
-        if product.id == SubscriptionManager.ProductID.yearly {
+        let total = product(for: id)?.displayPrice ?? "—"
+        if id == SubscriptionManager.ProductID.yearly {
             return "12 mo • \(total)"
         }
-        if product.id == SubscriptionManager.ProductID.monthly {
+        if id == SubscriptionManager.ProductID.monthly {
             return "1 mo • \(total)"
         }
         return total
     }
     
-    private func perMonthLabel(for product: Product) -> String {
+    private func perMonthLabel(forProductId id: String) -> String {
         // Match the reference shape: "TRY 36.67 / mo"
-        if product.id == SubscriptionManager.ProductID.monthly {
+        guard let product = product(for: id) else {
+            return "— / mo"
+        }
+        if id == SubscriptionManager.ProductID.monthly {
             return "\(product.displayPrice) / mo"
         }
-        if product.id == SubscriptionManager.ProductID.yearly {
+        if id == SubscriptionManager.ProductID.yearly {
             if let monthly = perMonthPriceString(forYearlyProduct: product) {
                 return "\(monthly) / mo"
             }
