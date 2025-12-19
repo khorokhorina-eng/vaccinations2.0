@@ -49,6 +49,7 @@ class VaccineViewModel: ObservableObject {
         childProfile = dataService.loadChildProfile()
         vaccineRecords = dataService.loadVaccineRecords()
         customVaccines = dataService.loadCustomVaccines()
+        showOnlyMandatory = dataService.showOnlyMandatoryPreference
         
         if let profile = childProfile {
             if let country = Country(rawValue: profile.country) {
@@ -306,6 +307,7 @@ class VaccineViewModel: ObservableObject {
         vaccines = []
         vaccineRecords = []
         customVaccines = []
+        showOnlyMandatory = false
         dataService.resetAllData()
     }
 }

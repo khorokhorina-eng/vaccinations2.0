@@ -9,59 +9,77 @@ import StoreKit
 struct PaywallView: View {
     @EnvironmentObject var subscriptionManager: SubscriptionManager
     @State private var selectedProductID: String = SubscriptionManager.ProductID.yearly
+    @State private var isFreeTrialEnabled: Bool = true
 
     @State private var promoCode: String = ""
     @State private var showErrorAlert: Bool = false
+    @State private var didTapPrimary: Bool = false
+    
+    // Display pricing (business model). Purchases still use StoreKit products.
+    private let monthlyPriceUSD: Decimal = 4.99
+    private let yearlyPriceUSD: Decimal = 19.99
 
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 18) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Unlock Premium")
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-
-                        Text("After registration, choose a plan to continue.")
-                            .foregroundColor(.secondary)
-                    }
-                    .padding(.top, 16)
-
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Plans")
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 16) {
+                    header
+                        .padding(.top, 6)
+                        .padding(.horizontal)
+                    
+                    // Reviews carousel (horizontal) — stays above plans like in the reference
+                    reviewsCarousel
+                        .padding(.top, 4)
+                    
+                    Toggle(isOn: $isFreeTrialEnabled) {
+                        Text("Free trial enabled")
                             .font(.headline)
-                            .foregroundColor(.secondary)
-
-                        ForEach(displayProducts, id: \.id) { product in
-                            PlanRow(
-                                title: planTitle(for: product),
-                                subtitle: planSubtitle(for: product),
-                                price: product.displayPrice,
-                                isSelected: selectedProductID == product.id
-                            ) {
-                                selectedProductID = product.id
-                            }
+                    }
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .background(
+                        RoundedRectangle(cornerRadius: 18)
+                            .fill(Color.purple.opacity(0.08))
+                    )
+                    .tint(.purple)
+                    .padding(.horizontal)
+                    
+                    // Plan tiles — kept high on the screen
+                    VStack(spacing: 12) {
+                        PaywallPlanCard(
+                            badgeText: planBadgeText(forProductId: SubscriptionManager.ProductID.yearly),
+                            title: "Yearly Plan",
+                            durationAndTotal: durationAndTotal(forProductId: SubscriptionManager.ProductID.yearly),
+                            perMonth: perMonthLabel(forProductId: SubscriptionManager.ProductID.yearly),
+                            isSelected: selectedProductID == SubscriptionManager.ProductID.yearly
+                        ) {
+                            selectedProductID = SubscriptionManager.ProductID.yearly
                         }
-
-                        if subscriptionManager.products.isEmpty && !subscriptionManager.isLoading {
-                            Text("Plans are temporarily unavailable. You can still restore purchases or use a promo code.")
-                                .font(.footnote)
-                                .foregroundColor(.secondary)
-                                .padding(.top, 4)
+                        
+                        PaywallPlanCard(
+                            badgeText: planBadgeText(forProductId: SubscriptionManager.ProductID.monthly),
+                            title: "Monthly Plan",
+                            durationAndTotal: durationAndTotal(forProductId: SubscriptionManager.ProductID.monthly),
+                            perMonth: perMonthLabel(forProductId: SubscriptionManager.ProductID.monthly),
+                            isSelected: selectedProductID == SubscriptionManager.ProductID.monthly
+                        ) {
+                            selectedProductID = SubscriptionManager.ProductID.monthly
                         }
                     }
-
+                    .padding(.horizontal)
+                    
+                    // Keep promo code available but below the first screen content
                     VStack(alignment: .leading, spacing: 10) {
                         Text("Promo code")
-                            .font(.headline)
+                            .font(.subheadline)
                             .foregroundColor(.secondary)
-
+                        
                         HStack(spacing: 10) {
                             TextField("Enter promo code", text: $promoCode)
                                 .textInputAutocapitalization(.never)
                                 .autocorrectionDisabled()
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
-
+                            
                             Button("Apply") {
                                 subscriptionManager.applyPromoCode(promoCode)
                                 if subscriptionManager.hasPremiumAccess {
@@ -73,46 +91,40 @@ struct PaywallView: View {
                             .buttonStyle(.bordered)
                         }
                     }
-
-                    VStack(spacing: 12) {
-                        Button(action: {
-                            Task { await purchaseSelected() }
-                        }) {
-                            HStack {
-                                Text(primaryButtonTitle)
-                                Spacer()
-                                if subscriptionManager.isLoading {
-                                    ProgressView()
-                                } else {
-                                    Image(systemName: "arrow.right")
-                                }
-                            }
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .padding()
-                            .background(subscriptionManager.isLoading ? Color.gray : Color.blue)
-                            .cornerRadius(12)
-                        }
-                        .disabled(subscriptionManager.isLoading || selectedProduct == nil)
-
-                        Button(action: {
-                            Task { await subscriptionManager.restorePurchases() }
-                        }) {
-                            Text("Restore purchases")
-                                .frame(maxWidth: .infinity)
-                        }
-                        .buttonStyle(.bordered)
-                        .disabled(subscriptionManager.isLoading)
-                    }
-                    .padding(.top, 6)
-
-                    Text("Monthly: $5. Yearly: $30. Yearly plan includes a 1-week free trial for new subscribers (configured in App Store Connect).")
-                        .font(.footnote)
-                        .foregroundColor(.secondary)
-                        .padding(.top, 4)
+                    .padding(.horizontal)
+                    .padding(.top, 2)
+                    
+                    Color.clear.frame(height: 110)
                 }
-                .padding(.horizontal)
-                .padding(.bottom, 24)
+                .padding(.bottom, 16)
+            }
+            .safeAreaInset(edge: .bottom) {
+                VStack(spacing: 10) {
+                    Button(action: {
+                        didTapPrimary = true
+                        Task { await purchaseSelected() }
+                    }) {
+                        HStack {
+                            Text(primaryButtonTitle)
+                            Spacer()
+                            if subscriptionManager.isLoading {
+                                ProgressView()
+                            } else {
+                                Image(systemName: "arrow.right")
+                            }
+                        }
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .padding()
+                        .background(subscriptionManager.isLoading ? Color.gray : Color(red: 0.96, green: 0.29, blue: 0.41))
+                        .cornerRadius(18)
+                    }
+                    .disabled(subscriptionManager.isLoading || selectedProduct == nil)
+                    .padding(.horizontal)
+                    .padding(.top, 10)
+                    .padding(.bottom, 10)
+                }
+                .background(.ultraThinMaterial)
             }
             .navigationBarHidden(true)
             .onAppear {
@@ -149,32 +161,110 @@ struct PaywallView: View {
     }
 
     private var primaryButtonTitle: String {
-        if selectedProductID == SubscriptionManager.ProductID.yearly {
-            return "Start free trial"
+        // Trial applies to both plans (configured in App Store Connect).
+        if isFreeTrialEnabled && (selectedProductID == SubscriptionManager.ProductID.yearly || selectedProductID == SubscriptionManager.ProductID.monthly) {
+            return "Start 3-Day Free Trial"
         }
         return "Continue"
     }
 
-    private func planTitle(for product: Product) -> String {
-        switch product.id {
-        case SubscriptionManager.ProductID.monthly:
-            return "Monthly"
+    private func planBadgeText(forProductId id: String) -> String? {
+        switch id {
         case SubscriptionManager.ProductID.yearly:
-            return "Yearly"
+            return isFreeTrialEnabled ? "3-DAY FREE TRIAL" : "BEST VALUE"
+        case SubscriptionManager.ProductID.monthly:
+            return isFreeTrialEnabled ? "3-DAY FREE TRIAL" : "MONTHLY PLAN"
         default:
-            return product.displayName
+            return nil
         }
     }
-
-    private func planSubtitle(for product: Product) -> String {
-        switch product.id {
-        case SubscriptionManager.ProductID.yearly:
-            return "1 week free, then billed yearly"
-        case SubscriptionManager.ProductID.monthly:
-            return "Billed monthly"
-        default:
-            return ""
+    
+    private var reviewsCarousel: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 14) {
+                ForEach(PaywallReview.sample, id: \.id) { review in
+                    PaywallReviewCard(review: review)
+                }
+            }
+            .padding(.horizontal, 18)
         }
+        .frame(height: 110)
+        .accessibilityLabel("User reviews")
+    }
+    
+    private var header: some View {
+        VStack(spacing: 10) {
+            HStack {
+                Button(action: {}) {
+                    Image(systemName: "xmark")
+                        .foregroundColor(.primary)
+                        .padding(10)
+                        .background(Color.black.opacity(0.04))
+                        .clipShape(Circle())
+                }
+                .disabled(true) // Paywall is root; keep visual parity without allowing bypass.
+                
+                Spacer()
+                
+                Button(action: {
+                    Task { await subscriptionManager.restorePurchases() }
+                }) {
+                    Text("Restore")
+                        .font(.headline)
+                        .foregroundColor(.secondary)
+                }
+                .disabled(subscriptionManager.isLoading)
+            }
+            
+            Text("Choose your plan")
+                .font(.largeTitle)
+                .fontWeight(.bold)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.top, 4)
+        }
+    }
+    
+    private func durationAndTotal(forProductId id: String) -> String {
+        // Match the reference shape: "12 mo • TRY 439.99"
+        let total = formattedUSD(totalPriceUSD(forProductId: id))
+        if id == SubscriptionManager.ProductID.yearly {
+            return "12 mo • \(total)"
+        }
+        if id == SubscriptionManager.ProductID.monthly {
+            return "1 mo • \(total)"
+        }
+        return total
+    }
+    
+    private func perMonthLabel(forProductId id: String) -> String {
+        // Match the reference shape: "TRY 36.67 / mo"
+        if id == SubscriptionManager.ProductID.monthly {
+            return "\(formattedUSD(monthlyPriceUSD)) / mo"
+        }
+        if id == SubscriptionManager.ProductID.yearly {
+            return "\(formattedUSD(yearlyPriceUSD / Decimal(12))) / mo"
+        }
+        return "—"
+    }
+    
+    private func totalPriceUSD(forProductId id: String) -> Decimal {
+        switch id {
+        case SubscriptionManager.ProductID.monthly:
+            return monthlyPriceUSD
+        case SubscriptionManager.ProductID.yearly:
+            return yearlyPriceUSD
+        default:
+            return 0
+        }
+    }
+    
+    private func formattedUSD(_ amount: Decimal) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.currencyCode = "USD"
+        formatter.maximumFractionDigits = 2
+        formatter.minimumFractionDigits = 2
+        return formatter.string(from: NSDecimalNumber(decimal: amount)) ?? "$\(amount)"
     }
 
     private func purchaseSelected() async {
@@ -183,48 +273,140 @@ struct PaywallView: View {
     }
 }
 
-private struct PlanRow: View {
+private struct PaywallPlanCard: View {
+    let badgeText: String?
     let title: String
-    let subtitle: String
-    let price: String
+    let durationAndTotal: String
+    let perMonth: String
     let isSelected: Bool
     let action: () -> Void
-
+    
     var body: some View {
         Button(action: action) {
-            HStack(alignment: .top, spacing: 12) {
-                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                    .foregroundColor(isSelected ? .blue : .secondary)
-                    .font(.title3)
-
-                VStack(alignment: .leading, spacing: 3) {
-                    HStack {
-                        Text(title)
-                            .font(.headline)
-                            .foregroundColor(.primary)
-                        Spacer()
-                        Text(price)
-                            .font(.headline)
-                            .foregroundColor(.primary)
-                    }
-                    if !subtitle.isEmpty {
-                        Text(subtitle)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                    }
+            VStack(spacing: 0) {
+                if let badgeText = badgeText {
+                    Text(badgeText)
+                        .font(.caption)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 6)
+                        .background(
+                            LinearGradient(
+                                colors: [
+                                    Color(red: 0.96, green: 0.29, blue: 0.41),
+                                    Color(red: 0.98, green: 0.42, blue: 0.55)
+                                ],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
                 }
+                
+                HStack(alignment: .center, spacing: 12) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(title)
+                            .font(.system(size: 24, weight: .bold))
+                            .foregroundColor(.primary)
+                            .minimumScaleFactor(0.85)
+                            .lineLimit(2)
+                        
+                        Text(durationAndTotal)
+                            .font(.caption)
+                            .foregroundColor(.primary.opacity(0.85))
+                    }
+                    
+                    Spacer()
+                    
+                    VStack(alignment: .trailing, spacing: 6) {
+                        Text(perMonth)
+                            .font(.system(size: 17, weight: .bold))
+                            .foregroundColor(.primary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.9)
+                    }
+                    
+                    Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                        .font(.title2)
+                        .foregroundColor(isSelected ? Color(red: 0.96, green: 0.29, blue: 0.41) : .secondary)
+                }
+                .padding(10)
             }
-            .padding()
             .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(isSelected ? Color.blue.opacity(0.1) : Color.gray.opacity(0.05))
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(isSelected ? Color(red: 0.96, green: 0.29, blue: 0.41).opacity(0.12) : Color.gray.opacity(0.06))
             )
             .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(isSelected ? Color.blue : Color.clear, lineWidth: 2)
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(isSelected ? Color(red: 0.96, green: 0.29, blue: 0.41) : Color.gray.opacity(0.15), lineWidth: isSelected ? 2 : 1)
             )
+            .clipShape(RoundedRectangle(cornerRadius: 16))
         }
         .buttonStyle(.plain)
+    }
+}
+
+private struct PaywallReview: Identifiable {
+    let id: String
+    let stars: Int
+    let quote: String
+    let author: String
+    
+    static let sample: [PaywallReview] = [
+        PaywallReview(
+            id: "r1",
+            stars: 5,
+            quote: "Finally everything is organized. The reminders keep us on track.",
+            author: "Sofia P."
+        ),
+        PaywallReview(
+            id: "r2",
+            stars: 5,
+            quote: "Super clear schedule and easy to mark vaccines as done.",
+            author: "Megan L."
+        ),
+        PaywallReview(
+            id: "r3",
+            stars: 5,
+            quote: "Love having all records in one place. It’s a lifesaver.",
+            author: "Daniel K."
+        )
+    ]
+}
+
+private struct PaywallReviewCard: View {
+    let review: PaywallReview
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 4) {
+                ForEach(0..<review.stars, id: \.self) { _ in
+                    Image(systemName: "star.fill")
+                        .font(.caption)
+                        .foregroundColor(Color(red: 0.92, green: 0.67, blue: 0.18))
+                }
+            }
+            
+            Text("“\(review.quote)”")
+                .font(.callout)
+                .fontWeight(.semibold)
+                .foregroundColor(.primary)
+                .lineLimit(2)
+            
+            Text(review.author)
+                .font(.footnote)
+                .foregroundColor(.secondary)
+        }
+        .padding(12)
+        .frame(width: 260, height: 98, alignment: .topLeading)
+        .background(
+            RoundedRectangle(cornerRadius: 18)
+                .fill(Color.white.opacity(0.85))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .stroke(Color.black.opacity(0.06), lineWidth: 1)
+        )
     }
 }
 
