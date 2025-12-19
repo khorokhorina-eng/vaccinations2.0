@@ -166,6 +166,13 @@ struct OnboardingView: View {
             .padding(.top, 18)
             
             VStack(alignment: .leading, spacing: 8) {
+                // Вопрос №1 (вернули)
+                Text("Как зовут твоего ребенка?")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .foregroundColor(.primary)
+                    .padding(.bottom, 4)
+                
                 Label("Имя ребенка", systemImage: "person.fill")
                     .font(.headline)
                     .foregroundColor(.primary)
@@ -205,6 +212,13 @@ struct OnboardingView: View {
             VStack(spacing: 16) {
                 // Birth Date
                 VStack(alignment: .leading, spacing: 8) {
+                    // Вопрос №2 (вернули)
+                    Text("Когда он родился?")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.primary)
+                        .padding(.bottom, 4)
+                    
                     Label("Дата рождения", systemImage: "calendar")
                         .font(.headline)
                         .foregroundColor(.primary)
