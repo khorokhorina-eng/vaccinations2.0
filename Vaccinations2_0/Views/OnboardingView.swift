@@ -19,7 +19,7 @@ struct OnboardingView: View {
     @State private var showCountrySelection = false
 
     @FocusState private var isNameFocused: Bool
-    @State private var step: OnboardingStep = .name
+    @State private var step: OnboardingStep = .welcome
 
     var body: some View {
         NavigationView {
@@ -48,7 +48,8 @@ struct OnboardingView: View {
                     in: ...Date(),
                     displayedComponents: .date
                 )
-                .datePickerStyle(GraphicalDatePickerStyle())
+                .datePickerStyle(WheelDatePickerStyle())
+                .labelsHidden()
                 .padding()
                 .navigationTitle("Select date")
                 .navigationBarTitleDisplayMode(.inline)
@@ -119,6 +120,14 @@ struct OnboardingView: View {
     @ViewBuilder
     private var currentStepView: some View {
         switch step {
+        case .welcome:
+            phrasePage(
+                imageSystemName: "heart.text.square.fill",
+                title: "Hi!",
+                highlight: "Let’s create a personalized vaccination plan for your child.",
+                body: "Answer a few quick questions and the app will help you keep everything under control."
+            )
+
         case .name:
             questionContainer(
                 imageSystemName: "person.fill",
@@ -142,7 +151,8 @@ struct OnboardingView: View {
             phrasePage(
                 imageSystemName: "sparkles",
                 title: "Nice to meet you!",
-                subtitle: "Vaccines work best when given on time—delays can leave children unprotected."
+                highlight: "Vaccines work best when given on time.",
+                body: "We’ll help you stay on schedule and keep everything under control."
             )
 
         case .birthDate:
@@ -176,13 +186,6 @@ struct OnboardingView: View {
                 }
             }
 
-        case .phraseAfterBirthDate:
-            phrasePage(
-                imageSystemName: "checkmark.seal.fill",
-                title: "Perfect.",
-                subtitle: "Timely vaccination helps prevent outbreaks and protects those who can’t be vaccinated."
-            )
-
         case .country:
             questionContainer(
                 imageSystemName: "globe.europe.africa.fill",
@@ -209,13 +212,6 @@ struct OnboardingView: View {
                     .cornerRadius(12)
                 }
             }
-
-        case .phraseAfterCountry:
-            phrasePage(
-                imageSystemName: "list.bullet.rectangle.portrait",
-                title: "Almost there.",
-                subtitle: "Staying on schedule reduces the risk of vaccine-preventable diseases."
-            )
 
         case .optionalVaccines:
             questionContainer(
@@ -250,13 +246,6 @@ struct OnboardingView: View {
                     }
                 }
             }
-
-        case .phraseAfterOptionalVaccines:
-            phrasePage(
-                imageSystemName: "wand.and.stars",
-                title: "Got it.",
-                subtitle: "Small delays can add up—this app helps you stay on time."
-            )
 
         case .personalization:
             questionContainer(
@@ -296,7 +285,8 @@ struct OnboardingView: View {
             phrasePage(
                 imageSystemName: "heart.text.square.fill",
                 title: "You’re all set!",
-                subtitle: "On-time vaccines build strong protection early—let’s set up your schedule."
+                highlight: "On-time vaccines build strong protection early.",
+                body: "Your personalized plan is ready—this app will help you stay on track."
             )
         }
     }
@@ -338,6 +328,8 @@ struct OnboardingView: View {
 
     private var nextEnabled: Bool {
         switch step {
+        case .welcome:
+            return true
         case .name:
             return !childName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         case .birthDate, .country:
@@ -346,7 +338,7 @@ struct OnboardingView: View {
             return optionalVaccinesPreference != nil
         case .personalization:
             return personalizationGoal != nil
-        case .phraseAfterName, .phraseAfterBirthDate, .phraseAfterCountry, .phraseAfterOptionalVaccines:
+        case .phraseAfterName:
             return true
         case .phraseBeforeStart:
             return false
@@ -358,7 +350,7 @@ struct OnboardingView: View {
     }
 
     private var canGoBack: Bool {
-        step != .name
+        step != .welcome
     }
 
     private func questionContainer(
@@ -404,7 +396,7 @@ struct OnboardingView: View {
         }
     }
 
-    private func phrasePage(imageSystemName: String, title: String, subtitle: String) -> some View {
+    private func phrasePage(imageSystemName: String, title: String, highlight: String, body: String) -> some View {
         VStack(spacing: 18) {
             Spacer(minLength: 14)
 
@@ -416,9 +408,16 @@ struct OnboardingView: View {
                     .font(.system(size: 40, weight: .heavy))
                     .multilineTextAlignment(.center)
 
-                Text(subtitle)
+                Text(highlight)
+                    .font(.title2)
+                    .fontWeight(.heavy)
+                    .foregroundColor(.primary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 6)
+
+                Text(body)
                     .font(.body)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.primary.opacity(0.75))
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 18)
             }
@@ -483,21 +482,17 @@ struct OnboardingView: View {
 
         withAnimation(.easeInOut) {
             switch step {
+            case .welcome:
+                step = .name
             case .name:
                 step = .phraseAfterName
             case .phraseAfterName:
                 step = .birthDate
             case .birthDate:
-                step = .phraseAfterBirthDate
-            case .phraseAfterBirthDate:
                 step = .country
             case .country:
-                step = .phraseAfterCountry
-            case .phraseAfterCountry:
                 step = .optionalVaccines
             case .optionalVaccines:
-                step = .phraseAfterOptionalVaccines
-            case .phraseAfterOptionalVaccines:
                 step = .personalization
             case .personalization:
                 step = .phraseBeforeStart
@@ -515,24 +510,20 @@ struct OnboardingView: View {
 
         withAnimation(.easeInOut) {
             switch step {
-            case .name:
+            case .welcome:
                 break
+            case .name:
+                step = .welcome
             case .phraseAfterName:
                 step = .name
             case .birthDate:
                 step = .phraseAfterName
-            case .phraseAfterBirthDate:
-                step = .birthDate
             case .country:
-                step = .phraseAfterBirthDate
-            case .phraseAfterCountry:
-                step = .country
+                step = .birthDate
             case .optionalVaccines:
-                step = .phraseAfterCountry
-            case .phraseAfterOptionalVaccines:
-                step = .optionalVaccines
+                step = .country
             case .personalization:
-                step = .phraseAfterOptionalVaccines
+                step = .optionalVaccines
             case .phraseBeforeStart:
                 step = .personalization
             }
@@ -577,14 +568,12 @@ struct OnboardingView: View {
 }
 
 private enum OnboardingStep: Int, CaseIterable, Identifiable {
+    case welcome
     case name
     case phraseAfterName
     case birthDate
-    case phraseAfterBirthDate
     case country
-    case phraseAfterCountry
     case optionalVaccines
-    case phraseAfterOptionalVaccines
     case personalization
     case phraseBeforeStart
 

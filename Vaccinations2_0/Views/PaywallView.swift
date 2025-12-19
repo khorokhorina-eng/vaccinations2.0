@@ -15,6 +15,7 @@ struct PaywallView: View {
     @State private var promoCode: String = ""
     @State private var showErrorAlert: Bool = false
     @State private var showGoBackConfirmation: Bool = false
+    @State private var localErrorMessage: String? = nil
 
     var body: some View {
         ZStack {
@@ -65,6 +66,7 @@ struct PaywallView: View {
                                 title: planTitle(for: product),
                                 leftSubtitle: planLeftSubtitle(for: product),
                                 rightSubtitle: planRightSubtitle(for: product),
+                                badgeText: badgeText(for: product),
                                 isSelected: selectedProductID == product.id
                             ) {
                                 selectedProductID = product.id
@@ -84,15 +86,6 @@ struct PaywallView: View {
                     promoCodeSection
                         .padding(.top, 6)
 
-                    ctaButton
-                        .padding(.top, 6)
-
-                    Button("Go back") {
-                        showGoBackConfirmation = true
-                    }
-                    .foregroundColor(.primary)
-                    .padding(.top, 2)
-
                     Text("Monthly: $5. Yearly: $30. Yearly plan includes a 1-week free trial for eligible new subscribers (configured in App Store Connect).")
                         .font(.footnote)
                         .foregroundColor(.secondary)
@@ -100,8 +93,19 @@ struct PaywallView: View {
                         .padding(.top, 6)
                 }
                 .padding(.horizontal, 18)
-                .padding(.bottom, 28)
+                .padding(.bottom, 140)
             }
+        }
+        .safeAreaInset(edge: .bottom) {
+            VStack(spacing: 10) {
+                ctaButton
+                Button("Go back") { showGoBackConfirmation = true }
+                    .foregroundColor(.primary)
+            }
+            .padding(.horizontal, 18)
+            .padding(.top, 10)
+            .padding(.bottom, 12)
+            .background(.ultraThinMaterial)
         }
         .onAppear {
             if subscriptionManager.products.isEmpty {
@@ -123,7 +127,7 @@ struct PaywallView: View {
         .alert("Error", isPresented: $showErrorAlert) {
             Button("OK", role: .cancel) {}
         } message: {
-            Text(subscriptionManager.lastErrorMessage ?? "Unknown error")
+            Text(subscriptionManager.lastErrorMessage ?? localErrorMessage ?? "Unknown error")
         }
         .alert("Are you sure?", isPresented: $showGoBackConfirmation) {
             Button("Cancel", role: .cancel) {}
@@ -198,10 +202,35 @@ struct PaywallView: View {
         formatter.currencyCode = yearlyProduct.priceFormatStyle.currencyCode
         return formatter.string(from: number)
     }
+    
+    private func badgeText(for product: Product) -> String? {
+        guard product.id == SubscriptionManager.ProductID.yearly else { return nil }
+        return freeTrialEnabled ? "7-DAY FREE TRIAL" : nil
+    }
 
     private func purchaseSelected() async {
         guard let product = selectedProduct else { return }
         await subscriptionManager.purchase(product: product)
+    }
+    
+    private func purchaseTapped() {
+        Task {
+            localErrorMessage = nil
+            if subscriptionManager.products.isEmpty {
+                await subscriptionManager.loadProducts()
+            }
+            if selectedProduct == nil, let yearly = subscriptionManager.products.first(where: { $0.id == SubscriptionManager.ProductID.yearly }) {
+                selectedProductID = yearly.id
+            } else if selectedProduct == nil, let first = subscriptionManager.products.first {
+                selectedProductID = first.id
+            }
+            guard let product = selectedProduct else {
+                localErrorMessage = "Plans are unavailable right now. Please try again later."
+                showErrorAlert = true
+                return
+            }
+            await subscriptionManager.purchase(product: product)
+        }
     }
 
     private var headerBar: some View {
@@ -272,7 +301,7 @@ struct PaywallView: View {
 
     private var ctaButton: some View {
         Button(action: {
-            Task { await purchaseSelected() }
+            purchaseTapped()
         }) {
             HStack {
                 Spacer()
@@ -287,7 +316,7 @@ struct PaywallView: View {
                     .fill(Color.pink)
             )
         }
-        .disabled(subscriptionManager.isLoading || selectedProduct == nil)
+        .disabled(subscriptionManager.isLoading)
         .overlay(alignment: .trailing) {
             if subscriptionManager.isLoading {
                 ProgressView()
@@ -317,38 +346,51 @@ private struct PlanCard: View {
     let title: String
     let leftSubtitle: String
     let rightSubtitle: String
+    let badgeText: String?
     let isSelected: Bool
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
-            HStack(alignment: .center, spacing: 12) {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(title)
-                        .font(.system(size: 34, weight: .heavy))
-                        .foregroundColor(.primary)
-
-                    if !leftSubtitle.isEmpty {
-                        Text(leftSubtitle)
-                            .font(.headline)
-                            .foregroundColor(.secondary)
-                    }
+            VStack(spacing: 0) {
+                if let badgeText {
+                    Text(badgeText)
+                        .font(.caption)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
+                        .background(Color.pink)
                 }
-
-                Spacer()
-
-                VStack(alignment: .trailing, spacing: 8) {
-                    if !rightSubtitle.isEmpty {
-                        Text(rightSubtitle)
-                            .font(.headline)
+                
+                HStack(alignment: .center, spacing: 12) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(title)
+                            .font(.system(size: 34, weight: .heavy))
                             .foregroundColor(.primary)
+                        
+                        if !leftSubtitle.isEmpty {
+                            Text(leftSubtitle)
+                                .font(.headline)
+                                .foregroundColor(.secondary)
+                        }
                     }
-                    Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                        .foregroundColor(isSelected ? .pink : .secondary.opacity(0.6))
-                        .font(.title2)
+                    
+                    Spacer()
+                    
+                    VStack(alignment: .trailing, spacing: 8) {
+                        if !rightSubtitle.isEmpty {
+                            Text(rightSubtitle)
+                                .font(.system(size: 24, weight: .heavy))
+                                .foregroundColor(.primary)
+                        }
+                        Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                            .foregroundColor(isSelected ? .pink : .secondary.opacity(0.6))
+                            .font(.title2)
+                    }
                 }
+                .padding(18)
             }
-            .padding(18)
             .background(
                 RoundedRectangle(cornerRadius: 18)
                     .fill(Color(.systemBackground))
@@ -358,6 +400,7 @@ private struct PlanCard: View {
                 RoundedRectangle(cornerRadius: 18)
                     .stroke(isSelected ? Color.pink : Color.gray.opacity(0.2), lineWidth: isSelected ? 3 : 1)
             )
+            .clipShape(RoundedRectangle(cornerRadius: 18))
         }
         .buttonStyle(.plain)
     }
