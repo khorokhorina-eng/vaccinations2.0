@@ -16,8 +16,8 @@ struct PaywallView: View {
     @State private var didTapPrimary: Bool = false
     
     // Display pricing (business model). Purchases still use StoreKit products.
-    private let monthlyPriceUSD: Decimal = 5
-    private let yearlyPriceUSD: Decimal = 20
+    private let monthlyPriceUSD: Decimal = 4.99
+    private let yearlyPriceUSD: Decimal = 19.99
 
     var body: some View {
         NavigationView {
@@ -59,13 +59,6 @@ struct PaywallView: View {
                                 isSelected: selectedProductID == SubscriptionManager.ProductID.monthly
                             ) {
                                 selectedProductID = SubscriptionManager.ProductID.monthly
-                            }
-                            
-                            if subscriptionManager.products.isEmpty && !subscriptionManager.isLoading {
-                                Text("Plans are temporarily unavailable. You can still restore purchases or use a promo code.")
-                                    .font(.footnote)
-                                    .foregroundColor(.secondary)
-                                    .padding(.top, 4)
                             }
                         }
                         .padding(.horizontal)
@@ -128,15 +121,6 @@ struct PaywallView: View {
                     }
                     .padding(.horizontal)
                     .padding(.top, 4)
-                    
-                    // If user taps primary while products are not loaded, show a clear error.
-                    if didTapPrimary && selectedProduct == nil {
-                        Text("Unable to start purchase. Please check your connection or try Restore purchases.")
-                            .font(.footnote)
-                            .foregroundColor(.secondary)
-                            .padding(.horizontal)
-                            .padding(.top, 4)
-                    }
                     
                     Spacer(minLength: 12)
                 }
@@ -309,10 +293,10 @@ private struct PaywallPlanCard: View {
                 HStack(alignment: .center, spacing: 12) {
                     VStack(alignment: .leading, spacing: 6) {
                         Text(title)
-                            .font(.system(size: 34, weight: .bold))
+                            .font(.system(size: 30, weight: .bold))
                             .foregroundColor(.primary)
-                            .minimumScaleFactor(0.85)
-                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                            .lineLimit(2)
                         
                         Text(durationAndTotal)
                             .font(.headline)
