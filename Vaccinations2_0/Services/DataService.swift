@@ -16,6 +16,9 @@ class DataService {
         static let childProfile = "childProfile"
         static let vaccineRecords = "vaccineRecords"
         static let customVaccines = "customVaccines"
+        static let showOnlyMandatory = "showOnlyMandatory"
+        static let onboardingPrimaryGoal = "onboardingPrimaryGoal"
+        static let onboardingReminderDays = "onboardingReminderDays"
     }
     
     private init() {}
@@ -126,5 +129,32 @@ class DataService {
         userDefaults.removeObject(forKey: Keys.childProfile)
         userDefaults.removeObject(forKey: Keys.vaccineRecords)
         userDefaults.removeObject(forKey: Keys.customVaccines)
+        userDefaults.removeObject(forKey: Keys.showOnlyMandatory)
+        userDefaults.removeObject(forKey: Keys.onboardingPrimaryGoal)
+        userDefaults.removeObject(forKey: Keys.onboardingReminderDays)
+    }
+}
+
+// MARK: - Lightweight onboarding preferences
+
+extension DataService {
+    var showOnlyMandatoryPreference: Bool {
+        get { userDefaults.bool(forKey: Keys.showOnlyMandatory) }
+        set { userDefaults.set(newValue, forKey: Keys.showOnlyMandatory) }
+    }
+    
+    /// User's primary goal (for personalization copy). Stored as raw string.
+    var onboardingPrimaryGoal: String? {
+        get { userDefaults.string(forKey: Keys.onboardingPrimaryGoal) }
+        set { userDefaults.set(newValue, forKey: Keys.onboardingPrimaryGoal) }
+    }
+    
+    /// Reminder lead time days (for future notifications). Default: 3.
+    var onboardingReminderDays: Int {
+        get {
+            let value = userDefaults.integer(forKey: Keys.onboardingReminderDays)
+            return value == 0 ? 3 : value
+        }
+        set { userDefaults.set(newValue, forKey: Keys.onboardingReminderDays) }
     }
 }
