@@ -15,7 +15,7 @@ struct OnboardingView: View {
     @FocusState private var isNameFocused: Bool
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ScrollView {
                 VStack(spacing: 30) {
                     // Header
@@ -108,6 +108,8 @@ struct OnboardingView: View {
                         }
                     }
                     .padding(.horizontal)
+                    .frame(maxWidth: 560, alignment: .center)
+                    .frame(maxWidth: .infinity, alignment: .center)
                     
                     // Spacer to prevent bottom inset button overlap while scrolling
                     Color.clear
@@ -177,7 +179,7 @@ struct CountrySelectionSheet: View {
     }
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 0) {
                 // Countries List
                 ScrollView {
@@ -200,6 +202,8 @@ struct CountrySelectionSheet: View {
                     }
                     .padding(.vertical)
                 }
+                .frame(maxWidth: 720, alignment: .center)
+                .frame(maxWidth: .infinity, alignment: .center)
                 
                 // Bottom button
                 Button(action: {

@@ -7,7 +7,7 @@ import SwiftUI
 
 struct AddVaccineView: View {
     @EnvironmentObject var viewModel: VaccineViewModel
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.dismiss) private var dismiss
     
     @State private var selectedTab = 0
     @State private var customVaccineName = ""
@@ -19,7 +19,7 @@ struct AddVaccineView: View {
     @State private var alertMessage = ""
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack {
                 // Tabs
                 Picker("", selection: $selectedTab) {
@@ -40,7 +40,7 @@ struct AddVaccineView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel") {
-                        presentationMode.wrappedValue.dismiss()
+                        dismiss()
                     }
                 }
                 
@@ -55,9 +55,7 @@ struct AddVaccineView: View {
                 Alert(
                     title: Text("Success"),
                     message: Text(alertMessage),
-                    dismissButton: .default(Text("OK")) {
-                        presentationMode.wrappedValue.dismiss()
-                    }
+                    dismissButton: .default(Text("OK")) { dismiss() }
                 )
             }
         }
