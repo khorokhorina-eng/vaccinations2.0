@@ -16,7 +16,7 @@ struct CountrySelectionView: View {
     }
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 0) {
                 // Header
                 VStack(alignment: .leading, spacing: 8) {
@@ -52,6 +52,8 @@ struct CountrySelectionView: View {
                     }
                     .padding(.vertical)
                 }
+                .frame(maxWidth: 720, alignment: .center)
+                .frame(maxWidth: .infinity, alignment: .center)
                 
                 // Bottom buttons
                 VStack(spacing: 12) {

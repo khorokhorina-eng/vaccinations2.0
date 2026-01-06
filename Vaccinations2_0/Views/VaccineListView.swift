@@ -7,6 +7,7 @@ import SwiftUI
 
 struct VaccineListView: View {
     @EnvironmentObject var viewModel: VaccineViewModel
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @State private var showingAddVaccine = false
     @State private var selectedVaccine: Vaccine?
     @State private var searchText = ""
@@ -14,88 +15,152 @@ struct VaccineListView: View {
     @State private var showingCountrySelection = false
     
     var body: some View {
-        NavigationView {
-            ZStack(alignment: .bottom) {
-                ScrollView {
-                    VStack(spacing: 0) {
-                        // Child profile header
-                        if let profile = viewModel.childProfile {
-                            profileHeader(profile)
-                        }
-                        
-                        // Statistics
-                        statisticsView
-                        
-                        // Filter chips
-                        filterView
-                        
-                        // Vaccine list
-                        if viewModel.filteredVaccines.isEmpty {
-                            emptyStateView
-                        } else {
-                            LazyVStack(spacing: 12) {
-                                ForEach(viewModel.filteredVaccines) { vaccine in
-                                    VaccineRowView(
-                                        vaccine: vaccine,
-                                        status: viewModel.getVaccineStatus(vaccine)
-                                    ) {
-                                        selectedVaccine = vaccine
-                                    }
-                                    .environmentObject(viewModel)
+        Group {
+            if horizontalSizeClass == .regular {
+                NavigationSplitView {
+                    mainListContent
+                        .navigationTitle("Vaccination Calendar")
+                        .toolbar {
+                            ToolbarItem(placement: .navigationBarLeading) {
+                                Button(action: { showingProfile = true }) {
+                                    Image(systemName: "person.circle")
                                 }
                             }
-                            .padding(.top)
-                            .padding(.horizontal)
-                            .padding(.bottom, 120) // space for disclaimer
+
+                            ToolbarItem(placement: .navigationBarTrailing) {
+                                Button(action: { showingAddVaccine = true }) {
+                                    Image(systemName: "plus")
+                                }
+                            }
+                        }
+                } detail: {
+                    NavigationStack {
+                        if let vaccine = selectedVaccine {
+                            VaccineDetailContentView(vaccine: vaccine)
+                                .environmentObject(viewModel)
+                        } else {
+                            VStack(spacing: 12) {
+                                Image(systemName: "list.bullet.rectangle")
+                                    .font(.system(size: 48))
+                                    .foregroundColor(.secondary)
+                                Text("Select a vaccine")
+                                    .font(.title3)
+                                    .fontWeight(.semibold)
+                                Text("Choose an item from the list to view details.")
+                                    .foregroundColor(.secondary)
+                            }
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .padding()
                         }
                     }
                 }
-                
-                // Fixed disclaimer at the bottom
-                CollapsibleDisclaimerView()
-                    .padding(.horizontal)
-                    .padding(.bottom, 10)
-                    .background(.ultraThinMaterial)
-                    .shadow(radius: 5)
-            }
-            .navigationTitle("Vaccination Calendar")
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: { showingProfile = true }) {
-                        Image(systemName: "person.circle")
-                    }
-                }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { showingAddVaccine = true }) {
-                        Image(systemName: "plus")
-                    }
+            } else {
+                NavigationStack {
+                    mainListContent
+                        .navigationTitle("Vaccination Calendar")
+                        .navigationBarTitleDisplayMode(.large)
+                        .toolbar {
+                            ToolbarItem(placement: .navigationBarLeading) {
+                                Button(action: { showingProfile = true }) {
+                                    Image(systemName: "person.circle")
+                                }
+                            }
+
+                            ToolbarItem(placement: .navigationBarTrailing) {
+                                Button(action: { showingAddVaccine = true }) {
+                                    Image(systemName: "plus")
+                                }
+                            }
+                        }
                 }
             }
-            .sheet(isPresented: $showingAddVaccine) {
-                AddVaccineView()
-                    .environmentObject(viewModel)
-            }
-            .sheet(item: $selectedVaccine) { vaccine in
+        }
+        .sheet(isPresented: $showingAddVaccine) {
+            AddVaccineView()
+                .environmentObject(viewModel)
+        }
+        .sheet(item: $selectedVaccine) { vaccine in
+            // iPhone flow: show details as a sheet. iPad flow: details are shown in split-view.
+            if horizontalSizeClass != .regular {
                 VaccineDetailView(vaccine: vaccine)
                     .environmentObject(viewModel)
             }
-            .sheet(isPresented: $showingProfile) {
-                profileEditView
+        }
+        .sheet(isPresented: $showingProfile) {
+            profileEditView
+        }
+        .sheet(isPresented: $showingCountrySelection) {
+            CountrySelectionView(viewModel: viewModel)
+        }
+        .overlay(loadingOverlay)
+        .alert("Error", isPresented: .constant(viewModel.loadingError != nil)) {
+            Button("OK") { viewModel.loadingError = nil }
+            Button("Retry") { viewModel.loadVaccines(for: viewModel.selectedCountry) }
+        } message: {
+            Text(viewModel.loadingError?.errorDescription ?? "An error occurred")
+        }
+    }
+
+    private var mainListContent: some View {
+        ZStack(alignment: .bottom) {
+            ScrollView {
+                VStack(spacing: 0) {
+                    // Child profile header
+                    if let profile = viewModel.childProfile {
+                        profileHeader(profile)
+                    }
+
+                    // Statistics
+                    statisticsView
+
+                    // Filter chips
+                    filterView
+
+                    // Vaccine list
+                    if viewModel.filteredVaccines.isEmpty {
+                        emptyStateView
+                    } else if horizontalSizeClass == .regular {
+                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                            ForEach(viewModel.filteredVaccines) { vaccine in
+                                VaccineRowView(
+                                    vaccine: vaccine,
+                                    status: viewModel.getVaccineStatus(vaccine)
+                                ) {
+                                    selectedVaccine = vaccine
+                                }
+                                .environmentObject(viewModel)
+                            }
+                        }
+                        .padding(.top)
+                        .padding(.horizontal)
+                        .padding(.bottom, 120)
+                    } else {
+                        LazyVStack(spacing: 12) {
+                            ForEach(viewModel.filteredVaccines) { vaccine in
+                                VaccineRowView(
+                                    vaccine: vaccine,
+                                    status: viewModel.getVaccineStatus(vaccine)
+                                ) {
+                                    selectedVaccine = vaccine
+                                }
+                                .environmentObject(viewModel)
+                            }
+                        }
+                        .padding(.top)
+                        .padding(.horizontal)
+                        .padding(.bottom, 120) // space for disclaimer
+                    }
+                }
+                .frame(maxWidth: horizontalSizeClass == .regular ? 980 : nil, alignment: .center)
+                .frame(maxWidth: .infinity, alignment: .center)
             }
-            .sheet(isPresented: $showingCountrySelection) {
-                CountrySelectionView(viewModel: viewModel)
-            }
-            .overlay(
-                loadingOverlay
-            )
-            .alert("Error", isPresented: .constant(viewModel.loadingError != nil)) {
-                Button("OK") { viewModel.loadingError = nil }
-                Button("Retry") { viewModel.loadVaccines(for: viewModel.selectedCountry) }
-            } message: {
-                Text(viewModel.loadingError?.errorDescription ?? "An error occurred")
-            }
+
+            // Fixed disclaimer at the bottom
+            CollapsibleDisclaimerView()
+                .padding(.horizontal)
+                .padding(.bottom, 10)
+                .background(.ultraThinMaterial)
+                .shadow(radius: 5)
         }
     }
     
@@ -172,39 +237,74 @@ struct VaccineListView: View {
     // MARK: - Statistics View
     
     private var statisticsView: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 15) {
-                StatCard(
-                    title: "Total",
-                    value: "\(viewModel.completedVaccinesCount)/\(viewModel.totalVaccinesCount)",
-                    color: .blue,
-                    icon: "chart.pie.fill"
-                )
-                
-                StatCard(
-                    title: "Mandatory",
-                    value: "\(viewModel.completedMandatoryCount)/\(viewModel.mandatoryVaccinesCount)",
-                    color: .green,
-                    icon: "checkmark.shield.fill"
-                )
-                
-                StatCard(
-                    title: "Overdue",
-                    value: "\(viewModel.overdueVaccinesCount)",
-                    color: .red,
-                    icon: "exclamationmark.triangle.fill"
-                )
-                
-                StatCard(
-                    title: "Upcoming",
-                    value: "\(viewModel.upcomingVaccinesCount)",
-                    color: .orange,
-                    icon: "clock.fill"
-                )
+        Group {
+            if horizontalSizeClass == .regular {
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                    StatCard(
+                        title: "Total",
+                        value: "\(viewModel.completedVaccinesCount)/\(viewModel.totalVaccinesCount)",
+                        color: .blue,
+                        icon: "chart.pie.fill"
+                    )
+
+                    StatCard(
+                        title: "Mandatory",
+                        value: "\(viewModel.completedMandatoryCount)/\(viewModel.mandatoryVaccinesCount)",
+                        color: .green,
+                        icon: "checkmark.shield.fill"
+                    )
+
+                    StatCard(
+                        title: "Overdue",
+                        value: "\(viewModel.overdueVaccinesCount)",
+                        color: .red,
+                        icon: "exclamationmark.triangle.fill"
+                    )
+
+                    StatCard(
+                        title: "Upcoming",
+                        value: "\(viewModel.upcomingVaccinesCount)",
+                        color: .orange,
+                        icon: "clock.fill"
+                    )
+                }
+                .padding(.horizontal)
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 15) {
+                        StatCard(
+                            title: "Total",
+                            value: "\(viewModel.completedVaccinesCount)/\(viewModel.totalVaccinesCount)",
+                            color: .blue,
+                            icon: "chart.pie.fill"
+                        )
+
+                        StatCard(
+                            title: "Mandatory",
+                            value: "\(viewModel.completedMandatoryCount)/\(viewModel.mandatoryVaccinesCount)",
+                            color: .green,
+                            icon: "checkmark.shield.fill"
+                        )
+
+                        StatCard(
+                            title: "Overdue",
+                            value: "\(viewModel.overdueVaccinesCount)",
+                            color: .red,
+                            icon: "exclamationmark.triangle.fill"
+                        )
+
+                        StatCard(
+                            title: "Upcoming",
+                            value: "\(viewModel.upcomingVaccinesCount)",
+                            color: .orange,
+                            icon: "clock.fill"
+                        )
+                    }
+                    .padding(.horizontal)
+                }
+                .padding(.vertical, 10)
             }
-            .padding(.horizontal)
         }
-        .padding(.vertical, 10)
     }
     
     // MARK: - Filter View
@@ -252,7 +352,7 @@ struct VaccineListView: View {
     // MARK: - Profile Edit View
     
     private var profileEditView: some View {
-        NavigationView {
+        NavigationStack {
             if let profile = viewModel.childProfile {
                 Form {
                     Section("Child Information") {
@@ -283,6 +383,11 @@ struct VaccineListView: View {
                             Text(profile.country)
                                 .foregroundColor(.secondary)
                         }
+                    }
+
+                    Section("Legal") {
+                        Link("Privacy Policy", destination: LegalLinks.privacyPolicyURL)
+                        Link("Terms of Use (EULA)", destination: LegalLinks.termsOfUseURL)
                     }
                     
                     Section {

@@ -7,7 +7,7 @@ import SwiftUI
 
 struct VaccineDetailView: View {
     @EnvironmentObject var viewModel: VaccineViewModel
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.dismiss) private var dismiss
     
     let vaccine: Vaccine
     @State private var record: VaccineRecord
@@ -27,65 +27,92 @@ struct VaccineDetailView: View {
     }
     
     var body: some View {
-        NavigationView {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    // Vaccine Information
-                    vaccineInfoSection
-                    
-                    Divider()
-                    
-                    // Status
-                    statusSection
-                    
-                    // Record Details
-                    if record.isDone {
-                        Divider()
-                        recordDetailsSection
-                    }
-                    
-                    // Notes
-                    if ((record.notes?.isEmpty) == nil) {
-                        Divider()
-                        notesSection
-                    }
-                    
-                    // Side Effects
-                    if ((record.sideEffects?.isEmpty) == nil) {
-                        Divider()
-                        sideEffectsSection
+        NavigationStack {
+            VaccineDetailContentView(vaccine: vaccine)
+                .environmentObject(viewModel)
+                .navigationTitle(vaccine.name)
+                .navigationBarTitleDisplayMode(.large)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button("Close") { dismiss() }
                     }
                 }
-                .padding()
-            }
-            .navigationTitle(vaccine.name)
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Close") {
-                        presentationMode.wrappedValue.dismiss()
-                    }
-                }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    if record.isDone {
-                        Button(isEditing ? "Done" : "Edit") {
-                            if isEditing {
-                                saveChanges()
-                            }
-                            isEditing.toggle()
-                        }
-                    }
-                }
-            }
-            .onAppear {
-                loadRecord()
-            }
         }
     }
-    
+}
+
+struct VaccineDetailContentView: View {
+    @EnvironmentObject var viewModel: VaccineViewModel
+    let vaccine: Vaccine
+
+    @State private var record: VaccineRecord
+    @State private var isEditing = false
+    @State private var showingDatePicker = false
+    @State private var tempDate = Date()
+    @State private var tempVaccineName = ""
+    @State private var tempBatchNumber = ""
+    @State private var tempNotes = ""
+    @State private var tempSideEffects = ""
+    @State private var tempDoctorName = ""
+    @State private var tempClinicName = ""
+
+    init(vaccine: Vaccine) {
+        self.vaccine = vaccine
+        self._record = State(initialValue: VaccineRecord(vaccineId: vaccine.id))
+    }
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                // Vaccine Information
+                vaccineInfoSection
+
+                Divider()
+
+                // Status
+                statusSection
+
+                // Record Details
+                if record.isDone {
+                    Divider()
+                    recordDetailsSection
+                }
+
+                // Notes
+                if ((record.notes?.isEmpty) == nil) {
+                    Divider()
+                    notesSection
+                }
+
+                // Side Effects
+                if ((record.sideEffects?.isEmpty) == nil) {
+                    Divider()
+                    sideEffectsSection
+                }
+            }
+            .padding()
+            .frame(maxWidth: 860, alignment: .leading)
+            .frame(maxWidth: .infinity, alignment: .center)
+        }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                if record.isDone {
+                    Button(isEditing ? "Done" : "Edit") {
+                        if isEditing {
+                            saveChanges()
+                        }
+                        isEditing.toggle()
+                    }
+                }
+            }
+        }
+        .onAppear {
+            loadRecord()
+        }
+    }
+
     // MARK: - Sections
-    
+
     private var vaccineInfoSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Label {
@@ -95,7 +122,7 @@ struct VaccineDetailView: View {
                 Image(systemName: "shield.fill")
                     .foregroundColor(.blue)
             }
-            
+
             Label {
                 Text(vaccine.ageDescription)
                     .font(.headline)
@@ -103,7 +130,7 @@ struct VaccineDetailView: View {
                 Image(systemName: "calendar")
                     .foregroundColor(.orange)
             }
-            
+
             if let profile = viewModel.childProfile {
                 Label {
                     Text(dateFormatter.string(from: vaccine.scheduledDate(birthDate: profile.birthDate)))
@@ -113,7 +140,7 @@ struct VaccineDetailView: View {
                         .foregroundColor(.purple)
                 }
             }
-            
+
             HStack {
                 if vaccine.isMandatory {
                     Label("Mandatory", systemImage: "exclamationmark.circle.fill")
@@ -133,14 +160,14 @@ struct VaccineDetailView: View {
                         .cornerRadius(8)
                 }
             }
-            
+
             if let description = vaccine.description {
                 Text(description)
                     .font(.body)
                     .foregroundColor(.secondary)
                     .padding(.top, 5)
             }
-            
+
             if let notes = vaccine.notes {
                 Text(notes)
                     .font(.caption)
@@ -149,12 +176,12 @@ struct VaccineDetailView: View {
             }
         }
     }
-    
+
     private var statusSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Status")
                 .font(.headline)
-            
+
             HStack {
                 Button(action: {
                     if record.isDone {
@@ -177,31 +204,31 @@ struct VaccineDetailView: View {
                 }
                 .buttonStyle(PlainButtonStyle())
             }
-            
+
             if showingDatePicker && !record.isDone {
                 VStack(alignment: .leading, spacing: 12) {
                     Text("Vaccination Date")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
-                    
+
                     DatePicker("", selection: $tempDate, in: ...Date(), displayedComponents: .date)
                         .datePickerStyle(GraphicalDatePickerStyle())
-                    
+
                     TextField("Vaccine Name (optional)", text: $tempVaccineName)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
-                    
+
                     TextField("Notes (optional)", text: $tempNotes)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
-                    
+
                     HStack {
                         Button("Cancel") {
                             showingDatePicker = false
                             resetTempValues()
                         }
                         .foregroundColor(.red)
-                        
+
                         Spacer()
-                        
+
                         Button("Save") {
                             markAsDone()
                         }
@@ -215,12 +242,12 @@ struct VaccineDetailView: View {
             }
         }
     }
-    
+
     private var recordDetailsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Vaccination Details")
                 .font(.headline)
-            
+
             if isEditing {
                 editableDetailsView
             } else {
@@ -228,86 +255,86 @@ struct VaccineDetailView: View {
             }
         }
     }
-    
+
     private var editableDetailsView: some View {
         VStack(spacing: 12) {
             DatePicker("Date", selection: $tempDate, in: ...Date(), displayedComponents: .date)
-            
+
             TextField("Vaccine Name", text: $tempVaccineName)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
-            
+
             TextField("Batch Number", text: $tempBatchNumber)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
-            
+
             TextField("Doctor", text: $tempDoctorName)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
-            
+
             TextField("Clinic", text: $tempClinicName)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
-            
+
             TextField("Notes", text: $tempNotes)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
-            
+
             TextField("Side Effects", text: $tempSideEffects)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
         }
     }
-    
+
     private var readOnlyDetailsView: some View {
         VStack(alignment: .leading, spacing: 10) {
             if let date = record.dateAdministered {
                 DetailRow(label: "Date", value: dateFormatter.string(from: date))
             }
-            
+
             if let vaccineName = record.vaccineName, !vaccineName.isEmpty {
                 DetailRow(label: "Vaccine", value: vaccineName)
             }
-            
+
             if let batchNumber = record.batchNumber, !batchNumber.isEmpty {
                 DetailRow(label: "Batch Number", value: batchNumber)
             }
-            
+
             if let doctorName = record.doctorName, !doctorName.isEmpty {
                 DetailRow(label: "Doctor", value: doctorName)
             }
-            
+
             if let clinicName = record.clinicName, !clinicName.isEmpty {
                 DetailRow(label: "Clinic", value: clinicName)
             }
         }
     }
-    
+
     private var notesSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Notes")
                 .font(.headline)
-            
+
             Text(record.notes ?? "")
                 .font(.body)
                 .foregroundColor(.secondary)
         }
     }
-    
+
     private var sideEffectsSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Side Effects")
                 .font(.headline)
-            
+
             Text(record.sideEffects ?? "")
                 .font(.body)
                 .foregroundColor(.secondary)
         }
     }
-    
+
     // MARK: - Actions
-    
+
     private func loadRecord() {
         if let existingRecord = viewModel.getRecord(for: vaccine) {
             record = existingRecord
             loadTempValues()
         }
     }
-    
+
     private func loadTempValues() {
         tempDate = record.dateAdministered ?? Date()
         tempVaccineName = record.vaccineName ?? ""
@@ -317,7 +344,7 @@ struct VaccineDetailView: View {
         tempDoctorName = record.doctorName ?? ""
         tempClinicName = record.clinicName ?? ""
     }
-    
+
     private func resetTempValues() {
         tempDate = Date()
         tempVaccineName = ""
@@ -327,7 +354,7 @@ struct VaccineDetailView: View {
         tempDoctorName = ""
         tempClinicName = ""
     }
-    
+
     private func markAsDone() {
         record.markAsDone(
             date: tempDate,
@@ -339,13 +366,13 @@ struct VaccineDetailView: View {
         resetTempValues()
         loadTempValues()
     }
-    
+
     private func markAsNotDone() {
         record.markAsNotDone()
         viewModel.updateVaccineRecord(record)
         resetTempValues()
     }
-    
+
     private func saveChanges() {
         record.dateAdministered = tempDate
         record.vaccineName = tempVaccineName.isEmpty ? nil : tempVaccineName
@@ -354,10 +381,10 @@ struct VaccineDetailView: View {
         record.sideEffects = tempSideEffects.isEmpty ? nil : tempSideEffects
         record.doctorName = tempDoctorName.isEmpty ? nil : tempDoctorName
         record.clinicName = tempClinicName.isEmpty ? nil : tempClinicName
-        
+
         viewModel.updateVaccineRecord(record)
     }
-    
+
     private var dateFormatter: DateFormatter {
         let formatter = DateFormatter()
         formatter.dateStyle = .long
@@ -396,7 +423,9 @@ struct VaccineDetailView_Previews: PreviewProvider {
             notes: nil
         )
         
-        VaccineDetailView(vaccine: vaccine)
-            .environmentObject(VaccineViewModel())
+        NavigationStack {
+            VaccineDetailContentView(vaccine: vaccine)
+                .environmentObject(VaccineViewModel())
+        }
     }
 }
