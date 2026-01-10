@@ -165,6 +165,10 @@ Users can configure:
 - User has full control over their data
 - Can delete all data at any time through settings
 
+## Terms of Use (EULA)
+
+- Apple Standard EULA: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+
 ## Troubleshooting
 
 ### Build Issues

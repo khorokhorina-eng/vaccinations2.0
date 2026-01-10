@@ -28,7 +28,11 @@ To the maximum extent permitted by law, the developer is not liable for any indi
 
 ## 6. Apple Standard EULA
 
-If applicable, Apple’s Standard EULA also applies. If there is any conflict, the terms presented in the App purchase flow and the App Store rules prevail.
+If applicable, Apple’s Standard EULA also applies:
+
+- https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+
+If there is any conflict, the terms presented in the App purchase flow and the App Store rules prevail.
 
 ## 7. Contact
 
