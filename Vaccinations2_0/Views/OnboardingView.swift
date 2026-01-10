@@ -7,146 +7,46 @@ import SwiftUI
 
 struct OnboardingView: View {
     @EnvironmentObject var viewModel: VaccineViewModel
+    
+    @State private var step: Int = 0
+    private let lastStepIndex: Int = 4
+    
+    // Onboarding answers (currently used for UX only)
+    @State private var wantsReminders: Bool = true
+    @State private var wantsMultipleChildren: Bool = true
+    
     @State private var childName = ""
     @State private var birthDate = Date()
     @State private var selectedCountry: Country = .usa
-    @State private var showDatePicker = false
     @State private var showCountrySelection = false
     @FocusState private var isNameFocused: Bool
     
     var body: some View {
-        NavigationView {
-            ScrollView {
-                VStack(spacing: 30) {
-                    // Header
-                    VStack(spacing: 10) {
-                        Image(systemName: "heart.text.square.fill")
-                            .font(.system(size: 80))
-                            .foregroundColor(.blue)
-                        
-                        Text("Vaccination Calendar")
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                        
-                        Text("Welcome!")
-                            .font(.title2)
-                            .foregroundColor(.secondary)
-                    }
-                    .padding(.top, 40)
-                    
-                    // Input Form
-                    VStack(spacing: 20) {
-                        // Child's Name
-                        VStack(alignment: .leading, spacing: 8) {
-                            Label("Child's Name", systemImage: "person.fill")
-                                .font(.headline)
-                                .foregroundColor(.primary)
-                            
-                            TextField("Enter name", text: $childName)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                                .autocapitalization(.words)
-                                .focused($isNameFocused)
-                        }
-                        
-                        // Birth Date
-                        VStack(alignment: .leading, spacing: 8) {
-                            Label("Date of Birth", systemImage: "calendar")
-                                .font(.headline)
-                                .foregroundColor(.primary)
-                            
-                            Button(action: {
-                                isNameFocused = false
-                                withAnimation(.easeInOut) {
-                                    showDatePicker.toggle()
-                                }
-                            }) {
-                                HStack {
-                                    Text(dateFormatter.string(from: birthDate))
-                                        .foregroundColor(.primary)
-                                    Spacer()
-                                    Image(systemName: showDatePicker ? "chevron.up" : "chevron.down")
-                                        .foregroundColor(.secondary)
-                                        .font(.caption)
-                                }
-                                .padding()
-                                .background(Color(.systemGray6))
-                                .cornerRadius(8)
-                            }
-                            
-                            if showDatePicker {
-                                DatePicker("", selection: $birthDate, in: ...Date(), displayedComponents: .date)
-                                    .datePickerStyle(GraphicalDatePickerStyle())
-                                    .padding(.horizontal)
-                                    .transition(.opacity)
-                            }
-                        }
-                        
-                        // Country Selection
-                        VStack(alignment: .leading, spacing: 8) {
-                            Label("Country", systemImage: "globe")
-                                .font(.headline)
-                                .foregroundColor(.primary)
-                            
-                            Button(action: {
-                                isNameFocused = false
-                                showCountrySelection = true
-                            }) {
-                                HStack {
-                                    Text(selectedCountry.flag)
-                                        .font(.title2)
-                                    Text(selectedCountry.localizedName)
-                                        .foregroundColor(.primary)
-                                    Spacer()
-                                    Image(systemName: "chevron.right")
-                                        .foregroundColor(.secondary)
-                                        .font(.caption)
-                                }
-                                .padding()
-                                .background(Color(.systemGray6))
-                                .cornerRadius(8)
-                            }
-                        }
-                    }
-                    .padding(.horizontal)
-                    
-                    // Spacer to prevent bottom inset button overlap while scrolling
-                    Color.clear
-                        .frame(height: 90)
+        NavigationStack {
+            ZStack {
+                backgroundForStep(step)
+                    .ignoresSafeArea()
+                
+                TabView(selection: $step) {
+                    welcomeStep.tag(0)
+                    remindersStep.tag(1)
+                    privacyStep.tag(2)
+                    countryStep.tag(3)
+                    profileStep.tag(4)
                 }
+                .tabViewStyle(.page(indexDisplayMode: .never))
+                .animation(.easeInOut, value: step)
             }
-            .safeAreaInset(edge: .bottom) {
-                Button(action: {
-                    saveProfile()
-                }) {
-                    HStack {
-                        Text("Start")
-                        Image(systemName: "arrow.right")
-                    }
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(childName.isEmpty ? Color.gray : Color.blue)
-                    .cornerRadius(12)
-                }
-                .disabled(childName.isEmpty)
-                .padding(.horizontal)
-                .padding(.bottom, 12)
-                .padding(.top, 8)
-                .background(.ultraThinMaterial)
-            }
-            .navigationBarHidden(true)
-            .onChange(of: birthDate) { _ in
-                // После выбора даты сворачиваем календарь, чтобы было понятно, что делать дальше
-                if showDatePicker {
-                    withAnimation(.easeInOut) {
-                        showDatePicker = false
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    if step < lastStepIndex {
+                        Button("Skip") { step = lastStepIndex }
+                            .font(.subheadline.weight(.semibold))
                     }
                 }
             }
+            .safeAreaInset(edge: .bottom) { bottomControls }
         }
-        // iPad: prevent split-view with empty detail column.
-        .navigationViewStyle(StackNavigationViewStyle())
         .sheet(isPresented: $showCountrySelection) {
             CountrySelectionSheet(selectedCountry: $selectedCountry)
         }
@@ -165,6 +65,238 @@ struct OnboardingView: View {
         formatter.dateStyle = .long
         return formatter
     }
+    
+    // MARK: - Steps
+    
+    private var welcomeStep: some View {
+        OnboardingPage(
+            title: "CareVax",
+            subtitle: "Your child’s vaccination calendar—simple, visual, and always with you.",
+            systemImage: "heart.text.square.fill",
+            accent: .blue,
+            bullets: [
+                "Country-specific schedules",
+                "Track upcoming and overdue vaccines",
+                "Keep records in one place"
+            ]
+        )
+    }
+    
+    private var remindersStep: some View {
+        OnboardingQuestionPage(
+            title: "Reminders",
+            subtitle: "Would you like to get reminders for upcoming vaccines?",
+            systemImage: "bell.badge.fill",
+            accent: .orange
+        ) {
+            Toggle(isOn: $wantsReminders) {
+                Text(wantsReminders ? "Yes, remind me" : "No reminders")
+                    .font(.headline)
+            }
+            .toggleStyle(.switch)
+            .padding()
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+        }
+    }
+    
+    private var privacyStep: some View {
+        OnboardingPage(
+            title: "Private by design",
+            subtitle: "Your data stays on your device.",
+            systemImage: "hand.raised.fill",
+            accent: .green,
+            bullets: [
+                "No account required",
+                "No server-side personal data storage",
+                "You can delete everything anytime"
+            ]
+        )
+    }
+    
+    private var countryStep: some View {
+        OnboardingQuestionPage(
+            title: "Choose a schedule",
+            subtitle: "Select the country for your child’s vaccination calendar.",
+            systemImage: "globe.europe.africa.fill",
+            accent: .teal
+        ) {
+            Button {
+                showCountrySelection = true
+            } label: {
+                HStack(spacing: 12) {
+                    Text(selectedCountry.flag)
+                        .font(.title2)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(selectedCountry.localizedName)
+                            .font(.headline)
+                            .foregroundColor(.primary)
+                        Text("You can change this later")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .foregroundColor(.secondary)
+                }
+                .padding()
+                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+            }
+            .buttonStyle(.plain)
+        }
+    }
+    
+    private var profileStep: some View {
+        VStack(spacing: 18) {
+            OnboardingHeader(
+                title: "Create your first profile",
+                subtitle: "Add your child to generate a personalized schedule.",
+                systemImage: "person.crop.circle.badge.plus",
+                accent: .purple
+            )
+            .padding(.top, 24)
+            
+            VStack(spacing: 14) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Child’s name")
+                        .font(.caption.weight(.semibold))
+                        .foregroundColor(.secondary)
+                    TextField("Enter name", text: $childName)
+                        .textInputAutocapitalization(.words)
+                        .focused($isNameFocused)
+                        .padding()
+                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
+                }
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Date of birth")
+                        .font(.caption.weight(.semibold))
+                        .foregroundColor(.secondary)
+                    
+                    DatePicker(
+                        selection: $birthDate,
+                        in: ...Date(),
+                        displayedComponents: .date
+                    ) {
+                        Text(dateFormatter.string(from: birthDate))
+                            .font(.headline)
+                    }
+                    .datePickerStyle(.compact)
+                    .padding()
+                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
+                }
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Country")
+                        .font(.caption.weight(.semibold))
+                        .foregroundColor(.secondary)
+                    HStack {
+                        Text(selectedCountry.flag)
+                        Text(selectedCountry.localizedName)
+                            .font(.headline)
+                        Spacer()
+                        Button("Change") { showCountrySelection = true }
+                            .font(.subheadline.weight(.semibold))
+                    }
+                    .padding()
+                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
+                }
+            }
+            .padding(.horizontal)
+            
+            Spacer(minLength: 40)
+        }
+        .padding(.bottom, 16)
+    }
+    
+    // MARK: - Bottom controls
+    
+    private var bottomControls: some View {
+        VStack(spacing: 12) {
+            HStack(spacing: 8) {
+                ForEach(0...lastStepIndex, id: \.self) { i in
+                    Capsule()
+                        .fill(i == step ? Color.white.opacity(0.9) : Color.white.opacity(0.35))
+                        .frame(width: i == step ? 18 : 8, height: 8)
+                        .animation(.easeInOut(duration: 0.2), value: step)
+                }
+            }
+            .padding(.top, 6)
+            
+            HStack(spacing: 12) {
+                if step > 0 {
+                    Button {
+                        isNameFocused = false
+                        step = max(0, step - 1)
+                    } label: {
+                        Text("Back")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.white.opacity(0.20), in: RoundedRectangle(cornerRadius: 14))
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundColor(.white)
+                }
+                
+                Button {
+                    isNameFocused = false
+                    if step < lastStepIndex {
+                        step = min(lastStepIndex, step + 1)
+                    } else {
+                        saveProfile()
+                    }
+                } label: {
+                    HStack {
+                        Text(step < lastStepIndex ? "Continue" : "Start")
+                        Image(systemName: "arrow.right")
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(
+                        (step == lastStepIndex && childName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        ? Color.white.opacity(0.25)
+                        : Color.white.opacity(0.90),
+                        in: RoundedRectangle(cornerRadius: 14)
+                    )
+                }
+                .buttonStyle(.plain)
+                .foregroundColor(step < lastStepIndex ? .white : .black)
+                .disabled(step == lastStepIndex && childName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            }
+            .padding(.horizontal)
+            .padding(.bottom, 10)
+        }
+        .background(.ultraThinMaterial)
+    }
+    
+    // MARK: - Background
+    
+    private func backgroundForStep(_ step: Int) -> some View {
+        let gradient: LinearGradient
+        switch step {
+        case 0:
+            gradient = LinearGradient(colors: [Color.blue, Color.purple], startPoint: .topLeading, endPoint: .bottomTrailing)
+        case 1:
+            gradient = LinearGradient(colors: [Color.orange, Color.pink], startPoint: .topLeading, endPoint: .bottomTrailing)
+        case 2:
+            gradient = LinearGradient(colors: [Color.green, Color.teal], startPoint: .topLeading, endPoint: .bottomTrailing)
+        case 3:
+            gradient = LinearGradient(colors: [Color.teal, Color.blue], startPoint: .topLeading, endPoint: .bottomTrailing)
+        default:
+            gradient = LinearGradient(colors: [Color.purple, Color.indigo], startPoint: .topLeading, endPoint: .bottomTrailing)
+        }
+        
+        return ZStack {
+            gradient
+            Circle()
+                .fill(Color.white.opacity(0.12))
+                .frame(width: 360, height: 360)
+                .offset(x: 140, y: -220)
+            Circle()
+                .fill(Color.white.opacity(0.08))
+                .frame(width: 260, height: 260)
+                .offset(x: -180, y: 220)
+        }
+    }
 }
 
 // Simplified Country Selection Sheet
@@ -179,7 +311,7 @@ struct CountrySelectionSheet: View {
     }
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 0) {
                 // Countries List
                 ScrollView {
@@ -227,8 +359,6 @@ struct CountrySelectionSheet: View {
                 }
             }
         }
-        // iPad: force single-column navigation style.
-        .navigationViewStyle(StackNavigationViewStyle())
     }
 }
 
@@ -277,5 +407,92 @@ struct OnboardingView_Previews: PreviewProvider {
     static var previews: some View {
         OnboardingView()
             .environmentObject(VaccineViewModel())
+    }
+}
+
+// MARK: - Onboarding UI building blocks
+
+private struct OnboardingHeader: View {
+    let title: String
+    let subtitle: String
+    let systemImage: String
+    let accent: Color
+    
+    var body: some View {
+        VStack(spacing: 12) {
+            ZStack {
+                Circle()
+                    .fill(Color.white.opacity(0.22))
+                    .frame(width: 92, height: 92)
+                Image(systemName: systemImage)
+                    .font(.system(size: 44, weight: .semibold))
+                    .foregroundColor(.white)
+            }
+            Text(title)
+                .font(.system(.largeTitle, design: .rounded).weight(.bold))
+                .foregroundColor(.white)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+            Text(subtitle)
+                .font(.body)
+                .foregroundColor(.white.opacity(0.9))
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 28)
+        }
+    }
+}
+
+private struct OnboardingPage: View {
+    let title: String
+    let subtitle: String
+    let systemImage: String
+    let accent: Color
+    let bullets: [String]
+    
+    var body: some View {
+        VStack(spacing: 20) {
+            OnboardingHeader(title: title, subtitle: subtitle, systemImage: systemImage, accent: accent)
+                .padding(.top, 30)
+            
+            VStack(alignment: .leading, spacing: 12) {
+                ForEach(bullets, id: \.self) { text in
+                    HStack(alignment: .top, spacing: 10) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(.white.opacity(0.95))
+                        Text(text)
+                            .foregroundColor(.white.opacity(0.95))
+                            .font(.headline)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+            }
+            .padding()
+            .background(Color.white.opacity(0.18), in: RoundedRectangle(cornerRadius: 18))
+            .padding(.horizontal, 22)
+            
+            Spacer()
+        }
+    }
+}
+
+private struct OnboardingQuestionPage<Content: View>: View {
+    let title: String
+    let subtitle: String
+    let systemImage: String
+    let accent: Color
+    @ViewBuilder let content: () -> Content
+    
+    var body: some View {
+        VStack(spacing: 18) {
+            OnboardingHeader(title: title, subtitle: subtitle, systemImage: systemImage, accent: accent)
+                .padding(.top, 30)
+            
+            VStack(spacing: 12) {
+                content()
+            }
+            .padding(.horizontal, 22)
+            
+            Spacer()
+        }
     }
 }

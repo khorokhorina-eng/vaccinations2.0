@@ -105,6 +105,7 @@ struct PaywallView: View {
                 NavigationView {
                     LegalDocumentView(doc: doc)
                 }
+                .navigationViewStyle(StackNavigationViewStyle())
             }
             .onAppear {
                 if subscriptionManager.products.isEmpty {
@@ -218,6 +219,48 @@ private enum LegalDoc: String, Identifiable {
         case .termsOfUse: return "terms-of-use"
         }
     }
+    
+    var embeddedMarkdown: String {
+        switch self {
+        case .privacyPolicy:
+            return """
+            # Privacy Policy
+            
+            Last updated: 2026-01-10
+            
+            This Privacy Policy describes how **CareVax** (the “App”) handles information when you use the App.
+            
+            ## Data We Store
+            
+            The App stores information **locally on your device** (for example, child profiles and vaccination records you enter).
+            
+            ## Purchases
+            
+            If you purchase a subscription, purchases are processed by Apple using StoreKit. The App does not collect your payment information.
+            
+            ## Contact
+            
+            For support, contact the developer via the support email listed on the App Store product page.
+            """
+            
+        case .termsOfUse:
+            return """
+            # Terms of Use (EULA)
+            
+            Last updated: 2026-01-10
+            
+            These Terms of Use apply to **CareVax** (the “App”).
+            
+            ## Apple Standard EULA
+            
+            Apple’s Standard EULA: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+            
+            ## Subscription
+            
+            The App may offer auto-renewable subscriptions. Subscription terms are shown in the App at the time of purchase and are provided by the App Store.
+            """
+        }
+    }
 }
 
 private struct LegalDocumentView: View {
@@ -226,19 +269,15 @@ private struct LegalDocumentView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
-                if let attributed = loadMarkdownAttributedString() {
-                    Text(attributed)
-                        .font(.footnote)
-                        .foregroundColor(.primary)
-                } else if let plain = loadMarkdownString() {
-                    Text(plain)
-                        .font(.footnote)
-                        .foregroundColor(.primary)
-                } else {
-                    Text("Unable to load \(doc.title).")
-                        .font(.footnote)
-                        .foregroundColor(.secondary)
+                if doc == .termsOfUse, let url = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/") {
+                    Link("Apple Standard EULA", destination: url)
+                        .font(.footnote.weight(.semibold))
                 }
+                
+                Text(renderedText)
+                    .font(.footnote)
+                    .foregroundColor(.primary)
+                    .textSelection(.enabled)
             }
             .padding()
         }
@@ -258,9 +297,9 @@ private struct LegalDocumentView: View {
     
     @Environment(\.dismiss) private var dismiss
     
-    private func loadMarkdownAttributedString() -> AttributedString? {
-        guard let markdown = loadMarkdownString() else { return nil }
-        return try? AttributedString(markdown: markdown)
+    private var renderedText: AttributedString {
+        let markdown = loadMarkdownString() ?? doc.embeddedMarkdown
+        return (try? AttributedString(markdown: markdown)) ?? AttributedString(markdown)
     }
     
     private func loadMarkdownString() -> String? {
