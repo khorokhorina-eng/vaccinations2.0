@@ -10,8 +10,12 @@ struct PaywallView: View {
     @EnvironmentObject var subscriptionManager: SubscriptionManager
     @State private var selectedProductID: String = SubscriptionManager.ProductID.yearly
 
-    @State private var promoCode: String = ""
     @State private var showErrorAlert: Bool = false
+    
+    // NOTE: These URLs must be functional in the submitted binary (Guideline 3.1.2).
+    // They will work once the files are available on the default branch (e.g. main).
+    private let privacyPolicyURL = URL(string: "https://raw.githubusercontent.com/khorokhorina-eng/vaccinations2.0/main/Vaccinations2_0/Resources/Legal/privacy-policy.md")!
+    private let termsOfUseURL = URL(string: "https://raw.githubusercontent.com/khorokhorina-eng/vaccinations2.0/main/Vaccinations2_0/Resources/Legal/terms-of-use.md")!
 
     var body: some View {
         NavigationView {
@@ -44,33 +48,10 @@ struct PaywallView: View {
                         }
 
                         if subscriptionManager.products.isEmpty && !subscriptionManager.isLoading {
-                            Text("Plans are temporarily unavailable. You can still restore purchases or use a promo code.")
+                            Text("Plans are temporarily unavailable. You can still restore purchases.")
                                 .font(.footnote)
                                 .foregroundColor(.secondary)
                                 .padding(.top, 4)
-                        }
-                    }
-
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Promo code")
-                            .font(.headline)
-                            .foregroundColor(.secondary)
-
-                        HStack(spacing: 10) {
-                            TextField("Enter promo code", text: $promoCode)
-                                .textInputAutocapitalization(.never)
-                                .autocorrectionDisabled()
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-
-                            Button("Apply") {
-                                subscriptionManager.applyPromoCode(promoCode)
-                                if subscriptionManager.hasPremiumAccess {
-                                    promoCode = ""
-                                } else if subscriptionManager.lastErrorMessage != nil {
-                                    showErrorAlert = true
-                                }
-                            }
-                            .buttonStyle(.bordered)
                         }
                     }
 
@@ -106,10 +87,18 @@ struct PaywallView: View {
                     }
                     .padding(.top, 6)
 
-                    Text("Monthly: $5. Yearly: $30. Yearly plan includes a 1-week free trial for new subscribers (configured in App Store Connect).")
-                        .font(.footnote)
-                        .foregroundColor(.secondary)
-                        .padding(.top, 4)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(subscriptionDisclosure)
+                            .font(.footnote)
+                            .foregroundColor(.secondary)
+                        
+                        HStack(spacing: 14) {
+                            Link("Privacy Policy", destination: privacyPolicyURL)
+                            Link("Terms of Use (EULA)", destination: termsOfUseURL)
+                        }
+                        .font(.footnote.weight(.semibold))
+                    }
+                    .padding(.top, 4)
                 }
                 .padding(.horizontal)
                 .padding(.bottom, 24)
@@ -149,10 +138,22 @@ struct PaywallView: View {
     }
 
     private var primaryButtonTitle: String {
-        if selectedProductID == SubscriptionManager.ProductID.yearly {
-            return "Start free trial"
-        }
         return "Continue"
+    }
+    
+    private var subscriptionDisclosure: String {
+        guard let product = selectedProduct else {
+            return "Subscriptions renew automatically unless cancelled at least 24 hours before the end of the current period."
+        }
+        
+        let name = product.displayName
+        let price = product.displayPrice
+        
+        if let period = product.subscription?.subscriptionPeriod {
+            return "\(name) — \(price) per \(subscriptionPeriodText(period)). Subscriptions renew automatically unless cancelled at least 24 hours before the end of the current period."
+        }
+        
+        return "\(name) — \(price). Subscriptions renew automatically unless cancelled at least 24 hours before the end of the current period."
     }
 
     private func planTitle(for product: Product) -> String {
@@ -167,14 +168,25 @@ struct PaywallView: View {
     }
 
     private func planSubtitle(for product: Product) -> String {
-        switch product.id {
-        case SubscriptionManager.ProductID.yearly:
-            return "1 week free, then billed yearly"
-        case SubscriptionManager.ProductID.monthly:
-            return "Billed monthly"
-        default:
-            return ""
+        guard let period = product.subscription?.subscriptionPeriod else { return "" }
+        return "Billed every \(subscriptionPeriodText(period))"
+    }
+    
+    private func subscriptionPeriodText(_ period: Product.SubscriptionPeriod) -> String {
+        let unitText: String
+        switch period.unit {
+        case .day:
+            unitText = period.value == 1 ? "day" : "days"
+        case .week:
+            unitText = period.value == 1 ? "week" : "weeks"
+        case .month:
+            unitText = period.value == 1 ? "month" : "months"
+        case .year:
+            unitText = period.value == 1 ? "year" : "years"
+        @unknown default:
+            unitText = "period"
         }
+        return "\(period.value) \(unitText)"
     }
 
     private func purchaseSelected() async {
