@@ -1,3 +1,5 @@
+// Restored original colorful onboarding with questions + interstitials.
+// Source: origin/cursor/welcome-screen-and-ui-fixes-c007
 //
 //  OnboardingView.swift
 //  VaccineCalendar
@@ -7,62 +9,487 @@ import SwiftUI
 
 struct OnboardingView: View {
     @EnvironmentObject var viewModel: VaccineViewModel
-    
-    @State private var step: Int = 0
-    private let lastStepIndex: Int = 7
-    
-    // Onboarding answers (currently used for UX only)
-    @State private var wantsReminders: Bool = true
-    @State private var wantsMultipleChildren: Bool = true
-    @State private var includeRecommendedVaccines: Bool = true
-    @State private var reminderDaysBefore: Double = 7
-    
     @State private var childName = ""
     @State private var birthDate = Date()
     @State private var selectedCountry: Country = .usa
+    @State private var showDatePicker = false
     @State private var showCountrySelection = false
     @FocusState private var isNameFocused: Bool
     
+    @State private var step: Step = .intro
+    @State private var optionalPreference: OptionalVaccinesPreference = .includeRecommended
+    @State private var primaryGoal: PrimaryGoal = .stayOnTrack
+    @State private var reminderDays: Int = 3
+    
     var body: some View {
-        NavigationStack {
+        NavigationView {
             ZStack {
-                backgroundForStep(step)
+                background
                     .ignoresSafeArea()
                 
-                TabView(selection: $step) {
-                    welcomeStep.tag(0)
-                    goalsStep.tag(1)
-                    interstitialStep.tag(2)
-                    remindersStep.tag(3)
-                    reminderTimingStep.tag(4)
-                    privacyStep.tag(5)
-                    countryStep.tag(6)
-                    profileStep.tag(7)
-                }
-                .tabViewStyle(.page(indexDisplayMode: .never))
-                .animation(.easeInOut, value: step)
-            }
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    if step < lastStepIndex {
-                        Button("Skip") { step = lastStepIndex }
-                            .font(.subheadline.weight(.semibold))
+                VStack(spacing: 0) {
+                    topBar
+                        .padding(.horizontal, 18)
+                        .padding(.top, 10)
+                        .padding(.bottom, 10)
+                    
+                    ScrollView(showsIndicators: false) {
+                        VStack(spacing: 18) {
+                            progressDots
+                                .padding(.top, 2)
+                            
+                            stepContent
+                                .padding(.top, 6)
+                            
+                            Color.clear.frame(height: 96)
+                        }
+                        .padding(.horizontal, 18)
                     }
                 }
             }
-            .safeAreaInset(edge: .bottom) { bottomControls }
+            .safeAreaInset(edge: .bottom) {
+                VStack(spacing: 10) {
+                    Button(action: handlePrimaryAction) {
+                        Text(primaryButtonTitle)
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(primaryButtonEnabled ? Color(red: 0.96, green: 0.29, blue: 0.41) : Color.gray)
+                            .cornerRadius(18)
+                    }
+                    .disabled(!primaryButtonEnabled)
+                    .padding(.horizontal, 18)
+                    .padding(.bottom, 12)
+                }
+                .background(.ultraThinMaterial)
+            }
+            .navigationBarHidden(true)
+            .onAppear {
+                // preload persisted preferences (if any)
+                optionalPreference = viewModel.dataService.showOnlyMandatoryPreference ? .onlyMandatory : .includeRecommended
+                reminderDays = viewModel.dataService.onboardingReminderDays
+                if let raw = viewModel.dataService.onboardingPrimaryGoal, let goal = PrimaryGoal(rawValue: raw) {
+                    primaryGoal = goal
+                }
+            }
         }
+        // iPad: prevent split-view with empty detail column.
+        .navigationViewStyle(StackNavigationViewStyle())
         .sheet(isPresented: $showCountrySelection) {
             CountrySelectionSheet(selectedCountry: $selectedCountry)
         }
     }
     
+    private var primaryButtonTitle: String {
+        step == .finalQuestion ? "Get started" : "Next"
+    }
+    
+    private var primaryButtonEnabled: Bool {
+        switch step {
+        case .nameQuestion:
+            return !childName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        case .countryQuestion:
+            return true
+        case .birthDateQuestion:
+            return true
+        case .optionalVaccinesQuestion:
+            return true
+        case .finalQuestion:
+            return true
+        default:
+            return true
+        }
+    }
+    
+    private func handlePrimaryAction() {
+        isNameFocused = false
+        
+        if step == .finalQuestion {
+            persistPreferences()
+            saveProfile()
+            return
+        }
+        
+        withAnimation(.easeInOut) {
+            step = step.next
+        }
+    }
+    
+    private var progressDots: some View {
+        HStack(spacing: 8) {
+            ForEach(0..<Step.progressCount, id: \.self) { idx in
+                Capsule()
+                    .fill(idx == step.progressIndex ? Color(red: 0.96, green: 0.29, blue: 0.41) : Color.gray.opacity(0.25))
+                    .frame(width: idx == step.progressIndex ? 24 : 8, height: 8)
+                    .animation(.easeInOut(duration: 0.2), value: step.progressIndex)
+            }
+        }
+        .accessibilityLabel("Onboarding progress")
+    }
+    
+    private var stepContent: some View {
+        Group {
+            switch step {
+            case .intro:
+                interstitial(
+                    title: "Hi!",
+                    subtitle: "Let’s create a personalized vaccination plan for your child.",
+                    symbol: "sparkles",
+                    accent: Color(red: 0.96, green: 0.29, blue: 0.41)
+                )
+            case .nameQuestion:
+                questionName
+            case .betweenNameAndBirth:
+                interstitial(
+                    title: "Everything under control",
+                    subtitle: "Schedules, records, and reminders — in one place.",
+                    symbol: "checkmark.seal.fill",
+                    accent: Color(red: 0.45, green: 0.32, blue: 0.96)
+                )
+            case .birthDateQuestion:
+                questionBirthDate
+            case .betweenBirthAndCountry:
+                interstitial(
+                    title: "Building your plan",
+                    subtitle: "We’ll use your child’s age and your country’s schedule.",
+                    symbol: "calendar.badge.clock",
+                    accent: Color(red: 0.12, green: 0.55, blue: 0.95)
+                )
+            case .countryQuestion:
+                questionCountry
+            case .betweenCountryAndOptional:
+                interstitial(
+                    title: "Optional vaccines",
+                    subtitle: "You can include or hide recommended vaccines — whatever feels right for you.",
+                    symbol: "slider.horizontal.3",
+                    accent: Color(red: 0.26, green: 0.78, blue: 0.51)
+                )
+            case .optionalVaccinesQuestion:
+                questionOptionalVaccines
+            case .betweenOptionalAndFinal:
+                interstitial(
+                    title: "Make it yours",
+                    subtitle: "A couple more details and we’ll personalize everything.",
+                    symbol: "wand.and.stars",
+                    accent: Color(red: 0.96, green: 0.67, blue: 0.18)
+                )
+            case .finalQuestion:
+                questionPersonalization
+            }
+        }
+    }
+    
+    private var questionName: some View {
+        VStack(spacing: 16) {
+            OnboardingIllustration(symbol: "person.crop.circle.fill", accent: Color(red: 0.96, green: 0.29, blue: 0.41))
+                .padding(.top, 6)
+            
+            Text("What’s your child’s name?")
+                .font(.system(size: 34, weight: .bold))
+                .multilineTextAlignment(.center)
+            
+            Text("We’ll use it in reminders and throughout the plan.")
+                .font(.body)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+            
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Name")
+                    .font(.headline)
+                TextField("Enter a name", text: $childName)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .autocapitalization(.words)
+                    .focused($isNameFocused)
+            }
+            .padding(.top, 6)
+        }
+    }
+    
+    private var questionBirthDate: some View {
+        VStack(spacing: 16) {
+            OnboardingIllustration(symbol: "calendar", accent: Color(red: 0.12, green: 0.55, blue: 0.95))
+                .padding(.top, 6)
+            
+            Text("When was your child born?")
+                .font(.system(size: 34, weight: .bold))
+                .multilineTextAlignment(.center)
+            
+            Text("We’ll build the vaccination schedule based on age.")
+                .font(.body)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+            
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Date of birth")
+                    .font(.headline)
+                
+                Button(action: {
+                    isNameFocused = false
+                    withAnimation(.easeInOut) { showDatePicker.toggle() }
+                }) {
+                    HStack {
+                        Text(dateFormatter.string(from: birthDate))
+                            .foregroundColor(.primary)
+                        Spacer()
+                        Image(systemName: showDatePicker ? "chevron.up" : "chevron.down")
+                            .foregroundColor(.secondary)
+                            .font(.caption)
+                    }
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .cornerRadius(14)
+                }
+                
+                if showDatePicker {
+                    VStack(spacing: 10) {
+                        DatePicker("", selection: $birthDate, in: ...Date(), displayedComponents: .date)
+                            .datePickerStyle(GraphicalDatePickerStyle())
+                            .labelsHidden()
+                        
+                        Button("Done") {
+                            withAnimation(.easeInOut) { showDatePicker = false }
+                        }
+                        .buttonStyle(.bordered)
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                    }
+                    .padding()
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color(.systemGray6))
+                    )
+                    .transition(.opacity)
+                }
+            }
+            .padding(.top, 6)
+        }
+    }
+    
+    private var questionCountry: some View {
+        VStack(spacing: 16) {
+            OnboardingIllustration(symbol: "globe.europe.africa.fill", accent: Color(red: 0.45, green: 0.32, blue: 0.96))
+                .padding(.top, 6)
+            
+            Text("Which country are you in?")
+                .font(.system(size: 34, weight: .bold))
+                .multilineTextAlignment(.center)
+            
+            Text("We’ll use your country’s recommended vaccination schedule.")
+                .font(.body)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+            
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Country")
+                    .font(.headline)
+                
+                Button(action: {
+                    isNameFocused = false
+                    showCountrySelection = true
+                }) {
+                    HStack {
+                        Text(selectedCountry.flag)
+                            .font(.title2)
+                        Text(selectedCountry.localizedName)
+                            .foregroundColor(.primary)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .foregroundColor(.secondary)
+                            .font(.caption)
+                    }
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .cornerRadius(14)
+                }
+            }
+            .padding(.top, 6)
+        }
+    }
+    
+    private var questionOptionalVaccines: some View {
+        VStack(spacing: 16) {
+            OnboardingIllustration(symbol: "shield.lefthalf.filled", accent: Color(red: 0.26, green: 0.78, blue: 0.51))
+                .padding(.top, 6)
+            
+            Text("How do you feel about optional vaccines?")
+                .font(.system(size: 32, weight: .bold))
+                .multilineTextAlignment(.center)
+            
+            Text("Choose an option — we’ll set up your list accordingly.")
+                .font(.body)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+            
+            VStack(spacing: 10) {
+                OnboardingChoiceRow(
+                    title: "Show mandatory + recommended",
+                    subtitle: "See the complete schedule",
+                    isSelected: optionalPreference == .includeRecommended
+                ) { optionalPreference = .includeRecommended }
+                
+                OnboardingChoiceRow(
+                    title: "Show mandatory only",
+                    subtitle: "Keep things simple",
+                    isSelected: optionalPreference == .onlyMandatory
+                ) { optionalPreference = .onlyMandatory }
+            }
+            .padding(.top, 6)
+        }
+    }
+    
+    private var questionPersonalization: some View {
+        VStack(spacing: 16) {
+            OnboardingIllustration(symbol: "slider.horizontal.2.square", accent: Color(red: 0.96, green: 0.67, blue: 0.18))
+                .padding(.top, 6)
+            
+            Text("What matters most to you?")
+                .font(.system(size: 34, weight: .bold))
+                .multilineTextAlignment(.center)
+            
+            Text("This helps us personalize the experience and reminders.")
+                .font(.body)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+            
+            VStack(spacing: 10) {
+                OnboardingChoiceRow(
+                    title: "Never miss a due date",
+                    subtitle: "Reminders and upcoming vaccines",
+                    isSelected: primaryGoal == .stayOnTrack
+                ) { primaryGoal = .stayOnTrack }
+                
+                OnboardingChoiceRow(
+                    title: "Keep vaccination records",
+                    subtitle: "History and confirmations in one place",
+                    isSelected: primaryGoal == .keepRecords
+                ) { primaryGoal = .keepRecords }
+                
+                OnboardingChoiceRow(
+                    title: "Understand what’s mandatory",
+                    subtitle: "Clear labels and categories",
+                    isSelected: primaryGoal == .understandMandatory
+                ) { primaryGoal = .understandMandatory }
+            }
+            .padding(.top, 6)
+            
+            VStack(alignment: .leading, spacing: 10) {
+                Text("When should we remind you?")
+                    .font(.headline)
+                    .padding(.top, 10)
+                
+                HStack(spacing: 10) {
+                    ForEach([1, 3, 7], id: \.self) { days in
+                        Button(action: { reminderDays = days }) {
+                            Text(days == 1 ? "1 day" : "\(days) days")
+                                .font(.headline)
+                                .foregroundColor(reminderDays == days ? .white : .primary)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 12)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 14)
+                                        .fill(reminderDays == days ? Color(red: 0.96, green: 0.29, blue: 0.41) : Color(.systemGray6))
+                                )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+        }
+    }
+    
+    private func interstitial(title: String, subtitle: String, symbol: String, accent: Color) -> some View {
+        VStack(spacing: 16) {
+            OnboardingIllustration(symbol: symbol, accent: accent)
+                .padding(.top, 6)
+            
+            Text(title)
+                .font(.system(size: 36, weight: .bold))
+                .multilineTextAlignment(.center)
+            
+            Text(subtitle)
+                .font(.title3)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+            
+            // Small feature list on the intro screen only
+            if step == .intro {
+                VStack(alignment: .leading, spacing: 10) {
+                    FeatureRow(icon: "calendar.badge.clock", title: "Schedules & reminders", subtitle: "Stay on track effortlessly")
+                    FeatureRow(icon: "checkmark.seal", title: "Vaccination records", subtitle: "Keep everything documented")
+                    FeatureRow(icon: "tray.full", title: "All in one place", subtitle: "Plan, records, and status")
+                }
+                .padding(.top, 8)
+            }
+        }
+    }
+    
+    private var topBar: some View {
+        HStack {
+            Button(action: goBack) {
+                Image(systemName: "chevron.left")
+                    .font(.headline)
+                    .foregroundColor(.primary)
+                    .padding(10)
+                    .background(Color.black.opacity(0.05))
+                    .clipShape(Circle())
+            }
+            .opacity(step.canGoBack ? 1 : 0)
+            .disabled(!step.canGoBack)
+            
+            Spacer()
+            
+            Button(action: skipIfPossible) {
+                Text("Skip")
+                    .font(.headline)
+                    .foregroundColor(.secondary)
+            }
+            .opacity(step.canSkip ? 1 : 0)
+            .disabled(!step.canSkip)
+        }
+    }
+    
+    private func goBack() {
+        isNameFocused = false
+        withAnimation(.easeInOut) {
+            step = step.previous ?? step
+        }
+    }
+    
+    private func skipIfPossible() {
+        guard step.canSkip else { return }
+        withAnimation(.easeInOut) {
+            step = step.next
+        }
+    }
+    
+    private var background: some View {
+        LinearGradient(
+            colors: [
+                Color(red: 1.0, green: 0.95, blue: 0.97),
+                Color(red: 0.97, green: 0.97, blue: 1.0)
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+    
     private func saveProfile() {
         viewModel.saveChildProfile(
-            name: childName,
+            name: childName.trimmingCharacters(in: .whitespacesAndNewlines),
             birthDate: birthDate,
             country: selectedCountry.rawValue
         )
+    }
+    
+    private func persistPreferences() {
+        // Optional vaccines preference
+        let onlyMandatory = optionalPreference == .onlyMandatory
+        viewModel.showOnlyMandatory = onlyMandatory
+        viewModel.dataService.showOnlyMandatoryPreference = onlyMandatory
+        
+        // Personalization (future use)
+        viewModel.dataService.onboardingPrimaryGoal = primaryGoal.rawValue
+        viewModel.dataService.onboardingReminderDays = reminderDays
     }
     
     private var dateFormatter: DateFormatter {
@@ -70,314 +497,170 @@ struct OnboardingView: View {
         formatter.dateStyle = .long
         return formatter
     }
+}
+
+private struct FeatureRow: View {
+    let icon: String
+    let title: String
+    let subtitle: String
     
-    // MARK: - Steps
-    
-    private var welcomeStep: some View {
-        OnboardingPage(
-            title: "CareVax",
-            subtitle: "Your child’s vaccination calendar—simple, visual, and always with you.",
-            systemImage: "heart.text.square.fill",
-            accent: .blue,
-            bullets: [
-                "Country-specific schedules",
-                "Track upcoming and overdue vaccines",
-                "Keep records in one place"
-            ]
-        )
-    }
-    
-    private var remindersStep: some View {
-        OnboardingQuestionPage(
-            title: "Reminders",
-            subtitle: "Would you like to get reminders for upcoming vaccines?",
-            systemImage: "bell.badge.fill",
-            accent: .orange
-        ) {
-            Toggle(isOn: $wantsReminders) {
-                Text(wantsReminders ? "Yes, remind me" : "No reminders")
-                    .font(.headline)
-            }
-            .toggleStyle(.switch)
-            .padding()
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: icon)
+                .font(.title3)
+                .foregroundColor(.blue)
+                .frame(width: 28)
             
-            Toggle(isOn: $wantsMultipleChildren) {
-                Text(wantsMultipleChildren ? "I have (or plan) multiple children" : "Just one child")
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
                     .font(.headline)
-            }
-            .toggleStyle(.switch)
-            .padding()
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
-        }
-    }
-    
-    private var reminderTimingStep: some View {
-        OnboardingQuestionPage(
-            title: "Reminder timing",
-            subtitle: "How many days before a vaccine should we remind you?",
-            systemImage: "clock.badge.fill",
-            accent: .pink
-        ) {
-            VStack(alignment: .leading, spacing: 10) {
-                HStack {
-                    Text("Days before")
-                        .font(.headline)
-                        .foregroundColor(.primary)
-                    Spacer()
-                    Text("\(Int(reminderDaysBefore))")
-                        .font(.headline)
-                        .foregroundColor(.primary)
-                }
-                
-                Slider(value: $reminderDaysBefore, in: 1...30, step: 1)
-            }
-            .padding()
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
-            .opacity(wantsReminders ? 1 : 0.55)
-            .disabled(!wantsReminders)
-        }
-    }
-    
-    private var goalsStep: some View {
-        OnboardingQuestionPage(
-            title: "What do you want to track?",
-            subtitle: "Choose what to show in your child’s schedule.",
-            systemImage: "checklist.checked",
-            accent: .indigo
-        ) {
-            VStack(alignment: .leading, spacing: 10) {
-                Toggle(isOn: $includeRecommendedVaccines) {
-                    Text(includeRecommendedVaccines ? "Mandatory + recommended vaccines" : "Mandatory vaccines only")
-                        .font(.headline)
-                }
-                .toggleStyle(.switch)
-                
-                Text("You can change this later in Settings.")
-                    .font(.caption)
+                    .foregroundColor(.primary)
+                Text(subtitle)
+                    .font(.subheadline)
                     .foregroundColor(.secondary)
             }
-            .padding()
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+            
+            Spacer()
         }
-    }
-    
-    private var interstitialStep: some View {
-        OnboardingPage(
-            title: "Works offline",
-            subtitle: "Schedules are stored in the app, so it works without an account or network.",
-            systemImage: "wifi.slash",
-            accent: .teal,
-            bullets: [
-                "No sign‑up required",
-                "Data stays on your device",
-                "Fast and reliable on the go"
-            ]
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 14)
+                .fill(Color.gray.opacity(0.06))
         )
     }
+}
+
+private struct OnboardingIllustration: View {
+    let symbol: String
+    let accent: Color
     
-    private var privacyStep: some View {
-        OnboardingPage(
-            title: "Private by design",
-            subtitle: "Your data stays on your device.",
-            systemImage: "hand.raised.fill",
-            accent: .green,
-            bullets: [
-                "No account required",
-                "No server-side personal data storage",
-                "You can delete everything anytime"
-            ]
-        )
-    }
-    
-    private var countryStep: some View {
-        OnboardingQuestionPage(
-            title: "Choose a schedule",
-            subtitle: "Select the country for your child’s vaccination calendar.",
-            systemImage: "globe.europe.africa.fill",
-            accent: .teal
-        ) {
-            Button {
-                showCountrySelection = true
-            } label: {
-                HStack(spacing: 12) {
-                    Text(selectedCountry.flag)
-                        .font(.title2)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(selectedCountry.localizedName)
-                            .font(.headline)
-                            .foregroundColor(.primary)
-                        Text("You can change this later")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .foregroundColor(.secondary)
-                }
-                .padding()
-                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
-            }
-            .buttonStyle(.plain)
-        }
-    }
-    
-    private var profileStep: some View {
-        VStack(spacing: 18) {
-            OnboardingHeader(
-                title: "Create your first profile",
-                subtitle: "Add your child to generate a personalized schedule.",
-                systemImage: "person.crop.circle.badge.plus",
-                accent: .purple
-            )
-            .padding(.top, 24)
-            
-            VStack(spacing: 14) {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Child’s name")
-                        .font(.caption.weight(.semibold))
-                        .foregroundColor(.secondary)
-                    TextField("Enter name", text: $childName)
-                        .textInputAutocapitalization(.words)
-                        .focused($isNameFocused)
-                        .padding()
-                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
-                }
-                
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Date of birth")
-                        .font(.caption.weight(.semibold))
-                        .foregroundColor(.secondary)
-                    
-                    DatePicker(
-                        selection: $birthDate,
-                        in: ...Date(),
-                        displayedComponents: .date
-                    ) {
-                        Text(dateFormatter.string(from: birthDate))
-                            .font(.headline)
-                    }
-                    .datePickerStyle(.compact)
-                    .padding()
-                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
-                }
-                
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Country")
-                        .font(.caption.weight(.semibold))
-                        .foregroundColor(.secondary)
-                    HStack {
-                        Text(selectedCountry.flag)
-                        Text(selectedCountry.localizedName)
-                            .font(.headline)
-                        Spacer()
-                        Button("Change") { showCountrySelection = true }
-                            .font(.subheadline.weight(.semibold))
-                    }
-                    .padding()
-                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
-                }
-            }
-            .padding(.horizontal)
-            
-            Spacer(minLength: 40)
-        }
-        .padding(.bottom, 16)
-    }
-    
-    // MARK: - Bottom controls
-    
-    private var bottomControls: some View {
-        VStack(spacing: 12) {
-            HStack(spacing: 8) {
-                ForEach(0...lastStepIndex, id: \.self) { i in
-                    Capsule()
-                        .fill(i == step ? Color.white.opacity(0.9) : Color.white.opacity(0.35))
-                        .frame(width: i == step ? 18 : 8, height: 8)
-                        .animation(.easeInOut(duration: 0.2), value: step)
-                }
-            }
-            .padding(.top, 6)
-            
-            HStack(spacing: 12) {
-                if step > 0 {
-                    Button {
-                        isNameFocused = false
-                        step = max(0, step - 1)
-                    } label: {
-                        Text("Back")
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.white.opacity(0.20), in: RoundedRectangle(cornerRadius: 14))
-                    }
-                    .buttonStyle(.plain)
-                    .foregroundColor(.white)
-                }
-                
-                Button {
-                    isNameFocused = false
-                    if step < lastStepIndex {
-                        step = min(lastStepIndex, step + 1)
-                    } else {
-                        saveProfile()
-                    }
-                } label: {
-                    HStack {
-                        Text(step < lastStepIndex ? "Continue" : "Start")
-                        Image(systemName: "arrow.right")
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(
-                        (step == lastStepIndex && childName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                        ? Color.white.opacity(0.25)
-                        : Color.white.opacity(0.90),
-                        in: RoundedRectangle(cornerRadius: 14)
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 28)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            accent.opacity(0.20),
+                            accent.opacity(0.08),
+                            Color.white.opacity(0.9)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
                     )
-                }
-                .buttonStyle(.plain)
-                .foregroundColor(step < lastStepIndex ? .white : .black)
-                .disabled(step == lastStepIndex && childName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-            }
-            .padding(.horizontal)
-            .padding(.bottom, 10)
+                )
+                .frame(height: 220)
+            
+            Image(systemName: symbol)
+                .font(.system(size: 84, weight: .bold))
+                .symbolRenderingMode(.palette)
+                .foregroundStyle(accent, Color.white)
         }
-        .background(.ultraThinMaterial)
+        .overlay(
+            RoundedRectangle(cornerRadius: 28)
+                .stroke(Color.black.opacity(0.06), lineWidth: 1)
+        )
+    }
+}
+
+private struct OnboardingChoiceRow: View {
+    let title: String
+    let subtitle: String
+    let isSelected: Bool
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                    .font(.title3)
+                    .foregroundColor(isSelected ? Color(red: 0.96, green: 0.29, blue: 0.41) : .secondary)
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                    Text(subtitle)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+                
+                Spacer()
+            }
+            .padding(16)
+            .background(
+                RoundedRectangle(cornerRadius: 18)
+                    .fill(isSelected ? Color(red: 0.96, green: 0.29, blue: 0.41).opacity(0.12) : Color.white.opacity(0.7))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 18)
+                    .stroke(isSelected ? Color(red: 0.96, green: 0.29, blue: 0.41) : Color.black.opacity(0.06), lineWidth: isSelected ? 2 : 1)
+            )
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+private enum OptionalVaccinesPreference: String, CaseIterable {
+    case includeRecommended
+    case onlyMandatory
+}
+
+private enum PrimaryGoal: String, CaseIterable {
+    case stayOnTrack
+    case keepRecords
+    case understandMandatory
+}
+
+private enum Step: Int, CaseIterable {
+    // Interstitials are placed BETWEEN questions (per references)
+    case intro
+    case nameQuestion
+    case betweenNameAndBirth
+    case birthDateQuestion
+    case betweenBirthAndCountry
+    case countryQuestion
+    case betweenCountryAndOptional
+    case optionalVaccinesQuestion
+    case betweenOptionalAndFinal
+    case finalQuestion
+    
+    static var progressCount: Int { 5 } // number of questions
+    
+    var progressIndex: Int {
+        switch self {
+        case .nameQuestion: return 0
+        case .birthDateQuestion: return 1
+        case .countryQuestion: return 2
+        case .optionalVaccinesQuestion: return 3
+        case .finalQuestion: return 4
+        default:
+            // Interstitials inherit the previous question index visually
+            return max(0, (previous?.progressIndex ?? 0))
+        }
     }
     
-    // MARK: - Background
+    var next: Step {
+        let all = Step.allCases
+        guard let idx = all.firstIndex(of: self), idx + 1 < all.count else { return self }
+        return all[idx + 1]
+    }
     
-    private func backgroundForStep(_ step: Int) -> some View {
-        let gradient: LinearGradient
-        switch step {
-        case 0:
-            gradient = LinearGradient(colors: [Color.blue, Color.purple], startPoint: .topLeading, endPoint: .bottomTrailing)
-        case 1:
-            gradient = LinearGradient(colors: [Color.indigo, Color.purple], startPoint: .topLeading, endPoint: .bottomTrailing)
-        case 2:
-            gradient = LinearGradient(colors: [Color.teal, Color.blue], startPoint: .topLeading, endPoint: .bottomTrailing)
-        case 3:
-            gradient = LinearGradient(colors: [Color.orange, Color.pink], startPoint: .topLeading, endPoint: .bottomTrailing)
-        case 4:
-            gradient = LinearGradient(colors: [Color.pink, Color.purple], startPoint: .topLeading, endPoint: .bottomTrailing)
-        case 5:
-            gradient = LinearGradient(colors: [Color.green, Color.teal], startPoint: .topLeading, endPoint: .bottomTrailing)
-        case 6:
-            gradient = LinearGradient(colors: [Color.teal, Color.blue], startPoint: .topLeading, endPoint: .bottomTrailing)
+    var previous: Step? {
+        let all = Step.allCases
+        guard let idx = all.firstIndex(of: self), idx - 1 >= 0 else { return nil }
+        return all[idx - 1]
+    }
+    
+    var canGoBack: Bool {
+        return previous != nil
+    }
+    
+    var canSkip: Bool {
+        switch self {
+        case .intro, .betweenNameAndBirth, .betweenBirthAndCountry, .betweenCountryAndOptional, .betweenOptionalAndFinal:
+            return true
         default:
-            gradient = LinearGradient(colors: [Color.purple, Color.indigo], startPoint: .topLeading, endPoint: .bottomTrailing)
-        }
-        
-        return ZStack {
-            gradient
-            Circle()
-                .fill(Color.white.opacity(0.12))
-                .frame(width: 360, height: 360)
-                .offset(x: 140, y: -220)
-            Circle()
-                .fill(Color.white.opacity(0.08))
-                .frame(width: 260, height: 260)
-                .offset(x: -180, y: 220)
+            return false
         }
     }
 }
@@ -394,7 +677,7 @@ struct CountrySelectionSheet: View {
     }
     
     var body: some View {
-        NavigationStack {
+        NavigationView {
             VStack(spacing: 0) {
                 // Countries List
                 ScrollView {
@@ -442,6 +725,7 @@ struct CountrySelectionSheet: View {
                 }
             }
         }
+        .navigationViewStyle(StackNavigationViewStyle())
     }
 }
 
@@ -490,92 +774,5 @@ struct OnboardingView_Previews: PreviewProvider {
     static var previews: some View {
         OnboardingView()
             .environmentObject(VaccineViewModel())
-    }
-}
-
-// MARK: - Onboarding UI building blocks
-
-private struct OnboardingHeader: View {
-    let title: String
-    let subtitle: String
-    let systemImage: String
-    let accent: Color
-    
-    var body: some View {
-        VStack(spacing: 12) {
-            ZStack {
-                Circle()
-                    .fill(Color.white.opacity(0.22))
-                    .frame(width: 92, height: 92)
-                Image(systemName: systemImage)
-                    .font(.system(size: 44, weight: .semibold))
-                    .foregroundColor(.white)
-            }
-            Text(title)
-                .font(.system(.largeTitle, design: .rounded).weight(.bold))
-                .foregroundColor(.white)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal)
-            Text(subtitle)
-                .font(.body)
-                .foregroundColor(.white.opacity(0.9))
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 28)
-        }
-    }
-}
-
-private struct OnboardingPage: View {
-    let title: String
-    let subtitle: String
-    let systemImage: String
-    let accent: Color
-    let bullets: [String]
-    
-    var body: some View {
-        VStack(spacing: 20) {
-            OnboardingHeader(title: title, subtitle: subtitle, systemImage: systemImage, accent: accent)
-                .padding(.top, 30)
-            
-            VStack(alignment: .leading, spacing: 12) {
-                ForEach(bullets, id: \.self) { text in
-                    HStack(alignment: .top, spacing: 10) {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(.white.opacity(0.95))
-                        Text(text)
-                            .foregroundColor(.white.opacity(0.95))
-                            .font(.headline)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                }
-            }
-            .padding()
-            .background(Color.white.opacity(0.18), in: RoundedRectangle(cornerRadius: 18))
-            .padding(.horizontal, 22)
-            
-            Spacer()
-        }
-    }
-}
-
-private struct OnboardingQuestionPage<Content: View>: View {
-    let title: String
-    let subtitle: String
-    let systemImage: String
-    let accent: Color
-    @ViewBuilder let content: () -> Content
-    
-    var body: some View {
-        VStack(spacing: 18) {
-            OnboardingHeader(title: title, subtitle: subtitle, systemImage: systemImage, accent: accent)
-                .padding(.top, 30)
-            
-            VStack(spacing: 12) {
-                content()
-            }
-            .padding(.horizontal, 22)
-            
-            Spacer()
-        }
     }
 }

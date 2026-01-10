@@ -9,6 +9,7 @@ import Foundation
 
 struct PaywallView: View {
     @EnvironmentObject var subscriptionManager: SubscriptionManager
+    @Environment(\.openURL) private var openURL
     @State private var selectedProductID: String = SubscriptionManager.ProductID.yearly
 
     @State private var showErrorAlert: Bool = false
@@ -92,10 +93,13 @@ struct PaywallView: View {
                             .foregroundColor(.secondary)
                         
                         HStack(spacing: 14) {
-                            Link("Privacy Policy", destination: privacyPolicyExternalURL)
-                            Link("Terms of Use (EULA)", destination: appleEULAURL)
+                            Button("Privacy Policy") { openURL(privacyPolicyExternalURL) }
+                                .buttonStyle(.plain)
+                            Button("Terms of Use (EULA)") { openURL(appleEULAURL) }
+                                .buttonStyle(.plain)
                         }
                         .font(.footnote.weight(.semibold))
+                        .foregroundColor(.blue)
                     }
                     .padding(.top, 4)
                 }

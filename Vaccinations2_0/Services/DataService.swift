@@ -16,6 +16,9 @@ class DataService {
         static let childProfile = "childProfile"
         static let vaccineRecords = "vaccineRecords"
         static let customVaccines = "customVaccines"
+        static let showOnlyMandatoryPreference = "showOnlyMandatoryPreference"
+        static let onboardingPrimaryGoal = "onboardingPrimaryGoal"
+        static let onboardingReminderDays = "onboardingReminderDays"
     }
     
     private init() {}
@@ -121,10 +124,36 @@ class DataService {
     
     // MARK: - Reset All Data
     
+    // MARK: - Onboarding Preferences
+    
+    /// Persisted user preference from onboarding/settings: show only mandatory vaccines by default.
+    var showOnlyMandatoryPreference: Bool {
+        get { userDefaults.bool(forKey: Keys.showOnlyMandatoryPreference) }
+        set { userDefaults.set(newValue, forKey: Keys.showOnlyMandatoryPreference) }
+    }
+    
+    /// Persisted onboarding goal (for future personalization).
+    var onboardingPrimaryGoal: String? {
+        get { userDefaults.string(forKey: Keys.onboardingPrimaryGoal) }
+        set { userDefaults.set(newValue, forKey: Keys.onboardingPrimaryGoal) }
+    }
+    
+    /// Persisted onboarding reminder lead time in days.
+    var onboardingReminderDays: Int {
+        get {
+            let value = userDefaults.integer(forKey: Keys.onboardingReminderDays)
+            return value == 0 ? 3 : value
+        }
+        set { userDefaults.set(newValue, forKey: Keys.onboardingReminderDays) }
+    }
+    
     func resetAllData() {
         userDefaults.removeObject(forKey: Keys.isFirstLaunch)
         userDefaults.removeObject(forKey: Keys.childProfile)
         userDefaults.removeObject(forKey: Keys.vaccineRecords)
         userDefaults.removeObject(forKey: Keys.customVaccines)
+        userDefaults.removeObject(forKey: Keys.showOnlyMandatoryPreference)
+        userDefaults.removeObject(forKey: Keys.onboardingPrimaryGoal)
+        userDefaults.removeObject(forKey: Keys.onboardingReminderDays)
     }
 }
