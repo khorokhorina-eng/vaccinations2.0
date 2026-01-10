@@ -11,7 +11,7 @@ final class SubscriptionManager: ObservableObject {
     // MARK: - Public state
 
     @Published private(set) var products: [Product] = []
-    @Published private(set) var hasPremiumAccess: Bool
+    @Published private(set) var hasPremiumAccess: Bool = false
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var lastErrorMessage: String?
 
@@ -25,22 +25,11 @@ final class SubscriptionManager: ObservableObject {
         static let all: [String] = [monthly, yearly]
     }
 
-    private enum StorageKeys {
-        static let hasPremiumAccess = "hasPremiumAccess"
-        static let promoUnlocked = "promoUnlocked"
-        static let promoCodeUsed = "promoCodeUsed"
-    }
-
-    private let promoCodeFree = "khorokho"
     private var updatesTask: Task<Void, Never>?
 
     // MARK: - Init / deinit
 
     init() {
-        let storedHasPremium = UserDefaults.standard.bool(forKey: StorageKeys.hasPremiumAccess)
-        let promoUnlocked = UserDefaults.standard.bool(forKey: StorageKeys.promoUnlocked)
-        self.hasPremiumAccess = storedHasPremium || promoUnlocked
-
         updatesTask = Task { [weak self] in
             await self?.listenForTransactionUpdates()
         }
@@ -110,28 +99,9 @@ final class SubscriptionManager: ObservableObject {
         }
     }
 
-    /// In-app promo code (not App Store promo codes). `khorokho` unlocks the app for free.
-    func applyPromoCode(_ code: String) {
-        let normalized = code.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        guard !normalized.isEmpty else { return }
-
-        if normalized == promoCodeFree {
-            UserDefaults.standard.set(true, forKey: StorageKeys.promoUnlocked)
-            UserDefaults.standard.set(normalized, forKey: StorageKeys.promoCodeUsed)
-            setPremiumAccess(true)
-        } else {
-            lastErrorMessage = NSLocalizedString("Invalid promo code", comment: "")
-        }
-    }
-
     // MARK: - Internals
 
     func refreshEntitlements() async {
-        if UserDefaults.standard.bool(forKey: StorageKeys.promoUnlocked) {
-            setPremiumAccess(true)
-            return
-        }
-
         var isActive = false
         for await result in Transaction.currentEntitlements {
             guard let transaction = try? requireVerified(result) else { continue }
@@ -153,7 +123,6 @@ final class SubscriptionManager: ObservableObject {
 
     private func setPremiumAccess(_ newValue: Bool) {
         hasPremiumAccess = newValue
-        UserDefaults.standard.set(newValue, forKey: StorageKeys.hasPremiumAccess)
     }
 
     private func requireVerified<T>(_ result: VerificationResult<T>) throws -> T {
