@@ -9,11 +9,13 @@ struct OnboardingView: View {
     @EnvironmentObject var viewModel: VaccineViewModel
     
     @State private var step: Int = 0
-    private let lastStepIndex: Int = 4
+    private let lastStepIndex: Int = 7
     
     // Onboarding answers (currently used for UX only)
     @State private var wantsReminders: Bool = true
     @State private var wantsMultipleChildren: Bool = true
+    @State private var includeRecommendedVaccines: Bool = true
+    @State private var reminderDaysBefore: Double = 7
     
     @State private var childName = ""
     @State private var birthDate = Date()
@@ -29,10 +31,13 @@ struct OnboardingView: View {
                 
                 TabView(selection: $step) {
                     welcomeStep.tag(0)
-                    remindersStep.tag(1)
-                    privacyStep.tag(2)
-                    countryStep.tag(3)
-                    profileStep.tag(4)
+                    goalsStep.tag(1)
+                    interstitialStep.tag(2)
+                    remindersStep.tag(3)
+                    reminderTimingStep.tag(4)
+                    privacyStep.tag(5)
+                    countryStep.tag(6)
+                    profileStep.tag(7)
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
                 .animation(.easeInOut, value: step)
@@ -96,7 +101,79 @@ struct OnboardingView: View {
             .toggleStyle(.switch)
             .padding()
             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+            
+            Toggle(isOn: $wantsMultipleChildren) {
+                Text(wantsMultipleChildren ? "I have (or plan) multiple children" : "Just one child")
+                    .font(.headline)
+            }
+            .toggleStyle(.switch)
+            .padding()
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
         }
+    }
+    
+    private var reminderTimingStep: some View {
+        OnboardingQuestionPage(
+            title: "Reminder timing",
+            subtitle: "How many days before a vaccine should we remind you?",
+            systemImage: "clock.badge.fill",
+            accent: .pink
+        ) {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    Text("Days before")
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                    Spacer()
+                    Text("\(Int(reminderDaysBefore))")
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                }
+                
+                Slider(value: $reminderDaysBefore, in: 1...30, step: 1)
+            }
+            .padding()
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+            .opacity(wantsReminders ? 1 : 0.55)
+            .disabled(!wantsReminders)
+        }
+    }
+    
+    private var goalsStep: some View {
+        OnboardingQuestionPage(
+            title: "What do you want to track?",
+            subtitle: "Choose what to show in your child’s schedule.",
+            systemImage: "checklist.checked",
+            accent: .indigo
+        ) {
+            VStack(alignment: .leading, spacing: 10) {
+                Toggle(isOn: $includeRecommendedVaccines) {
+                    Text(includeRecommendedVaccines ? "Mandatory + recommended vaccines" : "Mandatory vaccines only")
+                        .font(.headline)
+                }
+                .toggleStyle(.switch)
+                
+                Text("You can change this later in Settings.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            .padding()
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+        }
+    }
+    
+    private var interstitialStep: some View {
+        OnboardingPage(
+            title: "Works offline",
+            subtitle: "Schedules are stored in the app, so it works without an account or network.",
+            systemImage: "wifi.slash",
+            accent: .teal,
+            bullets: [
+                "No sign‑up required",
+                "Data stays on your device",
+                "Fast and reliable on the go"
+            ]
+        )
     }
     
     private var privacyStep: some View {
@@ -276,10 +353,16 @@ struct OnboardingView: View {
         case 0:
             gradient = LinearGradient(colors: [Color.blue, Color.purple], startPoint: .topLeading, endPoint: .bottomTrailing)
         case 1:
-            gradient = LinearGradient(colors: [Color.orange, Color.pink], startPoint: .topLeading, endPoint: .bottomTrailing)
+            gradient = LinearGradient(colors: [Color.indigo, Color.purple], startPoint: .topLeading, endPoint: .bottomTrailing)
         case 2:
-            gradient = LinearGradient(colors: [Color.green, Color.teal], startPoint: .topLeading, endPoint: .bottomTrailing)
+            gradient = LinearGradient(colors: [Color.teal, Color.blue], startPoint: .topLeading, endPoint: .bottomTrailing)
         case 3:
+            gradient = LinearGradient(colors: [Color.orange, Color.pink], startPoint: .topLeading, endPoint: .bottomTrailing)
+        case 4:
+            gradient = LinearGradient(colors: [Color.pink, Color.purple], startPoint: .topLeading, endPoint: .bottomTrailing)
+        case 5:
+            gradient = LinearGradient(colors: [Color.green, Color.teal], startPoint: .topLeading, endPoint: .bottomTrailing)
+        case 6:
             gradient = LinearGradient(colors: [Color.teal, Color.blue], startPoint: .topLeading, endPoint: .bottomTrailing)
         default:
             gradient = LinearGradient(colors: [Color.purple, Color.indigo], startPoint: .topLeading, endPoint: .bottomTrailing)

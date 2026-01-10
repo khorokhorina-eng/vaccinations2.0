@@ -12,7 +12,9 @@ struct PaywallView: View {
     @State private var selectedProductID: String = SubscriptionManager.ProductID.yearly
 
     @State private var showErrorAlert: Bool = false
-    @State private var activeLegalDoc: LegalDoc?
+
+    private let privacyPolicyExternalURL = URL(string: "https://raw.githubusercontent.com/khorokhorina-eng/vaccinations2.0/main/Vaccinations2_0/Resources/Legal/privacy-policy.md")!
+    private let appleEULAURL = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!
     
     var body: some View {
         NavigationView {
@@ -90,8 +92,8 @@ struct PaywallView: View {
                             .foregroundColor(.secondary)
                         
                         HStack(spacing: 14) {
-                            Button("Privacy Policy") { activeLegalDoc = .privacyPolicy }
-                            Button("Terms of Use (EULA)") { activeLegalDoc = .termsOfUse }
+                            Link("Privacy Policy", destination: privacyPolicyExternalURL)
+                            Link("Terms of Use (EULA)", destination: appleEULAURL)
                         }
                         .font(.footnote.weight(.semibold))
                     }
@@ -101,12 +103,6 @@ struct PaywallView: View {
                 .padding(.bottom, 24)
             }
             .navigationBarHidden(true)
-            .sheet(item: $activeLegalDoc) { doc in
-                NavigationView {
-                    LegalDocumentView(doc: doc)
-                }
-                .navigationViewStyle(StackNavigationViewStyle())
-            }
             .onAppear {
                 if subscriptionManager.products.isEmpty {
                     Task { await subscriptionManager.loadProducts() }
@@ -197,118 +193,6 @@ struct PaywallView: View {
     private func purchaseSelected() async {
         guard let product = selectedProduct else { return }
         await subscriptionManager.purchase(product: product)
-    }
-}
-
-private enum LegalDoc: String, Identifiable {
-    case privacyPolicy
-    case termsOfUse
-    
-    var id: String { rawValue }
-    
-    var title: String {
-        switch self {
-        case .privacyPolicy: return "Privacy Policy"
-        case .termsOfUse: return "Terms of Use (EULA)"
-        }
-    }
-    
-    var fileBaseName: String {
-        switch self {
-        case .privacyPolicy: return "privacy-policy"
-        case .termsOfUse: return "terms-of-use"
-        }
-    }
-    
-    var embeddedMarkdown: String {
-        switch self {
-        case .privacyPolicy:
-            return """
-            # Privacy Policy
-            
-            Last updated: 2026-01-10
-            
-            This Privacy Policy describes how **CareVax** (the “App”) handles information when you use the App.
-            
-            ## Data We Store
-            
-            The App stores information **locally on your device** (for example, child profiles and vaccination records you enter).
-            
-            ## Purchases
-            
-            If you purchase a subscription, purchases are processed by Apple using StoreKit. The App does not collect your payment information.
-            
-            ## Contact
-            
-            For support, contact the developer via the support email listed on the App Store product page.
-            """
-            
-        case .termsOfUse:
-            return """
-            # Terms of Use (EULA)
-            
-            Last updated: 2026-01-10
-            
-            These Terms of Use apply to **CareVax** (the “App”).
-            
-            ## Apple Standard EULA
-            
-            Apple’s Standard EULA: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
-            
-            ## Subscription
-            
-            The App may offer auto-renewable subscriptions. Subscription terms are shown in the App at the time of purchase and are provided by the App Store.
-            """
-        }
-    }
-}
-
-private struct LegalDocumentView: View {
-    let doc: LegalDoc
-    
-    var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 12) {
-                if doc == .termsOfUse, let url = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/") {
-                    Link("Apple Standard EULA", destination: url)
-                        .font(.footnote.weight(.semibold))
-                }
-                
-                Text(renderedText)
-                    .font(.footnote)
-                    .foregroundColor(.primary)
-                    .textSelection(.enabled)
-            }
-            .padding()
-        }
-        .navigationTitle(doc.title)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .cancellationAction) {
-                Button("Done") {
-                    // Sheet is dismissed by the system via swipe down; this button is a convenience.
-                    // The parent sheet uses `.sheet(item:)`, so there's no direct binding here.
-                    // Using `dismiss` keeps it simple and avoids external dependencies.
-                    dismiss()
-                }
-            }
-        }
-    }
-    
-    @Environment(\.dismiss) private var dismiss
-    
-    private var renderedText: AttributedString {
-        let markdown = loadMarkdownString() ?? doc.embeddedMarkdown
-        return (try? AttributedString(markdown: markdown)) ?? AttributedString(markdown)
-    }
-    
-    private func loadMarkdownString() -> String? {
-        // Try a couple of locations to be resilient to Xcode bundle structure.
-        if let url = Bundle.main.url(forResource: doc.fileBaseName, withExtension: "md", subdirectory: "Legal") ??
-            Bundle.main.url(forResource: doc.fileBaseName, withExtension: "md") {
-            return try? String(contentsOf: url, encoding: .utf8)
-        }
-        return nil
     }
 }
 
