@@ -76,6 +76,8 @@ struct CountrySelectionView: View {
             }
             .navigationBarHidden(true)
         }
+        // iPad: prevent split-view with empty detail column.
+        .navigationViewStyle(StackNavigationViewStyle())
     }
     
     private func selectCountry(_ country: Country) {

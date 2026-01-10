@@ -82,6 +82,8 @@ struct VaccineDetailView: View {
                 loadRecord()
             }
         }
+        // iPad: prevent split-view with empty detail column.
+        .navigationViewStyle(StackNavigationViewStyle())
     }
     
     // MARK: - Sections

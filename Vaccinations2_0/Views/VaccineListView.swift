@@ -97,6 +97,8 @@ struct VaccineListView: View {
                 Text(viewModel.loadingError?.errorDescription ?? "An error occurred")
             }
         }
+        // iPad: prevent split-view with empty detail column.
+        .navigationViewStyle(StackNavigationViewStyle())
     }
     
     // MARK: - Loading Overlay
@@ -304,6 +306,8 @@ struct VaccineListView: View {
                 }
             }
         }
+        // iPad: prevent split-view with empty detail column.
+        .navigationViewStyle(StackNavigationViewStyle())
     }
     
     private var dateFormatter: DateFormatter {

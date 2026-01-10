@@ -61,6 +61,8 @@ struct AddVaccineView: View {
                 )
             }
         }
+        // iPad: prevent split-view with empty detail column.
+        .navigationViewStyle(StackNavigationViewStyle())
     }
     
     // MARK: - Recommended Vaccines View

@@ -127,6 +127,8 @@ struct PaywallView: View {
                 Text(subscriptionManager.lastErrorMessage ?? "Unknown error")
             }
         }
+        // iPad: prevent split-view with empty detail column.
+        .navigationViewStyle(StackNavigationViewStyle())
     }
 
     private var displayProducts: [Product] {

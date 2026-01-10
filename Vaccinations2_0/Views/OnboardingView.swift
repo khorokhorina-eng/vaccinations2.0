@@ -145,6 +145,8 @@ struct OnboardingView: View {
                 }
             }
         }
+        // iPad: prevent split-view with empty detail column.
+        .navigationViewStyle(StackNavigationViewStyle())
         .sheet(isPresented: $showCountrySelection) {
             CountrySelectionSheet(selectedCountry: $selectedCountry)
         }
@@ -225,6 +227,8 @@ struct CountrySelectionSheet: View {
                 }
             }
         }
+        // iPad: force single-column navigation style.
+        .navigationViewStyle(StackNavigationViewStyle())
     }
 }
 
