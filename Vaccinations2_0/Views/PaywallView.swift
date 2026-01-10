@@ -5,18 +5,15 @@
 
 import SwiftUI
 import StoreKit
+import Foundation
 
 struct PaywallView: View {
     @EnvironmentObject var subscriptionManager: SubscriptionManager
     @State private var selectedProductID: String = SubscriptionManager.ProductID.yearly
 
     @State private var showErrorAlert: Bool = false
+    @State private var activeLegalDoc: LegalDoc?
     
-    // NOTE: These URLs must be functional in the submitted binary (Guideline 3.1.2).
-    // They will work once the files are available on the default branch (e.g. main).
-    private let privacyPolicyURL = URL(string: "https://raw.githubusercontent.com/khorokhorina-eng/vaccinations2.0/main/Vaccinations2_0/Resources/Legal/privacy-policy.md")!
-    private let termsOfUseURL = URL(string: "https://raw.githubusercontent.com/khorokhorina-eng/vaccinations2.0/main/Vaccinations2_0/Resources/Legal/terms-of-use.md")!
-
     var body: some View {
         NavigationView {
             ScrollView {
@@ -93,8 +90,8 @@ struct PaywallView: View {
                             .foregroundColor(.secondary)
                         
                         HStack(spacing: 14) {
-                            Link("Privacy Policy", destination: privacyPolicyURL)
-                            Link("Terms of Use (EULA)", destination: termsOfUseURL)
+                            Button("Privacy Policy") { activeLegalDoc = .privacyPolicy }
+                            Button("Terms of Use (EULA)") { activeLegalDoc = .termsOfUse }
                         }
                         .font(.footnote.weight(.semibold))
                     }
@@ -104,6 +101,11 @@ struct PaywallView: View {
                 .padding(.bottom, 24)
             }
             .navigationBarHidden(true)
+            .sheet(item: $activeLegalDoc) { doc in
+                NavigationView {
+                    LegalDocumentView(doc: doc)
+                }
+            }
             .onAppear {
                 if subscriptionManager.products.isEmpty {
                     Task { await subscriptionManager.loadProducts() }
@@ -192,6 +194,80 @@ struct PaywallView: View {
     private func purchaseSelected() async {
         guard let product = selectedProduct else { return }
         await subscriptionManager.purchase(product: product)
+    }
+}
+
+private enum LegalDoc: String, Identifiable {
+    case privacyPolicy
+    case termsOfUse
+    
+    var id: String { rawValue }
+    
+    var title: String {
+        switch self {
+        case .privacyPolicy: return "Privacy Policy"
+        case .termsOfUse: return "Terms of Use (EULA)"
+        }
+    }
+    
+    var fileBaseName: String {
+        switch self {
+        case .privacyPolicy: return "privacy-policy"
+        case .termsOfUse: return "terms-of-use"
+        }
+    }
+}
+
+private struct LegalDocumentView: View {
+    let doc: LegalDoc
+    
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 12) {
+                if let attributed = loadMarkdownAttributedString() {
+                    Text(attributed)
+                        .font(.footnote)
+                        .foregroundColor(.primary)
+                } else if let plain = loadMarkdownString() {
+                    Text(plain)
+                        .font(.footnote)
+                        .foregroundColor(.primary)
+                } else {
+                    Text("Unable to load \(doc.title).")
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+                }
+            }
+            .padding()
+        }
+        .navigationTitle(doc.title)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Done") {
+                    // Sheet is dismissed by the system via swipe down; this button is a convenience.
+                    // The parent sheet uses `.sheet(item:)`, so there's no direct binding here.
+                    // Using `dismiss` keeps it simple and avoids external dependencies.
+                    dismiss()
+                }
+            }
+        }
+    }
+    
+    @Environment(\.dismiss) private var dismiss
+    
+    private func loadMarkdownAttributedString() -> AttributedString? {
+        guard let markdown = loadMarkdownString() else { return nil }
+        return try? AttributedString(markdown: markdown)
+    }
+    
+    private func loadMarkdownString() -> String? {
+        // Try a couple of locations to be resilient to Xcode bundle structure.
+        if let url = Bundle.main.url(forResource: doc.fileBaseName, withExtension: "md", subdirectory: "Legal") ??
+            Bundle.main.url(forResource: doc.fileBaseName, withExtension: "md") {
+            return try? String(contentsOf: url, encoding: .utf8)
+        }
+        return nil
     }
 }
 
